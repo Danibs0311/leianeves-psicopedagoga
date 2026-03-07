@@ -35,7 +35,7 @@ export const ProfessionalProfile: React.FC = () => {
               </p>
               <ul className="space-y-3 mt-6">
                 {[
-                  "Especialista em Neuropsicopedagogia Clínica",
+                  "Especialista em Neuropsicopedagogia Institucional",
                   "Expert em Intervenção no Autismo e TDAH",
                   "Foco em Alfabetização Baseada na Ciência da Leitura",
                   "Orientação Parental e Consultoria Educacional"

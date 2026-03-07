@@ -3,40 +3,26 @@ import { supabase } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
 
 export const AdminLogin: React.FC = () => {
-    const [isLoginMode, setIsLoginMode] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);
     const [loginError, setLoginError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    const handleAuth = async (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoginLoading(true);
         setLoginError(null);
-        setSuccessMessage(null);
 
         try {
-            if (isLoginMode) {
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
-                if (error) throw error;
-            } else {
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                });
-                if (error) throw error;
-                if (data.user) {
-                    setSuccessMessage('Conta criada com sucesso! Você já pode entrar.');
-                    setIsLoginMode(true);
-                }
-            }
-        } catch (error: any) {
-            console.error('Auth error:', error);
-            setLoginError(error.message || 'Falha na autenticação. Verifique os dados.');
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) throw error;
+        } catch (error) {
+            console.error('Login error:', error);
+            setLoginError('Falha ao entrar. Verifique suas credenciais.');
         } finally {
             setLoginLoading(false);
         }
@@ -45,14 +31,7 @@ export const AdminLogin: React.FC = () => {
     return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
             <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-                <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">
-                    {isLoginMode ? 'Área Administrativa' : 'Criar Conta Mestre'}
-                </h1>
-                {!isLoginMode && (
-                    <p className="text-center text-sm text-amber-600 font-medium mb-6">
-                        Atenção: Cadastre seu e-mail e senha de acesso seguro agora.
-                    </p>
-                )}
+                <h1 className="text-2xl font-bold text-slate-800 mb-6 text-center">Área Administrativa</h1>
 
                 {loginError && (
                     <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center">
@@ -60,13 +39,7 @@ export const AdminLogin: React.FC = () => {
                     </div>
                 )}
 
-                {successMessage && (
-                    <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm text-center font-medium">
-                        {successMessage}
-                    </div>
-                )}
-
-                <form onSubmit={handleAuth} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">E-mail</label>
                         <input
@@ -92,24 +65,12 @@ export const AdminLogin: React.FC = () => {
                     <button
                         type="submit"
                         disabled={loginLoading}
-                        className={`w-full text-white py-2 rounded-lg font-bold transition-colors disabled:opacity-70 flex justify-center ${isLoginMode ? 'bg-sky-600 hover:bg-sky-700' : 'bg-green-600 hover:bg-green-700'}`}
+                        className="w-full bg-sky-600 text-white py-2 rounded-lg font-bold hover:bg-sky-700 transition-colors disabled:opacity-70 flex justify-center"
                     >
-                        {loginLoading ? 'Carregando...' : isLoginMode ? 'Entrar' : 'Criar Conta Agora'}
+                        {loginLoading ? 'Entrando...' : 'Entrar'}
                     </button>
-
-                    <div className="text-center pt-4 border-t border-slate-100 mt-4 space-y-2 flex flex-col">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsLoginMode(!isLoginMode);
-                                setLoginError(null);
-                                setSuccessMessage(null);
-                            }}
-                            className="text-sm text-sky-600 font-medium hover:underline"
-                        >
-                            {isLoginMode ? 'Primeiro acesso? Crie sua conta master aqui' : 'Já tem conta? Fazer Login'}
-                        </button>
-                        <Link to="/" className="text-sm text-slate-500 hover:text-slate-800 pt-2 inline-block">Voltar para o site</Link>
+                    <div className="text-center pt-2">
+                        <Link to="/" className="text-sm text-slate-500 hover:text-sky-600">Voltar para o site</Link>
                     </div>
                 </form>
             </div>

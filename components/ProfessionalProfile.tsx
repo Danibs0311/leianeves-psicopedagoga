@@ -1,6 +1,6 @@
 
 import React from 'react';
-import profileImage from '../images/rf7qvvtb.png';
+import profileImage from '../images/leia_psicoped.webp';
 
 export const ProfessionalProfile: React.FC = () => {
   return (

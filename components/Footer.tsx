@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export const Footer: React.FC = () => {
   return (
@@ -38,10 +39,10 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="font-bold text-slate-900 mb-6 uppercase text-sm tracking-widest">Links Rápidos</h4>
             <ul className="space-y-4 text-slate-600">
-              <li><a href="#sobre" className="hover:text-sky-600 transition-colors">Sobre a Léia</a></li>
-              <li><a href="#metodo" className="hover:text-sky-600 transition-colors">Como funciona</a></li>
-              <li><a href="#beneficios" className="hover:text-sky-600 transition-colors">Benefícios</a></li>
-              <li><a href="/materiais" className="hover:text-sky-600 transition-colors">Materiais</a></li>
+              <li><a href="/#sobre" className="hover:text-sky-600 transition-colors">Sobre a Léia</a></li>
+              <li><a href="/#metodo" className="hover:text-sky-600 transition-colors">Como funciona</a></li>
+              <li><a href="/#beneficios" className="hover:text-sky-600 transition-colors">Benefícios</a></li>
+              <li><Link to="/materiais" className="hover:text-sky-600 transition-colors">Materiais</Link></li>
               <li><a href="https://wa.me/5575983507283" className="hover:text-sky-600 transition-colors">Contato</a></li>
             </ul>
           </div>

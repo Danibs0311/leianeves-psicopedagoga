@@ -3,8 +3,8 @@ import { supabase } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
 
 export const AdminLogin: React.FC = () => {
-    // START IN SIGNUP MODE TO FORCE USER TO CREATE ACCOUNT FIRST
-    const [isLoginMode, setIsLoginMode] = useState(false);
+    // START IN LOGIN MODE BY DEFAULT
+    const [isLoginMode, setIsLoginMode] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);

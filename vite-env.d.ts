@@ -1,4 +1,11 @@
 /// <reference types="vite/client" />
+/// <reference types="react" />
+
+declare namespace JSX {
+    interface IntrinsicElements {
+        [elemName: string]: any;
+    }
+}
 
 declare module '*.png' {
     const value: string;

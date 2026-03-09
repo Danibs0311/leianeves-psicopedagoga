@@ -22,12 +22,19 @@ const schedulingSchema = z.object({
         .min(10, 'Telefone inválido')
         .regex(/^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})\-?(\d{4}))$/, 'Formato inválido. Use (DD) 99999-9999'),
     concern: z.string().min(10, 'Descreva brevemente a queixa ou motivo do agendamento'),
+    // Date and time validation
     date: z.string().refine((val) => {
         const selectedDate = new Date(val + 'T00:00:00');
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return selectedDate >= today;
-    }, 'A data não pode ser anterior a hoje'),
+    }, 'A data não pode ser anterior a hoje')
+        .refine((val) => {
+            const selectedDate = new Date(val + 'T00:00:00');
+            const dayOfWeek = selectedDate.getDay();
+            // Permitir APENAS sábados (6)
+            return dayOfWeek === 6;
+        }, 'Atendimentos ocorrem apenas aos Sábados'),
     time: z.string().min(1, 'Selecione um horário'),
 }).refine((data) => {
     // Validar se data é hoje, o horário já passou
@@ -117,10 +124,12 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
         }
     };
 
-    // Horários disponíveis mockados (serão substituídos pela integração)
+    // Data mínima permitida (hoje) no formato YYYY-MM-DD
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Horários disponíveis limitados (Sábados, 09h às 11h e 14h às 16h)
     const availableTimes = [
-        "08:00", "09:00", "10:00", "11:00",
-        "13:00", "14:00", "15:00", "16:00", "17:00"
+        "09:00", "10:00", "11:00", "14:00", "15:00", "16:00"
     ];
 
     return (
@@ -218,6 +227,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                     <input
                         {...register('date')}
                         type="date"
+                        min={todayStr}
                         className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
                     />
                     {errors.date && <span className="text-xs text-red-500">{errors.date.message}</span>}

@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Calendar, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, Loader2, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 
 // Schema de validação
 const schedulingSchema = z.object({
@@ -66,10 +66,15 @@ interface SchedulingFormProps {
 export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCancel }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const [bookedTimes, setBookedTimes] = useState<string[]>([]);
+    const [isFetchingTimes, setIsFetchingTimes] = useState(false);
 
     const {
         register,
         handleSubmit,
+        watch,
+        setValue,
+        clearErrors,
         formState: { errors },
     } = useForm<SchedulingData>({
         resolver: zodResolver(schedulingSchema),
@@ -85,6 +90,51 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
             time: ''
         }
     });
+
+    const watchedDate = watch('date');
+    const selectedTime = watch('time');
+
+    useEffect(() => {
+        const fetchBookedTimes = async () => {
+            if (!watchedDate) {
+                setBookedTimes([]);
+                return;
+            }
+
+            setIsFetchingTimes(true);
+            try {
+                // Fetch all appointments for the selected date
+                // We consider anything not 'cancelled' or 'rejected' as taking up the slot
+                const { data, error } = await supabase
+                    .from('appointments')
+                    .select('preferred_time, status')
+                    .eq('preferred_date', watchedDate);
+
+                if (error) {
+                    console.error('Erro ao buscar horários:', error);
+                    return;
+                }
+
+                // Filter out cancelled/rejected ones and map to times
+                const booked = data
+                    .filter(app => app.status !== 'cancelled' && app.status !== 'rejected')
+                    .map(app => app.preferred_time.substring(0, 5)); // ensure HH:mm format
+
+                setBookedTimes(booked);
+
+                // If the currently selected time just became booked, clear the selection
+                if (selectedTime && booked.includes(selectedTime)) {
+                    setValue('time', '', { shouldValidate: true });
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setIsFetchingTimes(false);
+            }
+        };
+
+        fetchBookedTimes();
+    }, [watchedDate]);
 
     const onSubmit = async (data: SchedulingData) => {
         setIsSubmitting(true);
@@ -131,6 +181,13 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
     const availableTimes = [
         "09:00", "10:00", "11:00", "14:00", "15:00", "16:00"
     ];
+
+    const handleTimeSelect = (time: string) => {
+        if (!bookedTimes.includes(time)) {
+            setValue('time', time);
+            clearErrors('time');
+        }
+    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -234,19 +291,64 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-2">
-                        <Clock size={16} /> Horário
+                    <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center justify-between">
+                        <span className="flex items-center gap-2"><Clock size={16} /> Horário</span>
+                        {isFetchingTimes && <Loader2 size={14} className="animate-spin text-sky-600" />}
                     </label>
-                    <select
-                        {...register('time')}
-                        className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all bg-white"
-                    >
-                        <option value="">Selecione...</option>
-                        {availableTimes.map(time => (
-                            <option key={time} value={time}>{time}</option>
-                        ))}
-                    </select>
-                    {errors.time && <span className="text-xs text-red-500">{errors.time.message}</span>}
+
+                    {watchedDate ? (
+                        <div className="space-y-3">
+                            <div className="grid grid-cols-3 gap-2">
+                                {availableTimes.map(time => {
+                                    const isBooked = bookedTimes.includes(time);
+                                    const isSelected = selectedTime === time;
+
+                                    return (
+                                        <button
+                                            key={time}
+                                            type="button"
+                                            disabled={isBooked}
+                                            onClick={() => handleTimeSelect(time)}
+                                            className={`
+                                                relative flex items-center justify-center py-2 px-1 rounded-lg border text-sm font-medium transition-all
+                                                ${isBooked
+                                                    ? 'bg-red-50 border-red-200 text-red-400 cursor-not-allowed'
+                                                    : isSelected
+                                                        ? 'bg-sky-600 border-sky-600 text-white shadow-md'
+                                                        : 'bg-white border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300'
+                                                }
+                                            `}
+                                        >
+                                            {isBooked ? (
+                                                <span className="flex items-center gap-1"><XCircle size={14} /> {time}</span>
+                                            ) : (
+                                                <span className="flex items-center gap-1">
+                                                    {isSelected ? <CheckCircle2 size={14} /> : <div className="w-2 h-2 rounded-full bg-green-500 mr-1" />}
+                                                    {time}
+                                                </span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Legenda */}
+                            <div className="flex items-center justify-center gap-4 text-xs text-slate-500 bg-slate-50 p-2 rounded-md border border-slate-100">
+                                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500" /> Livre</span>
+                                <span className="flex items-center gap-1"><XCircle size={10} className="text-red-400" /> Ocupado</span>
+                                <span className="flex items-center gap-1"><CheckCircle2 size={10} className="text-sky-600" /> Selecionado</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="h-[100px] flex items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-slate-400 text-sm italic">
+                            Selecione uma data primeiro
+                        </div>
+                    )}
+
+                    {/* Input hidden só para o react-hook-form registrar o valor final */}
+                    <input type="hidden" {...register('time')} />
+
+                    {errors.time && <span className="text-xs text-red-500 inline-block mt-1">{errors.time.message}</span>}
                 </div>
             </div>
 

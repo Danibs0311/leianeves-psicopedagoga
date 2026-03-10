@@ -14,6 +14,21 @@ const DAYS_OF_WEEK = [
     { id: 6, name: 'Sábado' },
 ];
 
+const MONTHS_OF_YEAR = [
+    { id: 0, name: 'Jan' },
+    { id: 1, name: 'Fev' },
+    { id: 2, name: 'Mar' },
+    { id: 3, name: 'Abr' },
+    { id: 4, name: 'Mai' },
+    { id: 5, name: 'Jun' },
+    { id: 6, name: 'Jul' },
+    { id: 7, name: 'Ago' },
+    { id: 8, name: 'Set' },
+    { id: 9, name: 'Out' },
+    { id: 10, name: 'Nov' },
+    { id: 11, name: 'Dez' },
+];
+
 export const AdminSettings: React.FC = () => {
     const { user } = useAuth();
 
@@ -25,6 +40,7 @@ export const AdminSettings: React.FC = () => {
 
     // Data state
     const [availableDays, setAvailableDays] = useState<number[]>([]);
+    const [availableMonths, setAvailableMonths] = useState<number[]>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     const [availableTimes, setAvailableTimes] = useState<string[]>([]);
     const [newTime, setNewTime] = useState('');
 
@@ -46,6 +62,7 @@ export const AdminSettings: React.FC = () => {
                     throw error;
             } else if (data) {
                 setAvailableDays(data.available_days || []);
+                setAvailableMonths(data.available_months || [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
                 setAvailableTimes(data.available_times || []);
             }
         } catch (error) {
@@ -62,12 +79,12 @@ export const AdminSettings: React.FC = () => {
             setSuccessMessage('');
             setErrorMessage('');
 
-            // Upsert the settings
             const { error } = await supabase
                 .from('business_settings')
                 .upsert({
                     id: 1,
                     available_days: availableDays,
+                    available_months: availableMonths,
                     available_times: availableTimes.sort() // keep times sorted
                 });
 
@@ -87,6 +104,14 @@ export const AdminSettings: React.FC = () => {
             prev.includes(dayId)
                 ? prev.filter(id => id !== dayId)
                 : [...prev, dayId].sort()
+        );
+    };
+
+    const toggleMonth = (monthId: number) => {
+        setAvailableMonths(prev =>
+            prev.includes(monthId)
+                ? prev.filter(id => id !== monthId)
+                : [...prev, monthId].sort((a, b) => a - b)
         );
     };
 
@@ -193,11 +218,33 @@ export const AdminSettings: React.FC = () => {
                                         key={day.id}
                                         onClick={() => toggleDay(day.id)}
                                         className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${isSelected
-                                                ? 'bg-purple-100 border-purple-200 text-purple-700'
-                                                : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                                            ? 'bg-purple-100 border-purple-200 text-purple-700'
+                                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
                                             }`}
                                     >
                                         {day.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Months of year */}
+                    <div className="mb-6">
+                        <label className="block text-sm font-bold text-slate-700 mb-3">Meses de Atendimento no Ano</label>
+                        <div className="flex flex-wrap gap-2">
+                            {MONTHS_OF_YEAR.map(month => {
+                                const isSelected = availableMonths.includes(month.id);
+                                return (
+                                    <button
+                                        key={month.id}
+                                        onClick={() => toggleMonth(month.id)}
+                                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${isSelected
+                                            ? 'bg-sky-100 border-sky-200 text-sky-700'
+                                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                                            }`}
+                                    >
+                                        {month.name}
                                     </button>
                                 );
                             })}

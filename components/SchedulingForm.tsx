@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Calendar, Clock, Loader2, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Loader2, AlertCircle, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Schema base sem a validação dinâmica de dia, pois faremos isso no superRefine ou no component
 const baseSchedulingSchema = z.object({
@@ -41,7 +41,11 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
     // Configurações dinâmicas
     const [isLoadingSettings, setIsLoadingSettings] = useState(true);
     const [availableDays, setAvailableDays] = useState<number[]>([6]); // default Sabado
+    const [availableMonths, setAvailableMonths] = useState<number[]>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     const [availableTimes, setAvailableTimes] = useState<string[]>([]);
+
+    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
@@ -54,8 +58,15 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
         if (data.date) {
             const selectedDate = new Date(data.date + 'T00:00:00');
             const dayOfWeek = selectedDate.getDay();
+            const monthOfYear = selectedDate.getMonth();
 
-            if (!availableDays.includes(dayOfWeek)) {
+            if (!availableMonths.includes(monthOfYear)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "A clínica não atende neste mês.",
+                    path: ["date"]
+                });
+            } else if (!availableDays.includes(dayOfWeek)) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: "A clínica não atende neste dia da semana.",
@@ -125,6 +136,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
 
                 if (data) {
                     setAvailableDays(data.available_days || [6]); // Fallback Sabado
+                    setAvailableMonths(data.available_months || [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
                     setAvailableTimes(data.available_times || []);
                 }
             } catch (err) {
@@ -269,6 +281,82 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
 
     const todayStr = new Date().toISOString().split('T')[0];
 
+    // Calendar Functions
+    const handlePrevMonth = () => {
+        if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear(currentYear - 1); }
+        else { setCurrentMonth(currentMonth - 1); }
+    };
+    const handleNextMonth = () => {
+        if (currentMonth === 11) { setCurrentMonth(0); setCurrentYear(currentYear + 1); }
+        else { setCurrentMonth(currentMonth + 1); }
+    };
+
+    const renderCalendar = () => {
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const blanks = Array(firstDay).fill(null);
+        const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+        const isMonthAvailable = availableMonths.includes(currentMonth);
+        const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+        return (
+            <div className="border border-slate-200 rounded-xl p-4 bg-white shadow-sm mt-2">
+                <div className="flex justify-between items-center mb-4">
+                    <button type="button" onClick={handlePrevMonth} className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600"><ChevronLeft size={18} /></button>
+                    <div className="font-bold text-slate-800">{monthNames[currentMonth]} {currentYear}</div>
+                    <button type="button" onClick={handleNextMonth} className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600"><ChevronRight size={18} /></button>
+                </div>
+                <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 mb-2">
+                    <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                </div>
+                <div className="grid grid-cols-7 gap-1">
+                    {blanks.map((_, i) => <div key={`blank-${i}`} className="p-2"></div>)}
+                    {days.map(day => {
+                        const dateObj = new Date(currentYear, currentMonth, day);
+                        const dayOfWeek = dateObj.getDay();
+
+                        const dateObjNormalized = new Date(currentYear, currentMonth, day);
+                        dateObjNormalized.setHours(0, 0, 0, 0);
+                        const todayNormalized = new Date();
+                        todayNormalized.setHours(0, 0, 0, 0);
+
+                        const isToday = todayNormalized.getTime() === dateObjNormalized.getTime();
+                        const isPast = dateObjNormalized.getTime() < todayNormalized.getTime();
+
+                        const isAvailable = isMonthAvailable && availableDays.includes(dayOfWeek) && !isPast;
+                        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        const isSelected = watchedDate === dateStr;
+
+                        return (
+                            <button
+                                key={day}
+                                type="button"
+                                disabled={!isAvailable}
+                                onClick={() => { setValue('date', dateStr); clearErrors('date'); setValue('time', ''); }}
+                                className={`
+                                    relative p-2 h-12 rounded-lg flex flex-col items-center justify-center transition-all border
+                                    ${isSelected ? 'bg-sky-600 text-white border-sky-600 shadow-md scale-105 z-10' : 'bg-white hover:bg-slate-50 text-slate-700 border-transparent'}
+                                    ${!isAvailable ? 'opacity-40 cursor-not-allowed bg-slate-50' : 'cursor-pointer hover:border-slate-200'}
+                                    ${isToday && !isSelected ? 'border-sky-200 font-bold text-sky-700 bg-sky-50/50' : ''}
+                                `}
+                            >
+                                <span className={`text-sm ${isSelected ? 'font-bold' : ''}`}>{day}</span>
+                                <div className="mt-1 absolute bottom-1.5 flex justify-center w-full">
+                                    {isAvailable ? (
+                                        <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-green-500'}`}></div>
+                                    ) : (
+                                        <XCircle size={10} className={isSelected ? "text-white opacity-50" : "text-red-400/50"} />
+                                    )}
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    };
+
     const handleTimeSelect = (time: string) => {
         if (!bookedTimes.includes(time)) {
             setValue('time', time);
@@ -375,15 +463,12 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-2">
-                        <Calendar size={16} /> Data Preferencial
+                        <CalendarIcon size={16} /> Selecione o Dia
                     </label>
-                    <input
-                        {...register('date')}
-                        type="date"
-                        min={todayStr}
-                        className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
-                    />
-                    {errors.date && <span className="text-xs text-red-500">{errors.date.message}</span>}
+                    {renderCalendar()}
+                    {/* Render input hidden to keep form validation working */}
+                    <input type="hidden" {...register('date')} />
+                    {errors.date && <span className="text-xs text-red-500 mt-1 block">{errors.date.message}</span>}
                 </div>
 
                 <div>

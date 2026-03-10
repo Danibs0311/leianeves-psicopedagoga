@@ -75,6 +75,15 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
         setPatients(prev => prev.filter(p => p.id !== id));
 
         try {
+            const { error: apptError } = await supabase
+                .from('appointments')
+                .delete()
+                .eq('patient_id', id);
+
+            if (apptError) {
+                console.warn('Could not delete appointments, continuing with patient deletion:', apptError);
+            }
+
             const { error } = await supabase
                 .from('patients')
                 .delete()

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Calendar, Clock, Phone, Mail, User, CheckCircle, XCircle, Search, Filter } from 'lucide-react';
+import { Calendar, Clock, Phone, Mail, User, CheckCircle, XCircle, Search, Filter, Trash2 } from 'lucide-react';
 
 interface Appointment {
     id: number;
@@ -69,6 +69,24 @@ export const AdminAppointments: React.FC = () => {
         } catch (error) {
             console.error('Error updating status:', error);
             alert('Erro ao atualizar status');
+        }
+    };
+
+    const deleteAppointment = async (id: number) => {
+        if (!window.confirm('Tem certeza que deseja excluir este agendamento? Esta ação não pode ser desfeita.')) return;
+
+        try {
+            const { error } = await supabase
+                .from('appointments')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            setAppointments(appointments.filter(app => app.id !== id));
+        } catch (error) {
+            console.error('Error deleting appointment:', error);
+            alert('Erro ao excluir agendamento');
         }
     };
 
@@ -370,11 +388,17 @@ export const AdminAppointments: React.FC = () => {
                                     {(app.status === 'cancelled' || app.status === 'completed') && (
                                         <button
                                             onClick={() => updateStatus(app.id, 'pending')}
-                                            className="w-full text-center text-slate-400 hover:text-sky-600 text-xs underline decoration-dotted"
+                                            className="w-full text-center text-slate-400 hover:text-sky-600 text-xs underline decoration-dotted mb-2"
                                         >
                                             Reabrir
                                         </button>
                                     )}
+                                    <button
+                                        onClick={() => deleteAppointment(app.id)}
+                                        className="w-full lg:flex-none flex items-center justify-center gap-2 px-4 py-2 mt-auto text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors text-xs border border-transparent hover:border-red-100"
+                                    >
+                                        <Trash2 size={14} /> Excluir
+                                    </button>
                                 </div>
                             </div>
                         </div>

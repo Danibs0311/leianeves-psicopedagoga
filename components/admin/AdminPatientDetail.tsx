@@ -258,11 +258,18 @@ ${SIGNATURE}
     }
 ];
 
+interface PatientAnamnesis {
+    id: number;
+    created_at: string;
+    answers: Record<string, any>;
+}
+
 export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientId, onBack }) => {
     const [patient, setPatient] = useState<Patient | null>(null);
     const [documents, setDocuments] = useState<PatientDocument[]>([]);
+    const [anamnesis, setAnamnesis] = useState<PatientAnamnesis | null>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'history'>('info');
+    const [activeTab, setActiveTab] = useState<'info' | 'anamnesis' | 'docs' | 'history'>('info');
     const [appointments, setAppointments] = useState<any[]>([]);
     const [templates, setTemplates] = useState<DocumentTemplate[]>(DEFAULT_TEMPLATES);
     const [clinicalRecords, setClinicalRecords] = useState<ClinicalRecord[]>([]);
@@ -304,6 +311,17 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
             if (patientError) throw patientError;
             setPatient(patientData);
+
+            // Fetch Anamnesis
+            const { data: anamnesisData } = await supabase
+                .from('patient_anamnesis')
+                .select('*')
+                .eq('patient_id', patientId)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            if (anamnesisData) setAnamnesis(anamnesisData);
 
             const { data: docsData } = await supabase
                 .from('patient_documents')
@@ -394,7 +412,6 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
             alert('Erro ao salvar documento. Verifique a conexão ou se a tabela existe.');
         }
     };
-    // Custom Toolbar Logic removed layout in favor of react-simple-wysiwyg
 
     if (loading) {
         return (
@@ -492,29 +509,39 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                 </button>
                 <div>
                     <h2 className="text-2xl font-bold text-slate-800">{patient.child_name}</h2>
-                    <p className="text-slate-500 text-sm">Prontuário Digital</p>
+                    <p className="text-slate-500 text-sm">
+                        Prontuário Digital
+                    </p>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 border-b border-slate-200 mb-6">
+            <div className="flex gap-2 border-b border-slate-200 mb-6 overflow-x-auto pb-1">
                 <button
                     onClick={() => setActiveTab('info')}
-                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 
+                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap
                     ${activeTab === 'info' ? 'border-sky-600 text-sky-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
                 >
                     Informações Gerais
                 </button>
                 <button
+                    onClick={() => setActiveTab('anamnesis')}
+                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap flex items-center gap-2
+                    ${activeTab === 'anamnesis' ? 'border-sky-600 text-sky-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                >
+                    <List size={16} /> Triagem / Anamnese
+                    {anamnesis && <span className="bg-sky-100 text-sky-600 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">1</span>}
+                </button>
+                <button
                     onClick={() => setActiveTab('docs')}
-                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 
+                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap
                     ${activeTab === 'docs' ? 'border-sky-600 text-sky-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
                 >
                     Documentos
                 </button>
                 <button
                     onClick={() => setActiveTab('history')}
-                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2
+                    className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap
                     ${activeTab === 'history' ? 'border-sky-600 text-sky-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
                 >
                     Histórico de Sessões
@@ -574,6 +601,135 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                             {patient.notes || 'Nenhuma anotação registrada.'}
                         </p>
                     </div>
+                </div>
+            )}
+
+            {/* Content Anamnesis */}
+            {activeTab === 'anamnesis' && (
+                <div className="space-y-6">
+                    {!anamnesis ? (
+                        <div className="bg-slate-50 border border-slate-200 border-dashed rounded-2xl p-10 text-center text-slate-500">
+                            <List className="mx-auto mb-3 text-slate-400 opacity-50" size={48} />
+                            <h3 className="font-bold text-slate-700 mb-1">Nenhuma ficha de triagem preenchida</h3>
+                            <p className="text-sm">Os responsáveis ainda não enviaram as informações prévias pelo formulário do site.</p>
+                        </div>
+                    ) : (
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                            <div className="p-6 border-b border-slate-100 bg-sky-50 flex justify-between items-center">
+                                <div>
+                                    <h3 className="font-bold text-sky-900 text-lg flex items-center gap-2">
+                                        <List size={20} className="text-sky-600" />
+                                        Respostas da Triagem Digital
+                                    </h3>
+                                    <p className="text-sm text-sky-700">Preenchido em: {new Date(anamnesis.created_at).toLocaleString('pt-BR')}</p>
+                                </div>
+                            </div>
+
+                            <div className="p-6 grid gap-6 md:grid-cols-2">
+                                {/* GESTAÇÃO */}
+                                <div className="space-y-4">
+                                    <h4 className="font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs">1</div>
+                                        Gestação e Nascimento
+                                    </h4>
+                                    <div className="grid gap-3">
+                                        <div className="bg-slate-50 p-3 items-center rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Como foi a gestação</span>
+                                            <span className="font-medium text-slate-700">{anamnesis.answers.pregnancyType || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 items-center rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Tipo de Parto</span>
+                                            <span className="font-medium text-slate-700">{anamnesis.answers.birthType || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Complicações</span>
+                                            <span className="text-slate-700">{anamnesis.answers.birthComplications || '-'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* DESENVOLVIMENTO */}
+                                <div className="space-y-4">
+                                    <h4 className="font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">2</div>
+                                        Desenvolvimento
+                                    </h4>
+                                    <div className="grid gap-3">
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Motor (Andou/Engatinhou)</span>
+                                            <span className="font-medium text-slate-700">{anamnesis.answers.motorDevelopment || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Desenvolvimento da Fala</span>
+                                            <span className="font-medium text-slate-700">{anamnesis.answers.speechDevelopment || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Desfralde</span>
+                                            <span className="font-medium text-slate-700">{anamnesis.answers.sphincterControl || '-'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* ESCOLA */}
+                                <div className="space-y-4 md:col-span-2">
+                                    <h4 className="font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">3</div>
+                                        Vida Escolar
+                                    </h4>
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div className="grid gap-3">
+                                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Escola Atual</span>
+                                                <span className="font-medium text-slate-700">{anamnesis.answers.schoolName || '-'}</span>
+                                            </div>
+                                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Série / Ano</span>
+                                                <span className="font-medium text-slate-700">{anamnesis.answers.currentGrade || '-'}</span>
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-3">
+                                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Desempenho</span>
+                                                <span className="text-slate-700 italic">"{anamnesis.answers.schoolPerformance || '-'}"</span>
+                                            </div>
+                                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Comportamento na Lição C/ Casa</span>
+                                                <span className="text-slate-700 italic">"{anamnesis.answers.homeworkBehavior || '-'}"</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* SAÚDE / OUTROS */}
+                                <div className="space-y-4 md:col-span-2">
+                                    <h4 className="font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs">4</div>
+                                        Saúde e Observações Livres
+                                    </h4>
+                                    <div className="grid md:grid-cols-3 gap-4 mb-3">
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Qualidade do Sono</span>
+                                            <span className="text-slate-700">{anamnesis.answers.sleepQuality || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Alimentação</span>
+                                            <span className="text-slate-700">{anamnesis.answers.eatingHabits || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Medicamentos / Alergias</span>
+                                            <span className="text-slate-700">{anamnesis.answers.allergiesOrMedications || '-'}</span>
+                                        </div>
+                                    </div>
+                                    {anamnesis.answers.additionalNotes && (
+                                        <div className="bg-sky-50 p-4 rounded-xl border border-sky-100 text-sky-900">
+                                            <span className="block text-xs uppercase font-bold text-sky-700 mb-2">Informações Adicionais Fornecidas</span>
+                                            <p className="italic">"{anamnesis.answers.additionalNotes}"</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 

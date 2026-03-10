@@ -33,7 +33,7 @@ const baseSchedulingSchema = z.object({
 type SchedulingData = z.infer<typeof baseSchedulingSchema>;
 
 interface SchedulingFormProps {
-    onSuccess: () => void;
+    onSuccess: (patientId: number | null) => void;
     onCancel: () => void;
 }
 
@@ -185,7 +185,58 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
         try {
             const cleanCpf = data.cpf.replace(/\D/g, '');
 
-            const { error } = await supabase
+            // 1. Marketing Leads Capture (To trigger Make / E-mail campaigns)
+            const { error: marketingError } = await supabase
+                .from('marketing_leads')
+                .insert([{
+                    parent_name: data.parentName,
+                    email: data.email,
+                    phone: data.phone,
+                    source: 'website_scheduling'
+                }]);
+
+            if (marketingError) {
+                console.error("Erro sútil ao salvar lead de marketing:", marketingError);
+                // Não bloquear o agendamento se apenas o lead falhar
+            }
+
+            // 2. Create Clinical Patient (Required to link Anamnesis & Appointments)
+            let patientId = null;
+
+            // Check if clinical patient exists by CPF
+            const { data: existingPatient, error: searchError } = await supabase
+                .from('patients')
+                .select('id')
+                .eq('cpf', cleanCpf)
+                .maybeSingle();
+
+            if (searchError && searchError.code !== 'PGRST116') {
+                throw searchError;
+            }
+
+            if (existingPatient) {
+                patientId = existingPatient.id;
+            } else {
+                // Insert new patient as prospect (Will be updated when anamnesis finishes)
+                const { data: newPatient, error: insertPatientError } = await supabase
+                    .from('patients')
+                    .insert([{
+                        child_name: data.childName,
+                        parent_name: data.parentName,
+                        phone: data.phone,
+                        email: data.email,
+                        cpf: cleanCpf,
+                        status: 'prospect'
+                    }])
+                    .select('id')
+                    .single();
+
+                if (insertPatientError) throw insertPatientError;
+                if (newPatient) patientId = newPatient.id;
+            }
+
+            // 3. Create Appointment Request
+            const { error: appointmentError } = await supabase
                 .from('appointments')
                 .insert([
                     {
@@ -198,12 +249,15 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                         concern: data.concern,
                         preferred_date: data.date,
                         preferred_time: data.time,
-                        status: 'pending'
+                        status: 'pending',
+                        patient_id: patientId
                     },
                 ]);
 
-            if (error) throw error;
-            onSuccess();
+            if (appointmentError) throw appointmentError;
+
+            // Pass the clinical patientId back so the Modal knows to open the Anamnesis step
+            onSuccess(patientId);
         } catch (error) {
             console.error('Erro ao agendar:', error);
             // @ts-ignore

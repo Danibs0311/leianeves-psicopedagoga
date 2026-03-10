@@ -43,6 +43,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
     const [availableDays, setAvailableDays] = useState<number[]>([6]); // default Sabado
     const [availableMonths, setAvailableMonths] = useState<number[]>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     const [availableTimes, setAvailableTimes] = useState<string[]>([]);
+    const [customSchedule, setCustomSchedule] = useState<Record<string, string[]>>({});
 
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -56,20 +57,22 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
     const schedulingSchema = baseSchedulingSchema.superRefine((data, ctx) => {
         // Validação 1: Dia da Semana
         if (data.date) {
-            const selectedDate = new Date(data.date + 'T00:00:00');
+            const dateStr = val.split('T')[0];
+            const selectedDate = new Date(dateStr + 'T00:00:00');
             const dayOfWeek = selectedDate.getDay();
             const monthOfYear = selectedDate.getMonth();
 
-            if (!availableMonths.includes(monthOfYear)) {
+            let hasTimes = false;
+            if (customSchedule[dateStr] !== undefined) {
+                hasTimes = customSchedule[dateStr].length > 0;
+            } else {
+                hasTimes = availableMonths.includes(monthOfYear) && availableDays.includes(dayOfWeek) && availableTimes.length > 0;
+            }
+
+            if (!hasTimes) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    message: "A clínica não atende neste mês.",
-                    path: ["date"]
-                });
-            } else if (!availableDays.includes(dayOfWeek)) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: "A clínica não atende neste dia da semana.",
+                    message: "A clínica não atende ou não possui horários neste dia.",
                     path: ["date"]
                 });
             }
@@ -138,6 +141,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                     setAvailableDays(data.available_days || [6]); // Fallback Sabado
                     setAvailableMonths(data.available_months || [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
                     setAvailableTimes(data.available_times || []);
+                    setCustomSchedule(data.custom_schedule || {});
                 }
             } catch (err) {
                 console.error("Erro ao carregar configurações:", err);
@@ -282,6 +286,16 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
     const todayStr = new Date().toISOString().split('T')[0];
 
     // Calendar Functions
+    const getTimesForDate = (dateStr: string, dayOfWeek: number, monthOfYear: number) => {
+        if (customSchedule[dateStr] !== undefined) {
+            return customSchedule[dateStr];
+        }
+        if (availableMonths.includes(monthOfYear) && availableDays.includes(dayOfWeek)) {
+            return availableTimes;
+        }
+        return [];
+    };
+
     const handlePrevMonth = () => {
         if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear(currentYear - 1); }
         else { setCurrentMonth(currentMonth - 1); }
@@ -321,11 +335,13 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                         const todayNormalized = new Date();
                         todayNormalized.setHours(0, 0, 0, 0);
 
+                        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
                         const isToday = todayNormalized.getTime() === dateObjNormalized.getTime();
                         const isPast = dateObjNormalized.getTime() < todayNormalized.getTime();
 
-                        const isAvailable = isMonthAvailable && availableDays.includes(dayOfWeek) && !isPast;
-                        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        const times = getTimesForDate(dateStr, dayOfWeek, currentMonth);
+                        const isAvailable = times.length > 0 && !isPast;
                         const isSelected = watchedDate === dateStr;
 
                         return (
@@ -477,58 +493,63 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                         {isFetchingTimes && <Loader2 size={14} className="animate-spin text-sky-600" />}
                     </label>
 
-                    {watchedDate ? (
-                        <div className="space-y-3">
-                            {availableTimes.length > 0 ? (
-                                <div className="grid grid-cols-3 gap-2">
-                                    {availableTimes.map(time => {
-                                        const isBooked = bookedTimes.includes(time);
-                                        const isSelected = selectedTime === time;
+                    {watchedDate ? (() => {
+                        const dateObj = new Date(watchedDate + 'T00:00:00');
+                        const timesForSelectedDate = getTimesForDate(watchedDate, dateObj.getDay(), dateObj.getMonth());
 
-                                        return (
-                                            <button
-                                                key={time}
-                                                type="button"
-                                                disabled={isBooked}
-                                                onClick={() => handleTimeSelect(time)}
-                                                className={`
-                                                    relative flex items-center justify-center py-2 px-1 rounded-lg border text-sm font-medium transition-all
-                                                    ${isBooked
-                                                        ? 'bg-red-50 border-red-200 text-red-400 cursor-not-allowed'
-                                                        : isSelected
-                                                            ? 'bg-sky-600 border-sky-600 text-white shadow-md'
-                                                            : 'bg-white border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300'
-                                                    }
-                                                `}
-                                            >
-                                                {isBooked ? (
-                                                    <span className="flex items-center gap-1"><XCircle size={14} /> {time}</span>
-                                                ) : (
-                                                    <span className="flex items-center gap-1">
-                                                        {isSelected ? <CheckCircle2 size={14} /> : <div className="w-2 h-2 rounded-full bg-green-500 mr-1" />}
-                                                        {time}
-                                                    </span>
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            ) : (
-                                <div className="p-4 border border-slate-200 bg-slate-50 rounded-lg text-sm text-center text-slate-500">
-                                    Nenhum horário disponível configurado na clínica.
-                                </div>
-                            )}
+                        return (
+                            <div className="space-y-3">
+                                {timesForSelectedDate.length > 0 ? (
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {timesForSelectedDate.map(time => {
+                                            const isBooked = bookedTimes.includes(time);
+                                            const isSelected = selectedTime === time;
 
-                            {/* Legenda (só mostrar se tiver horários configurados) */}
-                            {availableTimes.length > 0 && (
-                                <div className="flex items-center justify-center gap-4 text-xs text-slate-500 bg-slate-50 p-2 rounded-md border border-slate-100">
-                                    <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500" /> Livre</span>
-                                    <span className="flex items-center gap-1"><XCircle size={10} className="text-red-400" /> Ocupado</span>
-                                    <span className="flex items-center gap-1"><CheckCircle2 size={10} className="text-sky-600" /> Selecionado</span>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
+                                            return (
+                                                <button
+                                                    key={time}
+                                                    type="button"
+                                                    disabled={isBooked}
+                                                    onClick={() => handleTimeSelect(time)}
+                                                    className={`
+                                                        relative flex items-center justify-center py-2 px-1 rounded-lg border text-sm font-medium transition-all
+                                                        ${isBooked
+                                                            ? 'bg-red-50 border-red-200 text-red-400 cursor-not-allowed'
+                                                            : isSelected
+                                                                ? 'bg-sky-600 border-sky-600 text-white shadow-md'
+                                                                : 'bg-white border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300'
+                                                        }
+                                                    `}
+                                                >
+                                                    {isBooked ? (
+                                                        <span className="flex items-center gap-1"><XCircle size={14} /> {time}</span>
+                                                    ) : (
+                                                        <span className="flex items-center gap-1">
+                                                            {isSelected ? <CheckCircle2 size={14} /> : <div className="w-2 h-2 rounded-full bg-green-500 mr-1" />}
+                                                            {time}
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="p-4 border border-slate-200 bg-slate-50 rounded-lg text-sm text-center text-slate-500">
+                                        Nenhum horário disponível para a data selecionada.
+                                    </div>
+                                )}
+
+                                {/* Legenda */}
+                                {timesForSelectedDate.length > 0 && (
+                                    <div className="flex items-center justify-center gap-4 text-xs text-slate-500 bg-slate-50 p-2 rounded-md border border-slate-100">
+                                        <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500" /> Livre</span>
+                                        <span className="flex items-center gap-1"><XCircle size={10} className="text-red-400" /> Ocupado</span>
+                                        <span className="flex items-center gap-1"><CheckCircle2 size={10} className="text-sky-600" /> Selecionado</span>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })() : (
                         <div className="h-[100px] flex items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-slate-400 text-sm italic">
                             Selecione uma data primeiro
                         </div>

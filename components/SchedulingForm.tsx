@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useForm } from 'react-hook-form';
@@ -6,8 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Calendar, Clock, Loader2, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 
-// Schema de validação
-const schedulingSchema = z.object({
+// Schema base sem a validação dinâmica de dia, pois faremos isso no superRefine ou no component
+const baseSchedulingSchema = z.object({
     parentName: z.string().min(2, 'Nome do responsável é obrigatório'),
     childName: z.string().min(2, 'Nome da criança é obrigatório'),
     childAge: z.coerce.number()
@@ -22,41 +21,16 @@ const schedulingSchema = z.object({
         .min(10, 'Telefone inválido')
         .regex(/^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})\-?(\d{4}))$/, 'Formato inválido. Use (DD) 99999-9999'),
     concern: z.string().min(10, 'Descreva brevemente a queixa ou motivo do agendamento'),
-    // Date and time validation
     date: z.string().refine((val) => {
         const selectedDate = new Date(val + 'T00:00:00');
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return selectedDate >= today;
-    }, 'A data não pode ser anterior a hoje')
-        .refine((val) => {
-            const selectedDate = new Date(val + 'T00:00:00');
-            const dayOfWeek = selectedDate.getDay();
-            // Permitir APENAS sábados (6)
-            return dayOfWeek === 6;
-        }, 'Atendimentos ocorrem apenas aos Sábados'),
+    }, 'A data não pode ser anterior a hoje'),
     time: z.string().min(1, 'Selecione um horário'),
-}).refine((data) => {
-    // Validar se data é hoje, o horário já passou
-    const selectedDate = new Date(data.date + 'T00:00:00');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (selectedDate.getTime() === today.getTime()) {
-        const [hours, minutes] = data.time.split(':').map(Number);
-        const now = new Date();
-        const selectedTime = new Date();
-        selectedTime.setHours(hours, minutes, 0, 0);
-        return selectedTime > now;
-    }
-    return true;
-}, {
-    message: "O horário selecionado já passou",
-    path: ["time"] // O erro aparecerá no campo 'time'
 });
 
-// Infer type from schema
-type SchedulingData = z.infer<typeof schedulingSchema>;
+type SchedulingData = z.infer<typeof baseSchedulingSchema>;
 
 interface SchedulingFormProps {
     onSuccess: () => void;
@@ -64,10 +38,54 @@ interface SchedulingFormProps {
 }
 
 export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCancel }) => {
+    // Configurações dinâmicas
+    const [isLoadingSettings, setIsLoadingSettings] = useState(true);
+    const [availableDays, setAvailableDays] = useState<number[]>([6]); // default Sabado
+    const [availableTimes, setAvailableTimes] = useState<string[]>([]);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [bookedTimes, setBookedTimes] = useState<string[]>([]);
     const [isFetchingTimes, setIsFetchingTimes] = useState(false);
+
+    // Dynamic Schema that uses state
+    const schedulingSchema = baseSchedulingSchema.superRefine((data, ctx) => {
+        // Validação 1: Dia da Semana
+        if (data.date) {
+            const selectedDate = new Date(data.date + 'T00:00:00');
+            const dayOfWeek = selectedDate.getDay();
+
+            if (!availableDays.includes(dayOfWeek)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "A clínica não atende neste dia da semana.",
+                    path: ["date"]
+                });
+            }
+        }
+
+        // Validação 2: Horário no passado se for hoje
+        if (data.date && data.time) {
+            const selectedDate = new Date(data.date + 'T00:00:00');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate.getTime() === today.getTime()) {
+                const [hours, minutes] = data.time.split(':').map(Number);
+                const now = new Date();
+                const selectedTime = new Date();
+                selectedTime.setHours(hours, minutes, 0, 0);
+
+                if (selectedTime <= now) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "O horário selecionado já passou.",
+                        path: ["time"]
+                    });
+                }
+            }
+        }
+    });
 
     const {
         register,
@@ -94,6 +112,32 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
     const watchedDate = watch('date');
     const selectedTime = watch('time');
 
+    // Mudar para buscar configurações globais
+    useEffect(() => {
+        const loadBusinessSettings = async () => {
+            try {
+                // Buscamos a tabela business_settings (id=1 é a padrão que criamos)
+                const { data, error } = await supabase
+                    .from('business_settings')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+
+                if (data) {
+                    setAvailableDays(data.available_days || [6]); // Fallback Sabado
+                    setAvailableTimes(data.available_times || []);
+                }
+            } catch (err) {
+                console.error("Erro ao carregar configurações:", err);
+            } finally {
+                setIsLoadingSettings(false);
+            }
+        };
+
+        loadBusinessSettings();
+    }, []);
+
+    // Buscar horários ocupados para a data selecionada
     useEffect(() => {
         const fetchBookedTimes = async () => {
             if (!watchedDate) {
@@ -103,8 +147,6 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
 
             setIsFetchingTimes(true);
             try {
-                // Fetch all appointments for the selected date
-                // We consider anything not 'cancelled' or 'rejected' as taking up the slot
                 const { data, error } = await supabase
                     .from('appointments')
                     .select('preferred_time, status')
@@ -115,14 +157,14 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                     return;
                 }
 
-                // Filter out cancelled/rejected ones and map to times
+                // Filtrar cancelados/recusados
                 const booked = data
                     .filter(app => app.status !== 'cancelled' && app.status !== 'rejected')
-                    .map(app => app.preferred_time.substring(0, 5)); // ensure HH:mm format
+                    .map(app => app.preferred_time.substring(0, 5));
 
                 setBookedTimes(booked);
 
-                // If the currently selected time just became booked, clear the selection
+                // Limpar seleção se o horário que o user clicou ficou ocupado
                 if (selectedTime && booked.includes(selectedTime)) {
                     setValue('time', '', { shouldValidate: true });
                 }
@@ -141,7 +183,6 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
         setSubmitError(null);
 
         try {
-            // Remove formatting from CPF for storage (optional, but good practice)
             const cleanCpf = data.cpf.replace(/\D/g, '');
 
             const { error } = await supabase
@@ -162,25 +203,17 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                 ]);
 
             if (error) throw error;
-
-            // Sucesso
             onSuccess();
         } catch (error) {
             console.error('Erro ao agendar:', error);
             // @ts-ignore
-            setSubmitError(error?.message ? `Erro: ${error.message}` : 'Ocorreu um erro ao realizar o agendamento. Tente novamente.');
+            setSubmitError(error?.message ? `Erro: ${error.message}` : 'Ocorreu um erro ao realizar o agendamento.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    // Data mínima permitida (hoje) no formato YYYY-MM-DD
     const todayStr = new Date().toISOString().split('T')[0];
-
-    // Horários disponíveis limitados (Sábados, 09h às 11h e 14h às 16h)
-    const availableTimes = [
-        "09:00", "10:00", "11:00", "14:00", "15:00", "16:00"
-    ];
 
     const handleTimeSelect = (time: string) => {
         if (!bookedTimes.includes(time)) {
@@ -188,6 +221,15 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
             clearErrors('time');
         }
     };
+
+    if (isLoadingSettings) {
+        return (
+            <div className="flex flex-col items-center justify-center py-12 text-slate-500 gap-3">
+                <Loader2 className="animate-spin text-sky-600" size={32} />
+                <p className="text-sm font-medium">Carregando horários da clínica...</p>
+            </div>
+        );
+    }
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -298,46 +340,54 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
 
                     {watchedDate ? (
                         <div className="space-y-3">
-                            <div className="grid grid-cols-3 gap-2">
-                                {availableTimes.map(time => {
-                                    const isBooked = bookedTimes.includes(time);
-                                    const isSelected = selectedTime === time;
+                            {availableTimes.length > 0 ? (
+                                <div className="grid grid-cols-3 gap-2">
+                                    {availableTimes.map(time => {
+                                        const isBooked = bookedTimes.includes(time);
+                                        const isSelected = selectedTime === time;
 
-                                    return (
-                                        <button
-                                            key={time}
-                                            type="button"
-                                            disabled={isBooked}
-                                            onClick={() => handleTimeSelect(time)}
-                                            className={`
-                                                relative flex items-center justify-center py-2 px-1 rounded-lg border text-sm font-medium transition-all
-                                                ${isBooked
-                                                    ? 'bg-red-50 border-red-200 text-red-400 cursor-not-allowed'
-                                                    : isSelected
-                                                        ? 'bg-sky-600 border-sky-600 text-white shadow-md'
-                                                        : 'bg-white border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300'
-                                                }
-                                            `}
-                                        >
-                                            {isBooked ? (
-                                                <span className="flex items-center gap-1"><XCircle size={14} /> {time}</span>
-                                            ) : (
-                                                <span className="flex items-center gap-1">
-                                                    {isSelected ? <CheckCircle2 size={14} /> : <div className="w-2 h-2 rounded-full bg-green-500 mr-1" />}
-                                                    {time}
-                                                </span>
-                                            )}
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                                        return (
+                                            <button
+                                                key={time}
+                                                type="button"
+                                                disabled={isBooked}
+                                                onClick={() => handleTimeSelect(time)}
+                                                className={`
+                                                    relative flex items-center justify-center py-2 px-1 rounded-lg border text-sm font-medium transition-all
+                                                    ${isBooked
+                                                        ? 'bg-red-50 border-red-200 text-red-400 cursor-not-allowed'
+                                                        : isSelected
+                                                            ? 'bg-sky-600 border-sky-600 text-white shadow-md'
+                                                            : 'bg-white border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300'
+                                                    }
+                                                `}
+                                            >
+                                                {isBooked ? (
+                                                    <span className="flex items-center gap-1"><XCircle size={14} /> {time}</span>
+                                                ) : (
+                                                    <span className="flex items-center gap-1">
+                                                        {isSelected ? <CheckCircle2 size={14} /> : <div className="w-2 h-2 rounded-full bg-green-500 mr-1" />}
+                                                        {time}
+                                                    </span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="p-4 border border-slate-200 bg-slate-50 rounded-lg text-sm text-center text-slate-500">
+                                    Nenhum horário disponível configurado na clínica.
+                                </div>
+                            )}
 
-                            {/* Legenda */}
-                            <div className="flex items-center justify-center gap-4 text-xs text-slate-500 bg-slate-50 p-2 rounded-md border border-slate-100">
-                                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500" /> Livre</span>
-                                <span className="flex items-center gap-1"><XCircle size={10} className="text-red-400" /> Ocupado</span>
-                                <span className="flex items-center gap-1"><CheckCircle2 size={10} className="text-sky-600" /> Selecionado</span>
-                            </div>
+                            {/* Legenda (só mostrar se tiver horários configurados) */}
+                            {availableTimes.length > 0 && (
+                                <div className="flex items-center justify-center gap-4 text-xs text-slate-500 bg-slate-50 p-2 rounded-md border border-slate-100">
+                                    <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500" /> Livre</span>
+                                    <span className="flex items-center gap-1"><XCircle size={10} className="text-red-400" /> Ocupado</span>
+                                    <span className="flex items-center gap-1"><CheckCircle2 size={10} className="text-sky-600" /> Selecionado</span>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div className="h-[100px] flex items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-slate-400 text-sm italic">

@@ -416,15 +416,24 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
     const handleDeleteDocument = async (id: number) => {
         if (!window.confirm('Tem certeza que deseja excluir este documento permanentemente?')) return;
+
+        // Atualização Otimista
+        setClinicalRecords(prev => prev.filter(r => r.id !== id));
+
         try {
             const { error } = await supabase
                 .from('clinical_records')
                 .delete()
                 .eq('id', id);
-            if (error) throw error;
+
+            if (error) {
+                fetchPatientData(); // Reverter
+                throw error;
+            }
         } catch (error) {
             console.error('Error deleting document:', error);
-            alert('Erro ao excluir documento.');
+            alert('Erro ao excluir documento. Verifique as permissões de deleção.');
+            fetchPatientData();
         }
     };
 

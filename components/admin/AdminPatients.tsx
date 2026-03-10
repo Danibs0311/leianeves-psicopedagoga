@@ -71,16 +71,23 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
         e.stopPropagation();
         if (!window.confirm('Tem certeza que deseja excluir ESTE PACIENTE permanentemente? Todos os agendamentos, fichas de triagem e prontuários vinculados serão perdidos!')) return;
 
+        // Atualização Otimista da Interface
+        setPatients(prev => prev.filter(p => p.id !== id));
+
         try {
             const { error } = await supabase
                 .from('patients')
                 .delete()
                 .eq('id', id);
 
-            if (error) throw error;
+            if (error) {
+                fetchPatients(); // Reverter em caso de erro
+                throw error;
+            }
         } catch (error) {
             console.error('Error deleting patient:', error);
-            alert('Erro ao excluir paciente. Verifique as permissões.');
+            alert('Erro ao excluir paciente. Verifique as permissões do banco relativas à deleção.');
+            fetchPatients();
         }
     };
 

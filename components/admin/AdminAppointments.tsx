@@ -36,6 +36,23 @@ export const AdminAppointments: React.FC = () => {
 
     useEffect(() => {
         fetchAppointments();
+
+        // Subscribe to changes on the appointments table
+        const channel = supabase
+            .channel('custom-all-channel')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'appointments' },
+                (payload) => {
+                    console.log('Change received!', payload);
+                    fetchAppointments(); // Refresh the list
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     const fetchAppointments = async () => {

@@ -15,6 +15,7 @@ interface Appointment {
     preferred_date: string;
     preferred_time: string;
     status: string;
+    patient_id?: number;
 }
 
 export const AdminAppointments: React.FC = () => {
@@ -55,8 +56,8 @@ export const AdminAppointments: React.FC = () => {
 
             if (error) throw error;
 
-            // If marking as completed, check/create patient record
-            if (verifyStatus === 'completed') {
+            // If marking as confirmed, check/create patient record and set to active
+            if (verifyStatus === 'confirmed') {
                 const appointment = appointments.find(app => app.id === id);
                 if (appointment) {
                     await handlePatientCreation(appointment);
@@ -92,10 +93,20 @@ export const AdminAppointments: React.FC = () => {
 
     const handlePatientCreation = async (appointment: Appointment) => {
         try {
-            // Check if patient already exists by CPF (Priority) or fallback to name if no CPF
+            // Check if patient already exists by patient_id, CPF (Priority) or fallback to name
             let existingPatient = null;
 
-            if (appointment.cpf) {
+            if (appointment.patient_id) {
+                const { data, error } = await supabase
+                    .from('patients')
+                    .select('id')
+                    .eq('id', appointment.patient_id)
+                    .single();
+
+                if (!error) existingPatient = data;
+            }
+
+            if (!existingPatient && appointment.cpf) {
                 const { data, error } = await supabase
                     .from('patients')
                     .select('id')
@@ -103,7 +114,7 @@ export const AdminAppointments: React.FC = () => {
                     .single();
 
                 if (!error) existingPatient = data;
-            } else {
+            } else if (!existingPatient) {
                 // Fallback for old records without CPF
                 const { data, error } = await supabase
                     .from('patients')
@@ -115,7 +126,6 @@ export const AdminAppointments: React.FC = () => {
                 if (!error) existingPatient = data;
             }
 
-            // Only create if not found
             if (!existingPatient) {
                 const { error: insertError } = await supabase
                     .from('patients')
@@ -125,6 +135,7 @@ export const AdminAppointments: React.FC = () => {
                         phone: appointment.phone,
                         cpf: appointment.cpf, // Save CPF
                         email: appointment.email,
+                        status: 'active',
                         notes: `Paciente criado automaticamente a partir do agendamento #${appointment.id}. Queixa: ${appointment.concern}`,
                     });
 
@@ -135,8 +146,22 @@ export const AdminAppointments: React.FC = () => {
                     console.log('Patient record created successfully');
                 }
             } else {
-                console.log('Patient already exists, linking appointment to history...');
-                // Ideally we would update the appointment with patient_id here if we had that column
+                console.log('Patient already exists, activating patient...');
+                const { error: updateError } = await supabase
+                    .from('patients')
+                    .update({ status: 'active' })
+                    .eq('id', existingPatient.id);
+
+                if (updateError) {
+                    console.error('Error activating patient:', updateError);
+                }
+
+                if (!appointment.patient_id) {
+                    await supabase
+                        .from('appointments')
+                        .update({ patient_id: existingPatient.id })
+                        .eq('id', appointment.id);
+                }
             }
         } catch (err) {
             console.error('Unexpected error creating patient:', err);

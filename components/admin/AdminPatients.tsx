@@ -9,6 +9,7 @@ interface Patient {
     phone: string;
     email: string;
     created_at: string;
+    status: string;
 }
 
 interface AdminPatientsProps {
@@ -30,6 +31,7 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
             const { data, error } = await supabase
                 .from('patients')
                 .select('*')
+                .neq('status', 'prospect')
                 .order('child_name', { ascending: true });
 
             if (error) throw error;

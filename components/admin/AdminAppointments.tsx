@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Calendar, Clock, Phone, Mail, User, CheckCircle, XCircle, Search, Filter, Trash2 } from 'lucide-react';
+import { Calendar, Clock, Phone, Mail, User, CheckCircle, XCircle, Search, Filter, Trash2, List, X } from 'lucide-react';
+
+interface PatientAnamnesis {
+    id: number;
+    created_at: string;
+    answers: Record<string, any>;
+}
 
 interface Appointment {
     id: number;
@@ -23,6 +29,10 @@ export const AdminAppointments: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'cancelled' | 'completed'>('all');
     const [searchTerm, setSearchTerm] = useState('');
+
+    const [viewingAnamnesis, setViewingAnamnesis] = useState<PatientAnamnesis | null>(null);
+    const [isAnamnesisModalOpen, setIsAnamnesisModalOpen] = useState(false);
+    const [loadingAnamnesis, setLoadingAnamnesis] = useState(false);
 
     useEffect(() => {
         fetchAppointments();
@@ -88,6 +98,36 @@ export const AdminAppointments: React.FC = () => {
         } catch (error) {
             console.error('Error deleting appointment:', error);
             alert('Erro ao excluir agendamento');
+        }
+    };
+
+    const fetchAndShowAnamnesis = async (patientId?: number) => {
+        if (!patientId) {
+            alert('Este agendamento ainda não está vinculado a um paciente com ficha.');
+            return;
+        }
+        setLoadingAnamnesis(true);
+        try {
+            const { data, error } = await supabase
+                .from('patient_anamnesis')
+                .select('*')
+                .eq('patient_id', patientId)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            if (error) throw error;
+            if (data) {
+                setViewingAnamnesis(data);
+                setIsAnamnesisModalOpen(true);
+            } else {
+                alert('Nenhuma ficha de anamnese encontrada para este paciente.');
+            }
+        } catch (error) {
+            console.error('Erro ao buscar anamnese:', error);
+            alert('Erro ao carregar ficha de anamnese.');
+        } finally {
+            setLoadingAnamnesis(false);
         }
     };
 
@@ -329,8 +369,14 @@ export const AdminAppointments: React.FC = () => {
                                             </span>
                                         </div>
 
-                                        <h3 className="text-xl font-bold text-slate-900 leading-tight">{app.child_name}</h3>
-                                        <p className="text-slate-500 text-sm mb-4">Responsável: <span className="font-medium text-slate-700">{app.parent_name}</span></p>
+                                        <h3
+                                            className="text-xl font-bold text-sky-600 hover:text-sky-800 cursor-pointer leading-tight underline decoration-dotted underline-offset-4"
+                                            onClick={() => fetchAndShowAnamnesis(app.patient_id)}
+                                            title="Ver Ficha de Triagem"
+                                        >
+                                            {app.child_name} {app.patient_id && <List size={16} className="inline ml-1 mb-1" />}
+                                        </h3>
+                                        <p className="text-slate-500 text-sm mb-4 mt-1">Responsável: <span className="font-medium text-slate-700">{app.parent_name}</span></p>
 
                                         <div className="space-y-2 mt-4">
                                             <div className="flex items-center gap-3 text-slate-600 text-sm">
@@ -430,6 +476,131 @@ export const AdminAppointments: React.FC = () => {
                     ))
                 )}
             </div>
+
+            {/* Anamnesis Modal */}
+            {isAnamnesisModalOpen && viewingAnamnesis && (
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        <div className="p-6 border-b border-slate-100 bg-sky-50 flex justify-between items-center flex-shrink-0">
+                            <div>
+                                <h3 className="font-bold text-sky-900 text-lg flex items-center gap-2">
+                                    <List size={20} className="text-sky-600" />
+                                    Respostas da Triagem Digital
+                                </h3>
+                                <p className="text-sm text-sky-700">Preenchido em: {new Date(viewingAnamnesis.created_at).toLocaleString('pt-BR')}</p>
+                            </div>
+                            <button onClick={() => setIsAnamnesisModalOpen(false)} className="p-2 hover:bg-sky-100 rounded-full text-sky-700 transition-colors">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="p-6 overflow-y-auto">
+                            <div className="grid gap-6 md:grid-cols-2">
+                                {/* GESTÃO */}
+                                <div className="space-y-4">
+                                    <h4 className="font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs">1</div>
+                                        Gestação e Nascimento
+                                    </h4>
+                                    <div className="grid gap-3">
+                                        <div className="bg-slate-50 p-3 items-center rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Como foi a gestação</span>
+                                            <span className="font-medium text-slate-700">{viewingAnamnesis.answers.pregnancyType || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 items-center rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Tipo de Parto</span>
+                                            <span className="font-medium text-slate-700">{viewingAnamnesis.answers.birthType || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Complicações</span>
+                                            <span className="text-slate-700">{viewingAnamnesis.answers.birthComplications || '-'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* DESENVOLVIMENTO */}
+                                <div className="space-y-4">
+                                    <h4 className="font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">2</div>
+                                        Desenvolvimento
+                                    </h4>
+                                    <div className="grid gap-3">
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Motor (Andou/Engatinhou)</span>
+                                            <span className="font-medium text-slate-700">{viewingAnamnesis.answers.motorDevelopment || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Desenvolvimento da Fala</span>
+                                            <span className="font-medium text-slate-700">{viewingAnamnesis.answers.speechDevelopment || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Desfralde</span>
+                                            <span className="font-medium text-slate-700">{viewingAnamnesis.answers.sphincterControl || '-'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* ESCOLA */}
+                                <div className="space-y-4 md:col-span-2">
+                                    <h4 className="font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">3</div>
+                                        Vida Escolar
+                                    </h4>
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div className="grid gap-3">
+                                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Escola Atual</span>
+                                                <span className="font-medium text-slate-700">{viewingAnamnesis.answers.schoolName || '-'}</span>
+                                            </div>
+                                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Série / Ano</span>
+                                                <span className="font-medium text-slate-700">{viewingAnamnesis.answers.currentGrade || '-'}</span>
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-3">
+                                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Desempenho</span>
+                                                <span className="text-slate-700 italic">"{viewingAnamnesis.answers.schoolPerformance || '-'}"</span>
+                                            </div>
+                                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Comportamento na Lição C/ Casa</span>
+                                                <span className="text-slate-700 italic">"{viewingAnamnesis.answers.homeworkBehavior || '-'}"</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* SAÚDE / OUTROS */}
+                                <div className="space-y-4 md:col-span-2">
+                                    <h4 className="font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs">4</div>
+                                        Saúde e Observações Livres
+                                    </h4>
+                                    <div className="grid md:grid-cols-3 gap-4 mb-3">
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Qualidade do Sono</span>
+                                            <span className="text-slate-700">{viewingAnamnesis.answers.sleepQuality || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Alimentação</span>
+                                            <span className="text-slate-700">{viewingAnamnesis.answers.eatingHabits || '-'}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                            <span className="block text-xs uppercase font-bold text-slate-400 mb-1">Medicamentos / Alergias</span>
+                                            <span className="text-slate-700">{viewingAnamnesis.answers.allergiesOrMedications || '-'}</span>
+                                        </div>
+                                    </div>
+                                    {viewingAnamnesis.answers.additionalNotes && (
+                                        <div className="bg-sky-50 p-4 rounded-xl border border-sky-100 text-sky-900">
+                                            <span className="block text-xs uppercase font-bold text-sky-700 mb-2">Informações Adicionais Fornecidas</span>
+                                            <p className="italic">"{viewingAnamnesis.answers.additionalNotes}"</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

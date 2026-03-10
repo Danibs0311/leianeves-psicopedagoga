@@ -75,15 +75,32 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
         setPatients(prev => prev.filter(p => p.id !== id));
 
         try {
+            // Retain reference to patient CPF before deleting
+            const patientToDelete = patients.find(p => p.id === id);
+
+            // 1. Delete associated appointments (by patient_id or cpf)
+            if (patientToDelete?.cpf) {
+                const { error: apptCpfError } = await supabase
+                    .from('appointments')
+                    .delete()
+                    .eq('cpf', patientToDelete.cpf);
+                if (apptCpfError) console.warn('Warning on appt delete by cpf:', apptCpfError);
+            }
+
             const { error: apptError } = await supabase
                 .from('appointments')
                 .delete()
                 .eq('patient_id', id);
 
             if (apptError) {
-                console.warn('Could not delete appointments, continuing with patient deletion:', apptError);
+                console.warn('Could not delete appointments by patient_id:', apptError);
             }
 
+            // 2. Delete clinical records (anamnesis, documents) to prevent foreign key issues
+            await supabase.from('patient_anamnesis').delete().eq('patient_id', id);
+            await supabase.from('patient_documents').delete().eq('patient_id', id);
+
+            // 3. Delete the patient itself
             const { error } = await supabase
                 .from('patients')
                 .delete()

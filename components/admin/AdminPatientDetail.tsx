@@ -280,6 +280,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
     const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null);
     const [editorContent, setEditorContent] = useState('');
     const [editorTitle, setEditorTitle] = useState('');
+    const [editingRecordId, setEditingRecordId] = useState<number | null>(null);
     const editorRef = useRef<HTMLDivElement>(null);
 
     // UI State
@@ -291,13 +292,30 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
             fetchPatientData();
         }
 
+        const channel = supabase
+            .channel('patient-detail-channel')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'clinical_records', filter: `patient_id=eq.${patientId}` },
+                () => fetchPatientData()
+            )
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'patients', filter: `id=eq.${patientId}` },
+                () => fetchPatientData()
+            )
+            .subscribe();
+
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsDropdownOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            supabase.removeChannel(channel);
+        };
     }, [patientId]);
 
     const fetchPatientData = async () => {
@@ -364,6 +382,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
     const handleOpenEditor = (template?: DocumentTemplate) => {
         setIsViewMode(false);
+        setEditingRecordId(null);
         if (template) {
             setSelectedTemplate(template);
             setEditorTitle(template.title);
@@ -379,10 +398,34 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
     const handleViewDocument = (record: ClinicalRecord) => {
         setIsViewMode(true);
+        setEditingRecordId(null);
         setSelectedTemplate(null);
         setEditorTitle(record.title);
         setEditorContent(record.content);
         setIsEditorOpen(true);
+    };
+
+    const handleEditDocument = (record: ClinicalRecord) => {
+        setIsViewMode(false);
+        setEditingRecordId(record.id);
+        setSelectedTemplate(null);
+        setEditorTitle(record.title);
+        setEditorContent(record.content);
+        setIsEditorOpen(true);
+    };
+
+    const handleDeleteDocument = async (id: number) => {
+        if (!window.confirm('Tem certeza que deseja excluir este documento permanentemente?')) return;
+        try {
+            const { error } = await supabase
+                .from('clinical_records')
+                .delete()
+                .eq('id', id);
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error deleting document:', error);
+            alert('Erro ao excluir documento.');
+        }
     };
 
     const handleSaveDocument = async () => {
@@ -391,21 +434,35 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
         try {
             if (!patient.id) throw new Error("Paciente inválido");
 
-            const { error } = await supabase
-                .from('clinical_records')
-                .insert({
-                    patient_id: patient.id,
-                    template_id: selectedTemplate?.id || null,
-                    title: editorTitle,
-                    content: editorContent,
-                    date: new Date().toISOString()
-                });
+            if (editingRecordId) {
+                const { error } = await supabase
+                    .from('clinical_records')
+                    .update({
+                        title: editorTitle,
+                        content: editorContent
+                    })
+                    .eq('id', editingRecordId);
 
-            if (error) throw error;
+                if (error) throw error;
+                alert('Documento atualizado com sucesso!');
+            } else {
+                const { error } = await supabase
+                    .from('clinical_records')
+                    .insert({
+                        patient_id: patient.id,
+                        template_id: selectedTemplate?.id || null,
+                        title: editorTitle,
+                        content: editorContent,
+                        date: new Date().toISOString()
+                    });
 
-            alert('Documento salvo com sucesso!');
+                if (error) throw error;
+                alert('Documento salvo com sucesso!');
+            }
+
             setIsEditorOpen(false);
-            fetchPatientData();
+            setEditingRecordId(null);
+            // Realtime vai cuidar do fetchPatientData();
 
         } catch (error) {
             console.error('Error saving document:', error);
@@ -478,7 +535,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                     {/* Modal Footer */}
                     <div className="p-6 border-t border-slate-200 bg-white rounded-b-2xl flex justify-between items-center flex-shrink-0">
                         <p className="text-slate-500 text-sm">
-                            {isViewMode ? 'Modo de Leitura (Não editável)' : (selectedTemplate ? `Modelo: ${selectedTemplate.title}` : 'Novo documento')}
+                            {isViewMode ? 'Modo de Leitura (Não editável)' : editingRecordId ? 'Editando documento existente' : (selectedTemplate ? `Modelo: ${selectedTemplate.title}` : 'Novo documento')}
                         </p>
                         <div className="flex gap-3">
                             <button onClick={() => setIsEditorOpen(false)} className="px-6 py-2 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors">
@@ -822,9 +879,24 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                                 <button
                                                     onClick={() => handleViewDocument(rec)}
                                                     className="px-4 py-2 text-sky-600 bg-sky-50 font-bold rounded-lg hover:bg-sky-100 transition-colors flex items-center gap-2 text-sm"
+                                                    title="Visualizar"
                                                 >
                                                     <Eye size={16} />
-                                                    Visualizar
+                                                    <span className="hidden sm:inline">Visualizar</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleEditDocument(rec)}
+                                                    className="px-3 py-2 text-slate-600 bg-slate-50 font-bold rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-2 text-sm"
+                                                    title="Editar"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteDocument(rec.id)}
+                                                    className="px-3 py-2 text-red-500 bg-red-50 font-bold rounded-lg hover:bg-red-100 transition-colors flex items-center gap-2 text-sm"
+                                                    title="Excluir"
+                                                >
+                                                    <Trash2 size={16} />
                                                 </button>
                                             </div>
                                         </div>

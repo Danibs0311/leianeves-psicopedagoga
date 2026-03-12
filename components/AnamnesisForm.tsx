@@ -19,7 +19,7 @@ const anamnesisSchema = z.object({
     // Saúde
     sleepQuality: z.string().min(1, 'Campo obrigatório'),
     eatingHabits: z.string().min(1, 'Campo obrigatório'),
-    allergiesOrMedications: z.string(),
+    allergiesOrMedications: z.string().min(1, 'Campo obrigatório'),
 
     // Escolaridade
     schoolName: z.string().min(2, 'Nome da escola escolar'),
@@ -28,7 +28,7 @@ const anamnesisSchema = z.object({
     homeworkBehavior: z.string().min(1, 'Como é o comportamento durante a lição?'),
 
     // Observações Especiais
-    additionalNotes: z.string()
+    additionalNotes: z.string().min(1, 'Campo obrigatório')
 });
 
 type AnamnesisData = z.infer<typeof anamnesisSchema>;
@@ -128,7 +128,7 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
 
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Como foi a gestação?</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Como foi a gestação? *</label>
                             <select {...register('pregnancyType')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 bg-white">
                                 <option value="">Selecione...</option>
                                 <option value="Tranquila">Tranquila</option>
@@ -139,7 +139,7 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Tipo de Parto</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Tipo de Parto *</label>
                             <select {...register('birthType')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 bg-white">
                                 <option value="">Selecione...</option>
                                 <option value="Normal">Normal</option>
@@ -151,7 +151,7 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Houve alguma complicação no parto/pós-parto?</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Houve alguma complicação no parto/pós-parto? *</label>
                         <input {...register('birthComplications')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500" placeholder="Ex: Icterícia, UTI Neonatal, Nenhuma..." />
                         {errors.birthComplications && <span className="text-xs text-red-500">{errors.birthComplications.message}</span>}
                     </div>
@@ -166,7 +166,7 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
 
                     <div className="grid md:grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Engatinhou e Andou no tempo esperado?</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Engatinhou e Andou no tempo esperado? *</label>
                             <select {...register('motorDevelopment')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 bg-white">
                                 <option value="">Selecione...</option>
                                 <option value="Sim, dentro do esperado">Sim</option>
@@ -177,7 +177,7 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Desenvolvimento da Fala</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Desenvolvimento da Fala *</label>
                             <select {...register('speechDevelopment')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 bg-white">
                                 <option value="">Selecione...</option>
                                 <option value="Normal">Normal</option>
@@ -188,7 +188,7 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Desfralde Diurno e Noturno</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Desfralde Diurno e Noturno *</label>
                             <select {...register('sphincterControl')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 bg-white">
                                 <option value="">Selecione...</option>
                                 <option value="No tempo esperado">Tranquilo, no tempo esperado</option>
@@ -209,26 +209,26 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
 
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Nome da Escola</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Nome da Escola *</label>
                             <input {...register('schoolName')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500" placeholder="Onde estuda atualmente?" />
                             {errors.schoolName && <span className="text-xs text-red-500">{errors.schoolName.message}</span>}
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Série / Ano atual</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Série / Ano atual *</label>
                             <input {...register('currentGrade')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500" placeholder="Ex: 3º ano do Fundamental" />
                             {errors.currentGrade && <span className="text-xs text-red-500">{errors.currentGrade.message}</span>}
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Como você e a escola avaliam o desempenho e comportamento escolar?</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Como você e a escola avaliam o desempenho e comportamento escolar? *</label>
                         <textarea {...register('schoolPerformance')} rows={2} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 resize-none" placeholder="Relatos dos professores, facilidades e dificuldades gerais..." />
                         {errors.schoolPerformance && <span className="text-xs text-red-500">{errors.schoolPerformance.message}</span>}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Como é o momento da Lição de Casa?</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Como é o momento da Lição de Casa? *</label>
                         <textarea {...register('homeworkBehavior')} rows={2} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 resize-none" placeholder="Faz sozinho? Precisa de muita ajuda? Demora muito? Tem resistência?" />
                         {errors.homeworkBehavior && <span className="text-xs text-red-500">{errors.homeworkBehavior.message}</span>}
                     </div>
@@ -238,24 +238,24 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
                 <section className="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Sono</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Sono *</label>
                             <input {...register('sleepQuality')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500" placeholder="Ex: Dorme bem, agitado, insônia..." />
                             {errors.sleepQuality && <span className="text-xs text-red-500">{errors.sleepQuality.message}</span>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Alimentação</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Alimentação *</label>
                             <input {...register('eatingHabits')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500" placeholder="Ex: Come de tudo, seletivo..." />
                             {errors.eatingHabits && <span className="text-xs text-red-500">{errors.eatingHabits.message}</span>}
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Toma algum medicamento de uso contínuo ou tem alergia?</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Toma algum medicamento de uso contínuo ou tem alergia? *</label>
                         <input {...register('allergiesOrMedications')} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500" placeholder="Especificar..." />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Há mais alguma coisa que gostaria de me contar antes da nossa consulta?</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Há mais alguma coisa que gostaria de me contar antes da nossa consulta? *</label>
                         <textarea {...register('additionalNotes')} rows={3} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 resize-none" placeholder="Informação adicional sobre rotina, lutos, divórcio dos pais, etc..." />
                     </div>
                 </section>
@@ -263,17 +263,9 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
                 {/* Botões */}
                 <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-slate-200">
                     <button
-                        type="button"
-                        onClick={onSkip}
-                        className="px-6 py-2.5 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors font-medium text-sm order-2 sm:order-1"
-                    >
-                        Preencher depois
-                    </button>
-
-                    <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-6 py-2.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all font-medium shadow-md active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 order-1 sm:order-2"
+                        className="px-6 py-2.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all font-medium shadow-md active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
                     >
                         {isSubmitting ? (
                             <Loader2 className="w-5 h-5 animate-spin" />

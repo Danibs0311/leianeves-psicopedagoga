@@ -16,7 +16,7 @@ const baseSchedulingSchema = z.object({
         .min(11, 'CPF incompleto')
         .max(14, 'CPF inválido')
         .regex(/^\d{3}\.?\d{3}\.?\d{3}\-?\d{2}$/, 'Formato inválido. Use 000.000.000-00'),
-    email: z.string().email('E-mail inválido'),
+    email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
     phone: z.string()
         .min(10, 'Telefone inválido')
         .regex(/^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})\-?(\d{4}))$/, 'Formato inválido. Use (DD) 99999-9999'),
@@ -400,7 +400,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Nome do Responsável</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Nome do Responsável *</label>
                     <input
                         {...register('parentName')}
                         className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
@@ -410,7 +410,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">CPF do Responsável</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">CPF do Responsável *</label>
                     <input
                         {...register('cpf')}
                         className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
@@ -421,7 +421,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">E-mail</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">E-mail *</label>
                     <input
                         {...register('email')}
                         type="email"
@@ -432,7 +432,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Telefone / WhatsApp</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Telefone / WhatsApp *</label>
                     <input
                         {...register('phone')}
                         type="tel"
@@ -444,7 +444,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Nome da Criança</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Nome da Criança *</label>
                         <input
                             {...register('childName')}
                             className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
@@ -453,7 +453,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
                         {errors.childName && <span className="text-xs text-red-500">{errors.childName.message}</span>}
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Idade</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Idade *</label>
                         <input
                             {...register('childAge')}
                             type="number"
@@ -466,7 +466,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Queixa Principal / Motivo</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Queixa Principal / Motivo *</label>
                 <textarea
                     {...register('concern')}
                     rows={3}
@@ -479,7 +479,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-2">
-                        <CalendarIcon size={16} /> Selecione o Dia
+                        <CalendarIcon size={16} /> Selecione o Dia *
                     </label>
                     {renderCalendar()}
                     {/* Render input hidden to keep form validation working */}
@@ -489,7 +489,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
 
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center justify-between">
-                        <span className="flex items-center gap-2"><Clock size={16} /> Horário</span>
+                        <span className="flex items-center gap-2"><Clock size={16} /> Horário *</span>
                         {isFetchingTimes && <Loader2 size={14} className="animate-spin text-sky-600" />}
                     </label>
 

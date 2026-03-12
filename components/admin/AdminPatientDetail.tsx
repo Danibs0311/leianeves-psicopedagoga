@@ -286,6 +286,8 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
     // UI State
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
         if (patientId) {
@@ -438,7 +440,11 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
     };
 
     const handleSaveDocument = async () => {
-        if (!patient || !editorTitle) return;
+        if (!patient) return;
+        if (!editorTitle.trim()) {
+            alert('Por favor, insira um título para o documento.');
+            return;
+        }
 
         try {
             if (!patient.id) throw new Error("Paciente inválido");
@@ -477,6 +483,103 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
             console.error('Error saving document:', error);
             alert('Erro ao salvar documento. Verifique a conexão ou se a tabela existe.');
         }
+    };
+
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file || !patient) return;
+
+        setIsUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `patient-${patient.id}/${fileName}`;
+
+            // 1. Upload to Supabase Storage
+            const { error: uploadError } = await supabase.storage
+                .from('patient-documents')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            // 2. Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('patient-documents')
+                .getPublicUrl(filePath);
+
+            // 3. Save reference in database
+            const { error: dbError } = await supabase
+                .from('patient_documents')
+                .insert({
+                    patient_id: patient.id,
+                    title: file.name,
+                    file_url: publicUrl,
+                    file_type: file.type,
+                    description: 'Documento enviado por upload'
+                });
+
+            if (dbError) throw dbError;
+
+            alert('Arquivo enviado com sucesso!');
+            fetchPatientData();
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            alert('Erro ao enviar arquivo. Certifique-se que o bucket "patient-documents" existe no Supabase e tem permissões públicas.');
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    const handleDeleteUploadedDoc = async (id: number, fileUrl: string) => {
+        if (!window.confirm('Tem certeza que deseja excluir este anexo permanentemente?')) return;
+
+        try {
+            // Extair o path do Storage a partir da URL (simplificado)
+            const urlParts = fileUrl.split('/');
+            const fileName = urlParts[urlParts.length - 1];
+            const folderName = urlParts[urlParts.length - 2];
+            const filePath = `${folderName}/${fileName}`;
+
+            // 1. Delete from Storage
+            await supabase.storage
+                .from('patient-documents')
+                .remove([filePath]);
+
+            // 2. Delete from Database
+            const { error } = await supabase
+                .from('patient_documents')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+            fetchPatientData();
+        } catch (error) {
+            console.error('Error deleting uploaded doc:', error);
+            alert('Erro ao excluir documento.');
+        }
+    };
+
+    const handleRenameUploadedDoc = async (id: number, currentTitle: string) => {
+        const newTitle = window.prompt('Digite o novo nome para o documento:', currentTitle);
+        if (!newTitle || newTitle === currentTitle) return;
+
+        try {
+            const { error } = await supabase
+                .from('patient_documents')
+                .update({ title: newTitle })
+                .eq('id', id);
+
+            if (error) throw error;
+            fetchPatientData();
+        } catch (error) {
+            console.error('Error renaming doc:', error);
+            alert('Erro ao renomear documento.');
+        }
+    };
+
+    const handleExportPDF = () => {
+        window.print();
     };
 
     if (loading) {
@@ -843,9 +946,20 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                         </div>
 
                         {/* Upload Button */}
-                        <button className="px-6 py-3 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center gap-2 shadow-sm">
-                            <Upload size={20} />
-                            Upload de Documento
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            onChange={handleFileUpload}
+                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        />
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isUploading}
+                            className="px-6 py-3 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
+                        >
+                            {isUploading ? <div className="animate-spin w-5 h-5 border-2 border-sky-600 border-t-transparent rounded-full" /> : <Upload size={20} />}
+                            {isUploading ? 'Enviando...' : 'Upload de Documento'}
                         </button>
                     </div>
 
@@ -885,6 +999,13 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
+                                                <button
+                                                    onClick={handleExportPDF}
+                                                    className="px-3 py-2 text-slate-600 bg-slate-50 font-bold rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-2 text-sm"
+                                                    title="Exportar PDF/Imprimir"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                                </button>
                                                 <button
                                                     onClick={() => handleViewDocument(rec)}
                                                     className="px-4 py-2 text-sky-600 bg-sky-50 font-bold rounded-lg hover:bg-sky-100 transition-colors flex items-center gap-2 text-sm"
@@ -930,9 +1051,30 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                                     </div>
                                                 </div>
                                             </div>
-                                            <button className="text-slate-400 hover:bg-red-50 hover:text-red-500 p-2 rounded-lg transition-colors">
-                                                <Trash2 size={18} />
-                                            </button>
+                                            <div className="flex gap-2">
+                                                <a
+                                                    href={doc.file_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="px-3 py-2 text-sky-600 bg-sky-50 font-bold rounded-lg hover:bg-sky-100 transition-colors flex items-center gap-2 text-sm"
+                                                    title="Download"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                                </a>
+                                                <button
+                                                    onClick={() => handleRenameUploadedDoc(doc.id, doc.title)}
+                                                    className="px-3 py-2 text-slate-600 bg-slate-50 font-bold rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-2 text-sm"
+                                                    title="Renomear"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteUploadedDoc(doc.id, doc.file_url)}
+                                                    className="px-3 py-2 text-red-500 bg-red-50 font-bold rounded-lg hover:bg-red-100 transition-colors flex items-center gap-2 text-sm"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </>
@@ -965,7 +1107,12 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                             <tr key={app.id} className="hover:bg-sky-50 transition-colors">
                                                 <td className="px-6 py-4">
                                                     <div className="flex flex-col">
-                                                        <span className="font-bold text-slate-800 text-sm">{new Date(app.preferred_date).toLocaleDateString('pt-BR')}</span>
+                                                        <span className="font-bold text-slate-800 text-sm">
+                                                            {(() => {
+                                                                const [year, month, day] = app.preferred_date.split('-').map(Number);
+                                                                return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
+                                                            })()}
+                                                        </span>
                                                         <span className="text-xs text-slate-500 flex items-center gap-1">
                                                             <Clock size={12} />
                                                             {app.preferred_time}

@@ -477,13 +477,18 @@ export const AdminAppointments: React.FC = () => {
                                         </>
                                     )}
 
-                                    {(app.status === 'cancelled' || app.status === 'completed') && (
+                                    {app.status === 'completed' && (
                                         <button
                                             onClick={() => updateStatus(app.id, 'pending')}
                                             className="w-full text-center text-slate-400 hover:text-sky-600 text-xs underline decoration-dotted mb-2"
                                         >
-                                            Reabrir
+                                            Reabrir para pendente
                                         </button>
+                                    )}
+                                    {app.status === 'cancelled' && (
+                                        <div className="w-full text-center text-red-500 text-xs font-bold mb-2 uppercase tracking-tight">
+                                            Agendamento Cancelado
+                                        </div>
                                     )}
                                     <button
                                         onClick={() => deleteAppointment(app.id)}

@@ -315,10 +315,37 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                 setIsDropdownOpen(false);
             }
         };
+
+        // Inject Global Print Styles
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @media print {
+                body { background: white !important; margin: 0 !important; padding: 0 !important; }
+                #root > div > div:not(.print-modal-container), 
+                #root > div > main:not(.print-modal-container),
+                .print\\:hidden { 
+                    display: none !important; 
+                }
+                .print-modal-container { 
+                    position: fixed !important; 
+                    top: 0 !important; 
+                    left: 0 !important; 
+                    width: 100% !important; 
+                    height: 100% !important; 
+                    z-index: 99999 !important; 
+                    background: white !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
             supabase.removeChannel(channel);
+            document.head.removeChild(style);
         };
     }, [patientId]);
 
@@ -601,8 +628,21 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
         }
     };
 
-    const handleExportPDF = () => {
-        window.print();
+    const handleExportPDF = (record?: ClinicalRecord) => {
+        if (record) {
+            setIsViewMode(true);
+            setEditingRecordId(null);
+            setSelectedTemplate(null);
+            setEditorTitle(record.title);
+            setEditorContent(record.content);
+            setIsEditorOpen(true);
+            // Delay print to allow modal to render
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        } else {
+            window.print();
+        }
     };
 
     if (loading) {
@@ -617,7 +657,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
     if (isEditorOpen) {
         return (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto print-modal-container">
                 <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col h-[95vh] print:h-auto print:w-full print:max-w-none print:shadow-none print:rounded-none print:static">
                     {/* Modal Header */}
                     <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-2xl flex-shrink-0 print:hidden">
@@ -1063,7 +1103,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                             </div>
                                             <div className="flex gap-2">
                                                 <button
-                                                    onClick={handleExportPDF}
+                                                    onClick={() => handleExportPDF(rec)}
                                                     className="px-3 py-2 text-slate-600 bg-slate-50 font-bold rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-2 text-sm"
                                                     title="Exportar PDF/Imprimir"
                                                 >

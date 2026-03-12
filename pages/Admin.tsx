@@ -12,22 +12,15 @@ export const Admin: React.FC = () => {
     const { user, loading: authLoading } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Initialize state from URL params
-    const [activeView, setActiveView] = useState<'dashboard' | 'patients' | 'settings'>(
-        (searchParams.get('view') as 'dashboard' | 'patients' | 'settings') || 'dashboard'
-    );
-    const [selectedPatientId, setSelectedPatientId] = useState<number | null>(
-        searchParams.get('patient') ? Number(searchParams.get('patient')) : null
-    );
+    // Derived State from URL
+    const activeView = (searchParams.get('view') as 'dashboard' | 'patients' | 'settings') || 'dashboard';
+    const selectedPatientId = searchParams.get('patient') ? Number(searchParams.get('patient')) : null;
 
-    // Update URL when state changes
-    useEffect(() => {
-        const params: any = { view: activeView };
-        if (selectedPatientId) {
-            params.patient = selectedPatientId.toString();
-        }
+    const navigateTo = (view: 'dashboard' | 'patients' | 'settings', patientId: number | null = null) => {
+        const params: any = { view };
+        if (patientId) params.patient = patientId.toString();
         setSearchParams(params);
-    }, [activeView, selectedPatientId, setSearchParams]);
+    };
 
     if (authLoading) {
         return (
@@ -45,17 +38,17 @@ export const Admin: React.FC = () => {
     }
 
     return (
-        <AdminLayout activeView={activeView} onNavigate={setActiveView}>
+        <AdminLayout activeView={activeView} onNavigate={(view) => navigateTo(view)}>
             {activeView === 'dashboard' && <AdminAppointments />}
 
             {activeView === 'patients' && (
                 selectedPatientId ? (
                     <AdminPatientDetail
                         patientId={selectedPatientId}
-                        onBack={() => setSelectedPatientId(null)}
+                        onBack={() => navigateTo('patients')}
                     />
                 ) : (
-                    <AdminPatients onSelectPatient={(id) => setSelectedPatientId(id)} />
+                    <AdminPatients onSelectPatient={(id) => navigateTo('patients', id)} />
                 )
             )}
 

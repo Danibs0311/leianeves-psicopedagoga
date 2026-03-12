@@ -465,10 +465,10 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                     .from('clinical_records')
                     .insert({
                         patient_id: patient.id,
-                        template_id: selectedTemplate?.id || null,
+                        template_id: (selectedTemplate && selectedTemplate.id > 0) ? selectedTemplate.id : null,
                         title: editorTitle,
                         content: editorContent,
-                        date: new Date().toISOString()
+                        date: new Date().toISOString().split('T')[0]
                     });
 
                 if (error) throw error;
@@ -1109,7 +1109,9 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                                     <div className="flex flex-col">
                                                         <span className="font-bold text-slate-800 text-sm">
                                                             {(() => {
-                                                                const [year, month, day] = app.preferred_date.split('-').map(Number);
+                                                                // Ensure we only take the date part to avoid UTC shifts
+                                                                const datePart = app.preferred_date.substring(0, 10);
+                                                                const [year, month, day] = datePart.split('-').map(Number);
                                                                 return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
                                                             })()}
                                                         </span>

@@ -425,7 +425,8 @@ export const AdminAppointments: React.FC = () => {
                                             </h4>
                                             <p className="text-sky-950 font-bold">
                                                 {(() => {
-                                                    const [year, month, day] = app.preferred_date.split('-').map(Number);
+                                                    const datePart = app.preferred_date.substring(0, 10);
+                                                    const [year, month, day] = datePart.split('-').map(Number);
                                                     return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
                                                 })()} <span className="font-normal text-sky-700">às</span> {app.preferred_time}
                                             </p>

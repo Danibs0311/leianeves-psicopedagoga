@@ -307,12 +307,43 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
         };
     }, []);
 
-    // Sync tab with URL
+    // Sync state with URL
     useEffect(() => {
         const newParams = new URLSearchParams(searchParams);
         newParams.set('tab', activeTab);
+
+        if (editingRecordId) {
+            newParams.set('docId', editingRecordId.toString());
+        } else {
+            newParams.delete('docId');
+        }
+
+        if (viewingExternalUrl) {
+            newParams.set('fileUrl', viewingExternalUrl);
+            newParams.set('fileTitle', editorTitle);
+        } else {
+            newParams.delete('fileUrl');
+            newParams.delete('fileTitle');
+        }
+
         setSearchParams(newParams, { replace: true });
-    }, [activeTab, setSearchParams]);
+    }, [activeTab, editingRecordId, viewingExternalUrl, editorTitle, setSearchParams]);
+
+    // Handle initial load or URL changes to open documents
+    useEffect(() => {
+        const docId = searchParams.get('docId');
+        const fileUrl = searchParams.get('fileUrl');
+        const fileTitle = searchParams.get('fileTitle');
+
+        if (docId && clinicalRecords.length > 0 && !isEditorOpen) {
+            const record = clinicalRecords.find(r => r.id === Number(docId));
+            if (record) {
+                handleOpenDocument(record);
+            }
+        } else if (fileUrl && fileTitle && !isEditorOpen) {
+            handleViewExternalDoc(fileUrl, fileTitle);
+        }
+    }, [clinicalRecords, searchParams]);
 
     useEffect(() => {
         if (patientId) {
@@ -740,7 +771,14 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                             )}
                         </div>
                         <div className="flex gap-2">
-                            <button onClick={() => setIsEditorOpen(false)} className="p-2 hover:bg-slate-200 rounded-full text-slate-500">
+                            <button
+                                onClick={() => {
+                                    setIsEditorOpen(false);
+                                    setEditingRecordId(null);
+                                    setViewingExternalUrl(null);
+                                }}
+                                className="p-2 hover:bg-slate-200 rounded-full text-slate-500"
+                            >
                                 <X size={24} />
                             </button>
                         </div>
@@ -777,8 +815,15 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                         <p className="text-slate-500 text-sm">
                             {viewingExternalUrl ? 'Visualizador de Arquivo Anexo' : editingRecordId ? 'Editando documento existente' : (selectedTemplate ? `Modelo: ${selectedTemplate.title}` : 'Novo documento')}
                         </p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setIsEditorOpen(false)} className="px-6 py-2 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors">
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => {
+                                    setIsEditorOpen(false);
+                                    setEditingRecordId(null);
+                                    setViewingExternalUrl(null);
+                                }}
+                                className="px-6 py-2 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors"
+                            >
                                 Fechar
                             </button>
                             {!viewingExternalUrl && (

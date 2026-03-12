@@ -290,6 +290,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
     const [isUploading, setIsUploading] = useState(false);
     const [isEditingNotes, setIsEditingNotes] = useState(false);
     const [notesValue, setNotesValue] = useState('');
+    const [viewingExternalUrl, setViewingExternalUrl] = useState<string | null>(null);
 
     useEffect(() => {
         if (patientId) {
@@ -434,6 +435,16 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
         setSelectedTemplate(null);
         setEditorTitle(record.title);
         setEditorContent(record.content);
+        setViewingExternalUrl(null);
+        setIsEditorOpen(true);
+    };
+
+    const handleViewExternalDoc = (url: string, title: string) => {
+        setIsViewMode(true);
+        setEditingRecordId(null);
+        setSelectedTemplate(null);
+        setEditorTitle(title);
+        setViewingExternalUrl(url);
         setIsEditorOpen(true);
     };
 
@@ -682,10 +693,16 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                         </div>
                     </div>
 
-                    {/* Modal Content - Editor */}
+                    {/* Modal Content - Editor or Viewer */}
                     <div className="flex-1 overflow-y-auto bg-slate-100 flex justify-center p-8 print:p-0 print:bg-white print:overflow-visible">
                         <div className="bg-white shadow-lg min-h-[1123px] w-[794px] mx-auto rounded-sm border border-slate-200 flex flex-col relative prose max-w-none print:shadow-none print:border-none print:w-full print:min-h-0">
-                            {isViewMode ? (
+                            {viewingExternalUrl ? (
+                                <iframe
+                                    src={viewingExternalUrl}
+                                    className="flex-1 w-full h-full border-none rounded-sm min-h-[1000px]"
+                                    title={editorTitle}
+                                />
+                            ) : isViewMode ? (
                                 <div
                                     className="flex-1 p-12 outline-none"
                                     dangerouslySetInnerHTML={{ __html: editorContent }}
@@ -710,7 +727,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                     {/* Modal Footer */}
                     <div className="p-6 border-t border-slate-200 bg-white rounded-b-2xl flex justify-between items-center flex-shrink-0 print:hidden">
                         <p className="text-slate-500 text-sm">
-                            {isViewMode ? 'Modo de Leitura (Não editável)' : editingRecordId ? 'Editando documento existente' : (selectedTemplate ? `Modelo: ${selectedTemplate.title}` : 'Novo documento')}
+                            {viewingExternalUrl ? 'Visualizador de Arquivo Anexo' : isViewMode ? 'Modo de Leitura (Não editável)' : editingRecordId ? 'Editando documento existente' : (selectedTemplate ? `Modelo: ${selectedTemplate.title}` : 'Novo documento')}
                         </p>
                         <div className="flex gap-3">
                             <button onClick={() => setIsEditorOpen(false)} className="px-6 py-2 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors">
@@ -1155,12 +1172,20 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => handleViewExternalDoc(doc.file_url, doc.title)}
+                                                    className="px-4 py-2 text-sky-600 bg-sky-50 font-bold rounded-lg hover:bg-sky-100 transition-colors flex items-center gap-2 text-sm"
+                                                    title="Visualizar"
+                                                >
+                                                    <Eye size={16} />
+                                                    <span className="hidden sm:inline">Visualizar</span>
+                                                </button>
                                                 <a
                                                     href={doc.file_url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="px-3 py-2 text-sky-600 bg-sky-50 font-bold rounded-lg hover:bg-sky-100 transition-colors flex items-center gap-2 text-sm"
-                                                    title="Download"
+                                                    className="px-3 py-2 text-slate-600 bg-slate-50 font-bold rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-2 text-sm"
+                                                    title="Baixar Arquivo"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                                 </a>

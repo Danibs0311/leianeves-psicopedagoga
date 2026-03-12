@@ -57,7 +57,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
     const schedulingSchema = baseSchedulingSchema.superRefine((data, ctx) => {
         // Validação 1: Dia da Semana
         if (data.date) {
-            const dateStr = val.split('T')[0];
+            const dateStr = data.date.split('T')[0];
             const selectedDate = new Date(dateStr + 'T00:00:00');
             const dayOfWeek = selectedDate.getDay();
             const monthOfYear = selectedDate.getMonth();

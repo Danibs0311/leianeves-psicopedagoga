@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, User, Phone, Mail, FileText, Upload, Trash2, Clock, FilePlus, Save, Eye, X, Plus, ChevronDown, Bold, Italic, Underline, List, ListOrdered, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 import Editor from 'react-simple-wysiwyg';
@@ -265,11 +266,14 @@ interface PatientAnamnesis {
 }
 
 export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientId, onBack }) => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [patient, setPatient] = useState<Patient | null>(null);
     const [documents, setDocuments] = useState<PatientDocument[]>([]);
     const [anamnesis, setAnamnesis] = useState<PatientAnamnesis | null>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'info' | 'anamnesis' | 'docs' | 'history'>('info');
+    const [activeTab, setActiveTab] = useState<'info' | 'anamnese' | 'docs' | 'history'>(
+        (searchParams.get('tab') as any) || 'info'
+    );
     const [appointments, setAppointments] = useState<any[]>([]);
     const [templates, setTemplates] = useState<DocumentTemplate[]>(DEFAULT_TEMPLATES);
     const [clinicalRecords, setClinicalRecords] = useState<ClinicalRecord[]>([]);
@@ -291,6 +295,13 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
     const [isEditingNotes, setIsEditingNotes] = useState(false);
     const [notesValue, setNotesValue] = useState('');
     const [viewingExternalUrl, setViewingExternalUrl] = useState<string | null>(null);
+
+    // Sync tab with URL
+    useEffect(() => {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('tab', activeTab);
+        setSearchParams(newParams, { replace: true });
+    }, [activeTab, setSearchParams]);
 
     useEffect(() => {
         if (patientId) {
@@ -321,22 +332,32 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
         const style = document.createElement('style');
         style.innerHTML = `
             @media print {
-                body { background: white !important; margin: 0 !important; padding: 0 !important; }
-                #root > div > div:not(.print-modal-container), 
-                #root > div > main:not(.print-modal-container),
-                .print\\:hidden { 
-                    display: none !important; 
+                html, body { 
+                    height: auto !important;
+                    overflow: visible !important;
+                }
+                body * { 
+                    visibility: hidden !important; 
+                }
+                .print-modal-container, .print-modal-container * { 
+                    visibility: visible !important; 
                 }
                 .print-modal-container { 
-                    position: fixed !important; 
-                    top: 0 !important; 
+                    position: absolute !important; 
                     left: 0 !important; 
-                    width: 100% !important; 
-                    height: 100% !important; 
-                    z-index: 99999 !important; 
+                    top: 0 !important; 
+                    width: 100% !important;
+                    display: block !important;
                     background: white !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
+                }
+                .print-modal-container .document-sheet {
+                    margin: 0 auto !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    width: 100% !important;
+                }
+                .print\\:hidden { 
+                    display: none !important; 
                 }
             }
         `;
@@ -429,9 +450,8 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
         setIsDropdownOpen(false);
     };
 
-    const handleViewDocument = (record: ClinicalRecord) => {
-        setIsViewMode(true);
-        setEditingRecordId(null);
+    const handleOpenDocument = (record: ClinicalRecord) => {
+        setEditingRecordId(record.id);
         setSelectedTemplate(null);
         setEditorTitle(record.title);
         setEditorContent(record.content);
@@ -440,20 +460,10 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
     };
 
     const handleViewExternalDoc = (url: string, title: string) => {
-        setIsViewMode(true);
         setEditingRecordId(null);
         setSelectedTemplate(null);
         setEditorTitle(title);
         setViewingExternalUrl(url);
-        setIsEditorOpen(true);
-    };
-
-    const handleEditDocument = (record: ClinicalRecord) => {
-        setIsViewMode(false);
-        setEditingRecordId(record.id);
-        setSelectedTemplate(null);
-        setEditorTitle(record.title);
-        setEditorContent(record.content);
         setIsEditorOpen(true);
     };
 
@@ -641,16 +651,11 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
     const handleExportPDF = (record?: ClinicalRecord) => {
         if (record) {
-            setIsViewMode(true);
-            setEditingRecordId(null);
-            setSelectedTemplate(null);
-            setEditorTitle(record.title);
-            setEditorContent(record.content);
-            setIsEditorOpen(true);
-            // Delay print to allow modal to render
+            handleOpenDocument(record);
+            // Delay print to allow modal to render completely
             setTimeout(() => {
                 window.print();
-            }, 500);
+            }, 1000);
         } else {
             window.print();
         }
@@ -674,7 +679,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                     <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-2xl flex-shrink-0 print:hidden">
                         <div className="flex-1">
                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Título do Documento</label>
-                            {isViewMode ? (
+                            {viewingExternalUrl ? (
                                 <h2 className="text-xl font-bold text-slate-800">{editorTitle}</h2>
                             ) : (
                                 <input
@@ -695,17 +700,12 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
                     {/* Modal Content - Editor or Viewer */}
                     <div className="flex-1 overflow-y-auto bg-slate-100 flex justify-center p-8 print:p-0 print:bg-white print:overflow-visible">
-                        <div className="bg-white shadow-lg min-h-[1123px] w-[794px] mx-auto rounded-sm border border-slate-200 flex flex-col relative prose max-w-none print:shadow-none print:border-none print:w-full print:min-h-0">
+                        <div className="document-sheet bg-white shadow-lg min-h-[1123px] w-[794px] mx-auto rounded-sm border border-slate-200 flex flex-col relative prose max-w-none print:shadow-none print:border-none print:w-full print:min-h-0">
                             {viewingExternalUrl ? (
                                 <iframe
                                     src={viewingExternalUrl}
                                     className="flex-1 w-full h-full border-none rounded-sm min-h-[1000px]"
                                     title={editorTitle}
-                                />
-                            ) : isViewMode ? (
-                                <div
-                                    className="flex-1 p-12 outline-none"
-                                    dangerouslySetInnerHTML={{ __html: editorContent }}
                                 />
                             ) : (
                                 <Editor
@@ -727,13 +727,13 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                     {/* Modal Footer */}
                     <div className="p-6 border-t border-slate-200 bg-white rounded-b-2xl flex justify-between items-center flex-shrink-0 print:hidden">
                         <p className="text-slate-500 text-sm">
-                            {viewingExternalUrl ? 'Visualizador de Arquivo Anexo' : isViewMode ? 'Modo de Leitura (Não editável)' : editingRecordId ? 'Editando documento existente' : (selectedTemplate ? `Modelo: ${selectedTemplate.title}` : 'Novo documento')}
+                            {viewingExternalUrl ? 'Visualizador de Arquivo Anexo' : editingRecordId ? 'Editando documento existente' : (selectedTemplate ? `Modelo: ${selectedTemplate.title}` : 'Novo documento')}
                         </p>
                         <div className="flex gap-3">
                             <button onClick={() => setIsEditorOpen(false)} className="px-6 py-2 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors">
                                 Fechar
                             </button>
-                            {!isViewMode && (
+                            {!viewingExternalUrl && (
                                 <button onClick={handleSaveDocument} className="px-6 py-2 bg-sky-600 text-white font-bold rounded-xl hover:bg-sky-700 transition-colors flex items-center gap-2">
                                     <Save size={20} />
                                     Salvar Documento
@@ -1127,19 +1127,12 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                                 </button>
                                                 <button
-                                                    onClick={() => handleViewDocument(rec)}
+                                                    onClick={() => handleOpenDocument(rec)}
                                                     className="px-4 py-2 text-sky-600 bg-sky-50 font-bold rounded-lg hover:bg-sky-100 transition-colors flex items-center gap-2 text-sm"
-                                                    title="Visualizar"
+                                                    title="Abrir/Editar Documento"
                                                 >
                                                     <Eye size={16} />
-                                                    <span className="hidden sm:inline">Visualizar</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleEditDocument(rec)}
-                                                    className="px-3 py-2 text-slate-600 bg-slate-50 font-bold rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-2 text-sm"
-                                                    title="Editar"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                                    <span className="hidden sm:inline">Abrir e Editar</span>
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteDocument(rec.id)}

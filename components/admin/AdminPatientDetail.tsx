@@ -296,6 +296,17 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
     const [notesValue, setNotesValue] = useState('');
     const [viewingExternalUrl, setViewingExternalUrl] = useState<string | null>(null);
 
+    // Load html2pdf.js
+    useEffect(() => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        script.async = true;
+        document.head.appendChild(script);
+        return () => {
+            document.head.removeChild(script);
+        };
+    }, []);
+
     // Sync tab with URL
     useEffect(() => {
         const newParams = new URLSearchParams(searchParams);
@@ -649,6 +660,43 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
         }
     };
 
+    const handleDownloadPDF = async (record?: ClinicalRecord) => {
+        const title = record ? record.title : editorTitle;
+        const content = record ? record.content : editorContent;
+
+        // @ts-ignore
+        if (typeof html2pdf === 'undefined') {
+            alert('Aguarde um momento, o gerador de PDF está carregando...');
+            return;
+        }
+
+        const element = document.createElement('div');
+        element.innerHTML = `
+            <div style="padding: 40px; font-family: sans-serif; line-height: 1.5; color: #334155;">
+                <h1 style="font-size: 24px; font-weight: bold; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px;">${title}</h1>
+                <div style="font-size: 14px; color: #1e293b;">
+                    ${content}
+                </div>
+            </div>
+        `;
+
+        const opt = {
+            margin: 10,
+            filename: `${title.replace(/\s+/g, '_').toLowerCase()}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        try {
+            // @ts-ignore
+            await html2pdf().set(opt).from(element).save();
+        } catch (error) {
+            console.error('PDF Generation Error:', error);
+            alert('Erro ao gerar PDF. Tente novamente.');
+        }
+    };
+
     const handleExportPDF = (record?: ClinicalRecord) => {
         if (record) {
             handleOpenDocument(record);
@@ -734,10 +782,20 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                 Fechar
                             </button>
                             {!viewingExternalUrl && (
-                                <button onClick={handleSaveDocument} className="px-6 py-2 bg-sky-600 text-white font-bold rounded-xl hover:bg-sky-700 transition-colors flex items-center gap-2">
-                                    <Save size={20} />
-                                    Salvar Documento
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => handleDownloadPDF()}
+                                        className="px-6 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors flex items-center gap-2"
+                                        title="Baixar arquivo PDF real"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                        Baixar PDF
+                                    </button>
+                                    <button onClick={handleSaveDocument} className="px-6 py-2 bg-sky-600 text-white font-bold rounded-xl hover:bg-sky-700 transition-colors flex items-center gap-2">
+                                        <Save size={20} />
+                                        Salvar Documento
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -1120,9 +1178,9 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                             </div>
                                             <div className="flex gap-2">
                                                 <button
-                                                    onClick={() => handleExportPDF(rec)}
-                                                    className="px-3 py-2 text-slate-600 bg-slate-50 font-bold rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-2 text-sm"
-                                                    title="Exportar PDF/Imprimir"
+                                                    onClick={() => handleDownloadPDF(rec)}
+                                                    className="px-3 py-2 text-emerald-600 bg-emerald-50 font-bold rounded-lg hover:bg-emerald-100 transition-colors flex items-center gap-2 text-sm"
+                                                    title="Baixar PDF"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                                 </button>
@@ -1203,68 +1261,71 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
             {/* Content History */}
-            {activeTab === 'history' && (
-                <div className="space-y-6">
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        {appointments.length === 0 ? (
-                            <div className="text-center py-10 text-slate-400">
-                                Nenhum atendimento registrado para este paciente.
-                            </div>
-                        ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left">
-                                    <thead className="bg-slate-50 border-b border-slate-200">
-                                        <tr>
-                                            <th className="px-6 py-4 font-bold text-slate-600 text-xs uppercase tracking-wider">Data / Hora</th>
-                                            <th className="px-6 py-4 font-bold text-slate-600 text-xs uppercase tracking-wider">Queixa</th>
-                                            <th className="px-6 py-4 font-bold text-slate-600 text-xs uppercase tracking-wider text-right">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100">
-                                        {appointments.map(app => (
-                                            <tr key={app.id} className="hover:bg-sky-50 transition-colors">
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-bold text-slate-800 text-sm">
-                                                            {(() => {
-                                                                // Ensure we only take the date part to avoid UTC shifts
-                                                                const datePart = app.preferred_date.substring(0, 10);
-                                                                const [year, month, day] = datePart.split('-').map(Number);
-                                                                return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
-                                                            })()}
-                                                        </span>
-                                                        <span className="text-xs text-slate-500 flex items-center gap-1">
-                                                            <Clock size={12} />
-                                                            {app.preferred_time}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <p className="text-sm text-slate-600 truncate max-w-[200px]" title={app.concern}>{app.concern}</p>
-                                                </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
-                                                        ${app.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                                                            app.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                                                app.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                                        {app.status === 'completed' ? 'Concluído' :
-                                                            app.status === 'confirmed' ? 'Confirmado' :
-                                                                app.status === 'cancelled' ? 'Cancelado' :
-                                                                    app.status === 'pending' ? 'Pendente' : app.status}
-                                                    </span>
-                                                </td>
+            {
+                activeTab === 'history' && (
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                            {appointments.length === 0 ? (
+                                <div className="text-center py-10 text-slate-400">
+                                    Nenhum atendimento registrado para este paciente.
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-slate-50 border-b border-slate-200">
+                                            <tr>
+                                                <th className="px-6 py-4 font-bold text-slate-600 text-xs uppercase tracking-wider">Data / Hora</th>
+                                                <th className="px-6 py-4 font-bold text-slate-600 text-xs uppercase tracking-wider">Queixa</th>
+                                                <th className="px-6 py-4 font-bold text-slate-600 text-xs uppercase tracking-wider text-right">Status</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100">
+                                            {appointments.map(app => (
+                                                <tr key={app.id} className="hover:bg-sky-50 transition-colors">
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex flex-col">
+                                                            <span className="font-bold text-slate-800 text-sm">
+                                                                {(() => {
+                                                                    // Ensure we only take the date part to avoid UTC shifts
+                                                                    const datePart = app.preferred_date.substring(0, 10);
+                                                                    const [year, month, day] = datePart.split('-').map(Number);
+                                                                    return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
+                                                                })()}
+                                                            </span>
+                                                            <span className="text-xs text-slate-500 flex items-center gap-1">
+                                                                <Clock size={12} />
+                                                                {app.preferred_time}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <p className="text-sm text-slate-600 truncate max-w-[200px]" title={app.concern}>{app.concern}</p>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
+                                                        ${app.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                                                                app.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                                                    app.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                                            {app.status === 'completed' ? 'Concluído' :
+                                                                app.status === 'confirmed' ? 'Confirmado' :
+                                                                    app.status === 'cancelled' ? 'Cancelado' :
+                                                                        app.status === 'pending' ? 'Pendente' : app.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };

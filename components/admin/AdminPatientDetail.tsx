@@ -2,7 +2,23 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, User, Phone, Mail, FileText, Upload, Trash2, Clock, FilePlus, Save, Eye, X, Plus, ChevronDown, Bold, Italic, Underline, List, ListOrdered, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
-import Editor from 'react-simple-wysiwyg';
+import {
+    BtnBold,
+    BtnItalic,
+    BtnUnderline,
+    BtnStrikeThrough,
+    BtnNumberedList,
+    BtnBulletList,
+    BtnLink,
+    BtnUnlink,
+    BtnAlignLeft,
+    BtnAlignCenter,
+    BtnAlignRight,
+    BtnClearFormatting,
+    ContentEditable,
+    EditorProvider,
+    Toolbar
+} from 'react-simple-wysiwyg';
 
 interface Patient {
     id: number;
@@ -794,18 +810,77 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                     title={editorTitle}
                                 />
                             ) : (
-                                <Editor
-                                    value={editorContent}
-                                    onChange={(e: any) => setEditorContent(e.target.value)}
-                                    containerProps={{
-                                        style: {
+                                <EditorProvider value={editorContent} onChange={(e: any) => setEditorContent(e.target.value)}>
+                                    <Toolbar>
+                                        <div className="flex flex-wrap gap-1 p-1 items-center">
+                                            {/* Font Family Selector */}
+                                            <select
+                                                onChange={(e) => document.execCommand('fontName', false, e.target.value)}
+                                                className="h-8 text-xs bg-white border border-slate-200 rounded px-1 outline-none focus:ring-1 focus:ring-sky-500"
+                                                defaultValue=""
+                                            >
+                                                <option value="" disabled>Fonte</option>
+                                                <option value="Arial">Arial</option>
+                                                <option value="Courier New">Courier New</option>
+                                                <option value="Georgia">Georgia</option>
+                                                <option value="Impact">Impact</option>
+                                                <option value="Tahoma">Tahoma</option>
+                                                <option value="Times New Roman">Times New Roman</option>
+                                                <option value="Trebuchet MS">Trebuchet MS</option>
+                                                <option value="Verdana">Verdana</option>
+                                            </select>
+
+                                            {/* Font Size Selector */}
+                                            <select
+                                                onChange={(e) => document.execCommand('fontSize', false, e.target.value)}
+                                                className="h-8 text-xs bg-white border border-slate-200 rounded px-1 outline-none focus:ring-1 focus:ring-sky-500"
+                                                defaultValue=""
+                                            >
+                                                <option value="" disabled>Tamanho</option>
+                                                <option value="1">Muito Pequeno</option>
+                                                <option value="2">Pequeno</option>
+                                                <option value="3">Normal</option>
+                                                <option value="4">Médio (H3)</option>
+                                                <option value="5">Grande (H2)</option>
+                                                <option value="6">Muito Grande (H1)</option>
+                                                <option value="7">Gigante</option>
+                                            </select>
+
+                                            <div className="w-px h-6 bg-slate-200 mx-1" />
+
+                                            <BtnBold title="Negrito" />
+                                            <BtnItalic title="Itálico" />
+                                            <BtnUnderline title="Sublinhado" />
+                                            <BtnStrikeThrough title="Riscado" />
+
+                                            <div className="w-px h-6 bg-slate-200 mx-1" />
+
+                                            <BtnAlignLeft title="Alinhar Esquerda" />
+                                            <BtnAlignCenter title="Centralizar" />
+                                            <BtnAlignRight title="Alinhar Direita" />
+
+                                            <div className="w-px h-6 bg-slate-200 mx-1" />
+
+                                            <BtnNumberedList title="Lista Numerada" />
+                                            <BtnBulletList title="Marcadores" />
+
+                                            <div className="w-px h-6 bg-slate-200 mx-1" />
+
+                                            <BtnLink title="Inserir Link" />
+                                            <BtnUnlink title="Remover Link" />
+                                            <BtnClearFormatting title="Limpar Formatação" />
+                                        </div>
+                                    </Toolbar>
+                                    <ContentEditable
+                                        style={{
                                             minHeight: '1000px',
-                                            padding: '24px',
+                                            padding: '40px',
                                             border: 'none',
-                                            resize: 'none',
-                                        }
-                                    }}
-                                />
+                                            outline: 'none',
+                                            backgroundColor: 'white'
+                                        }}
+                                    />
+                                </EditorProvider>
                             )}
                         </div>
                     </div>

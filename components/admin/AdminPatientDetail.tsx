@@ -288,6 +288,8 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
     const dropdownRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [isEditingNotes, setIsEditingNotes] = useState(false);
+    const [notesValue, setNotesValue] = useState('');
 
     useEffect(() => {
         if (patientId) {
@@ -331,6 +333,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
             if (patientError) throw patientError;
             setPatient(patientData);
+            setNotesValue(patientData.notes || '');
 
             // Fetch Anamnesis
             const { data: anamnesisData } = await supabase
@@ -475,9 +478,11 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                 alert('Documento salvo com sucesso!');
             }
 
+            // Forçar atualização dos dados para garantir que a UI reflita as mudanças
+            await fetchPatientData();
+
             setIsEditorOpen(false);
             setEditingRecordId(null);
-            // Realtime vai cuidar do fetchPatientData();
 
         } catch (error) {
             console.error('Error saving document:', error);
@@ -578,6 +583,24 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
         }
     };
 
+    const handleSaveNotes = async () => {
+        if (!patient) return;
+        try {
+            const { error } = await supabase
+                .from('patients')
+                .update({ notes: notesValue })
+                .eq('id', patient.id);
+
+            if (error) throw error;
+            setPatient({ ...patient, notes: notesValue });
+            setIsEditingNotes(false);
+            alert('Anotações atualizadas!');
+        } catch (error) {
+            console.error('Error updating notes:', error);
+            alert('Erro ao salvar anotações.');
+        }
+    };
+
     const handleExportPDF = () => {
         window.print();
     };
@@ -595,9 +618,9 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
     if (isEditorOpen) {
         return (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-                <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col h-[95vh]">
+                <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col h-[95vh] print:h-auto print:w-full print:max-w-none print:shadow-none print:rounded-none print:static">
                     {/* Modal Header */}
-                    <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-2xl flex-shrink-0">
+                    <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-2xl flex-shrink-0 print:hidden">
                         <div className="flex-1">
                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Título do Documento</label>
                             {isViewMode ? (
@@ -620,8 +643,8 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                     </div>
 
                     {/* Modal Content - Editor */}
-                    <div className="flex-1 overflow-y-auto bg-slate-100 flex justify-center p-8">
-                        <div className="bg-white shadow-lg min-h-[1123px] w-[794px] mx-auto rounded-sm border border-slate-200 flex flex-col relative prose max-w-none">
+                    <div className="flex-1 overflow-y-auto bg-slate-100 flex justify-center p-8 print:p-0 print:bg-white print:overflow-visible">
+                        <div className="bg-white shadow-lg min-h-[1123px] w-[794px] mx-auto rounded-sm border border-slate-200 flex flex-col relative prose max-w-none print:shadow-none print:border-none print:w-full print:min-h-0">
                             {isViewMode ? (
                                 <div
                                     className="flex-1 p-12 outline-none"
@@ -645,7 +668,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                     </div>
 
                     {/* Modal Footer */}
-                    <div className="p-6 border-t border-slate-200 bg-white rounded-b-2xl flex justify-between items-center flex-shrink-0">
+                    <div className="p-6 border-t border-slate-200 bg-white rounded-b-2xl flex justify-between items-center flex-shrink-0 print:hidden">
                         <p className="text-slate-500 text-sm">
                             {isViewMode ? 'Modo de Leitura (Não editável)' : editingRecordId ? 'Editando documento existente' : (selectedTemplate ? `Modelo: ${selectedTemplate.title}` : 'Novo documento')}
                         </p>
@@ -765,10 +788,50 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                     </div>
 
                     <div className="col-span-full bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <h3 className="font-bold text-slate-800 mb-4">Anotações Gerais</h3>
-                        <p className="text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100 min-h-[100px]">
-                            {patient.notes || 'Nenhuma anotação registrada.'}
-                        </p>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-bold text-slate-800">Anotações Gerais</h3>
+                            {!isEditingNotes ? (
+                                <button
+                                    onClick={() => setIsEditingNotes(true)}
+                                    className="p-2 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors"
+                                    title="Editar Anotações"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                            ) : (
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => {
+                                            setIsEditingNotes(false);
+                                            setNotesValue(patient.notes || '');
+                                        }}
+                                        className="px-3 py-1 text-slate-500 hover:bg-slate-100 rounded-lg text-sm font-bold transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleSaveNotes}
+                                        className="px-3 py-1 bg-sky-600 text-white hover:bg-sky-700 rounded-lg text-sm font-bold transition-colors flex items-center gap-1"
+                                    >
+                                        <Save size={14} />
+                                        Salvar
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {isEditingNotes ? (
+                            <textarea
+                                value={notesValue}
+                                onChange={(e) => setNotesValue(e.target.value)}
+                                className="w-full min-h-[150px] p-4 bg-white border border-sky-100 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent text-slate-700 leading-relaxed outline-none transition-all"
+                                placeholder="Digite aqui observações gerais sobre o paciente..."
+                            />
+                        ) : (
+                            <p className="text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100 min-h-[100px] whitespace-pre-wrap">
+                                {patient.notes || 'Nenhuma anotação registrada.'}
+                            </p>
+                        )}
                     </div>
                 </div>
             )}

@@ -21,7 +21,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeView, 
     return (
         <div className="flex min-h-screen bg-slate-50">
             {/* Desktop Sidebar */}
-            <div className="hidden md:block">
+            <div className="hidden md:block print:hidden">
                 <AdminSidebar
                     activeView={activeView}
                     onNavigate={handleNavigate}
@@ -31,7 +31,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeView, 
             </div>
 
             {/* Mobile Header */}
-            <div className="md:hidden fixed top-0 w-full bg-white border-b border-slate-200 z-50 px-4 py-3 flex justify-between items-center shadow-sm">
+            <div className="md:hidden fixed top-0 w-full bg-white border-b border-slate-200 z-50 px-4 py-3 flex justify-between items-center shadow-sm print:hidden">
                 <span className="font-bold text-slate-800">Admin Panel</span>
                 <button
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

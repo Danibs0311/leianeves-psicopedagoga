@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { AdminLogin } from '../components/admin/AdminLogin';
 import { AdminLayout } from '../components/admin/AdminLayout';
@@ -9,8 +10,24 @@ import { AdminPatientDetail } from '../components/admin/AdminPatientDetail';
 
 export const Admin: React.FC = () => {
     const { user, loading: authLoading } = useAuth();
-    const [activeView, setActiveView] = useState<'dashboard' | 'patients' | 'settings'>('dashboard');
-    const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Initialize state from URL params
+    const [activeView, setActiveView] = useState<'dashboard' | 'patients' | 'settings'>(
+        (searchParams.get('view') as 'dashboard' | 'patients' | 'settings') || 'dashboard'
+    );
+    const [selectedPatientId, setSelectedPatientId] = useState<number | null>(
+        searchParams.get('patient') ? Number(searchParams.get('patient')) : null
+    );
+
+    // Update URL when state changes
+    useEffect(() => {
+        const params: any = { view: activeView };
+        if (selectedPatientId) {
+            params.patient = selectedPatientId.toString();
+        }
+        setSearchParams(params);
+    }, [activeView, selectedPatientId, setSearchParams]);
 
     if (authLoading) {
         return (

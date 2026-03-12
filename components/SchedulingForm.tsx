@@ -154,44 +154,65 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
     }, []);
 
     // Buscar horários ocupados para a data selecionada
-    useEffect(() => {
-        const fetchBookedTimes = async () => {
-            if (!watchedDate) {
-                setBookedTimes([]);
+    const fetchBookedTimes = async () => {
+        if (!watchedDate) {
+            setBookedTimes([]);
+            return;
+        }
+
+        setIsFetchingTimes(true);
+        try {
+            const { data, error } = await supabase
+                .from('appointments')
+                .select('preferred_time, status')
+                .eq('preferred_date', watchedDate);
+
+            if (error) {
+                console.error('Erro ao buscar horários:', error);
                 return;
             }
 
-            setIsFetchingTimes(true);
-            try {
-                const { data, error } = await supabase
-                    .from('appointments')
-                    .select('preferred_time, status')
-                    .eq('preferred_date', watchedDate);
+            // Filtrar cancelados/recusados
+            const booked = data
+                .filter(app => app.status !== 'cancelled' && app.status !== 'rejected')
+                .map(app => app.preferred_time.substring(0, 5));
 
-                if (error) {
-                    console.error('Erro ao buscar horários:', error);
-                    return;
-                }
+            setBookedTimes(booked);
 
-                // Filtrar cancelados/recusados
-                const booked = data
-                    .filter(app => app.status !== 'cancelled' && app.status !== 'rejected')
-                    .map(app => app.preferred_time.substring(0, 5));
-
-                setBookedTimes(booked);
-
-                // Limpar seleção se o horário que o user clicou ficou ocupado
-                if (selectedTime && booked.includes(selectedTime)) {
-                    setValue('time', '', { shouldValidate: true });
-                }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setIsFetchingTimes(false);
+            // Limpar seleção se o horário que o user clicou ficou ocupado
+            if (selectedTime && booked.includes(selectedTime)) {
+                setValue('time', '', { shouldValidate: true });
             }
-        };
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsFetchingTimes(false);
+        }
+    };
 
+    useEffect(() => {
         fetchBookedTimes();
+
+        // Inscrever para atualizações em tempo real para liberar horários instantaneamente
+        const channel = supabase
+            .channel(`realtime-appointments-${watchedDate}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'appointments',
+                    filter: watchedDate ? `preferred_date=eq.${watchedDate}` : undefined
+                },
+                () => {
+                    fetchBookedTimes();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [watchedDate]);
 
     const onSubmit = async (data: SchedulingData) => {

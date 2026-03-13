@@ -427,6 +427,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
     const fetchPatientData = async () => {
         setLoading(true);
+        console.log(`[Diagnostic] Fetching data for patient ID: ${patientId}`);
         try {
             const { data: patientData, error: patientError } = await supabase
                 .from('patients')
@@ -434,7 +435,11 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                 .eq('id', patientId)
                 .single();
 
-            if (patientError) throw patientError;
+            if (patientError) {
+                console.error('[Diagnostic] Patient fetch error:', patientError);
+                throw patientError;
+            }
+            console.log('[Diagnostic] Patient data loaded:', patientData?.child_name);
             setPatient(patientData);
             setNotesValue(patientData.notes || '');
 
@@ -447,7 +452,10 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                 .limit(1)
                 .maybeSingle();
 
-            if (anamnesisData) setAnamnesis(anamnesisData);
+            if (anamnesisData) {
+                console.log('[Diagnostic] Anamnesis found');
+                setAnamnesis(anamnesisData);
+            }
 
             const { data: docsData } = await supabase
                 .from('patient_documents')
@@ -455,7 +463,10 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                 .eq('patient_id', patientId)
                 .order('created_at', { ascending: false });
 
-            if (docsData) setDocuments(docsData);
+            if (docsData) {
+                console.log(`[Diagnostic] External documents found: ${docsData.length}`);
+                setDocuments(docsData);
+            }
 
             const { data: recordsData } = await supabase
                 .from('clinical_records')
@@ -463,7 +474,10 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                 .eq('patient_id', patientId)
                 .order('created_at', { ascending: false });
 
-            if (recordsData) setClinicalRecords(recordsData);
+            if (recordsData) {
+                console.log(`[Diagnostic] Clinical records found: ${recordsData.length}`);
+                setClinicalRecords(recordsData);
+            }
 
             let historyQuery = supabase
                 .from('appointments')
@@ -565,6 +579,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
                 if (error) throw error;
                 alert('Documento atualizado com sucesso!');
+            } else {
                 console.log('[Diagnostic] Inserting new clinical record:', {
                     patient_id: patient.id,
                     title: editorTitle,

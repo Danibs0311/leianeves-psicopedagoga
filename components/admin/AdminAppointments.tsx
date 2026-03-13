@@ -107,11 +107,15 @@ export const AdminAppointments: React.FC = () => {
             ));
             
             if (verifyStatus === 'confirmed' || verifyStatus === 'completed') {
-                alert('Agendamento confirmado e paciente sincronizado com sucesso!');
+                if (currentPatientId) {
+                    alert(`Agendamento confirmado! Paciente vinculado com sucesso (ID: ${currentPatientId}).`);
+                } else {
+                    alert('Agendamento confirmado, mas houve um problema ao vincular o paciente. Verifique o console do navegador (F12) para detalhes.');
+                }
             }
         } catch (error: any) {
-            console.error('Error updating status:', error);
-            alert(`Erro ao atualizar status: ${error.message || 'Erro desconhecido'}. Verifique se as colunas 'status' e 'patient_id' existem no banco.`);
+            console.error('[Diagnostic] Error in updateStatus:', error);
+            alert(`Erro ao atualizar status: ${error.message || 'Erro desconhecido'}.`);
         }
     };
 

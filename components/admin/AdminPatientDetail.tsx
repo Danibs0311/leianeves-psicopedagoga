@@ -565,8 +565,12 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
                 if (error) throw error;
                 alert('Documento atualizado com sucesso!');
-            } else {
-                const { error } = await supabase
+                console.log('[Diagnostic] Inserting new clinical record:', {
+                    patient_id: patient.id,
+                    title: editorTitle,
+                    date: new Date().toISOString().split('T')[0]
+                });
+                const { data: insertData, error: insertError } = await supabase
                     .from('clinical_records')
                     .insert({
                         patient_id: patient.id,
@@ -574,9 +578,14 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                         title: editorTitle,
                         content: editorContent,
                         date: new Date().toISOString().split('T')[0]
-                    });
+                    })
+                    .select();
 
-                if (error) throw error;
+                if (insertError) {
+                    console.error('[Diagnostic] Supabase Insert Error:', insertError);
+                    throw insertError;
+                }
+                console.log('[Diagnostic] Document saved successfully:', insertData);
                 alert('Documento salvo com sucesso!');
             }
 
@@ -806,7 +815,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                     title={editorTitle}
                                 />
                             ) : (
-                                <EditorProvider value={editorContent} onChange={(e: any) => setEditorContent(e.target.value)}>
+                                <EditorProvider key={editingRecordId ? `rec-${editingRecordId}` : (selectedTemplate ? `temp-${selectedTemplate.id}` : 'new-empty')} value={editorContent} onChange={(e: any) => setEditorContent(e.target.value)}>
                                     <Toolbar>
                                         <div className="flex flex-wrap gap-1 p-1 items-center">
                                             {/* Font Family Selector */}

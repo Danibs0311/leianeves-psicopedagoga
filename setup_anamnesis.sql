@@ -15,6 +15,12 @@ CREATE TABLE IF NOT EXISTS public.patient_anamnesis (
 ALTER TABLE public.patient_anamnesis ENABLE ROW LEVEL SECURITY;
 
 -- 3. Criar Políticas (Policies)
+-- Primeiro remover se já existirem para evitar erro de duplicata
+DROP POLICY IF EXISTS "Permitir inserção anônima de anamnese" ON public.patient_anamnesis;
+DROP POLICY IF EXISTS "Permitir leitura de anamnese por admin" ON public.patient_anamnesis;
+DROP POLICY IF EXISTS "Permitir atualizacao de anamnese por admin" ON public.patient_anamnesis;
+DROP POLICY IF EXISTS "Permitir exclusao de anamnese por admin" ON public.patient_anamnesis;
+
 -- Permitir que qualquer pessoa crie (necessário para o formulário público)
 CREATE POLICY "Permitir inserção anônima de anamnese" 
 ON public.patient_anamnesis 

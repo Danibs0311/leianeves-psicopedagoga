@@ -50,7 +50,7 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
             const { data, error } = await supabase
                 .from('patients')
                 .select('*')
-                .neq('status', 'prospect')
+                .or('status.neq.prospect,status.is.null')
                 .order('child_name', { ascending: true });
 
             if (error) throw error;

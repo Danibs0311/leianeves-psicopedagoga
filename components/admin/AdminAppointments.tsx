@@ -74,17 +74,18 @@ export const AdminAppointments: React.FC = () => {
     };
 
     const updateStatus = async (id: number, verifyStatus: string) => {
+        console.log(`[Diagnostic] Updating appointment ${id} to status ${verifyStatus}...`);
         try {
-            // If marking as confirmed or completed, check/create patient record first
             let currentPatientId = null;
             if (verifyStatus === 'confirmed' || verifyStatus === 'completed') {
                 const appointment = appointments.find(app => app.id === id);
                 if (appointment) {
+                    console.log(`[Diagnostic] Appointment found: ${appointment.child_name}. Syncing patient...`);
                     currentPatientId = await handlePatientCreation(appointment);
+                    console.log(`[Diagnostic] handlePatientCreation returned patient ID: ${currentPatientId}`);
                 }
             }
 
-            // Update the appointment status and patient_id if we have one
             const updateData: any = { status: verifyStatus };
             if (currentPatientId) {
                 updateData.patient_id = currentPatientId;
@@ -95,14 +96,22 @@ export const AdminAppointments: React.FC = () => {
                 .update(updateData)
                 .eq('id', id);
 
-            if (error) throw error;
+            if (error) {
+                console.error('[Diagnostic] Supabase update error:', error);
+                throw error;
+            }
 
+            console.log(`[Diagnostic] Update successful in DB. Updating local state...`);
             setAppointments(appointments.map(app =>
                 app.id === id ? { ...app, ...updateData } : app
             ));
-        } catch (error) {
+            
+            if (verifyStatus === 'confirmed' || verifyStatus === 'completed') {
+                alert('Agendamento confirmado e paciente sincronizado com sucesso!');
+            }
+        } catch (error: any) {
             console.error('Error updating status:', error);
-            alert('Erro ao atualizar status');
+            alert(`Erro ao atualizar status: ${error.message || 'Erro desconhecido'}. Verifique se as colunas 'status' e 'patient_id' existem no banco.`);
         }
     };
 
@@ -156,7 +165,7 @@ export const AdminAppointments: React.FC = () => {
 
     const handlePatientCreation = async (appointment: Appointment): Promise<number | null> => {
         try {
-            // Check if patient already exists by patient_id, CPF (Priority) or fallback to name
+            console.log(`[Diagnostic] handlePatientCreation for ${appointment.child_name}, CPF: ${appointment.cpf}`);
             let existingPatientId = appointment.patient_id || null;
 
             if (!existingPatientId && appointment.cpf) {
@@ -166,11 +175,13 @@ export const AdminAppointments: React.FC = () => {
                     .eq('cpf', appointment.cpf)
                     .maybeSingle();
 
-                if (!error && data) existingPatientId = data.id;
+                if (!error && data) {
+                    existingPatientId = data.id;
+                    console.log(`[Diagnostic] Found existing patient by CPF: ${existingPatientId}`);
+                }
             }
 
             if (!existingPatientId) {
-                // Fallback for old records without CPF
                 const { data, error } = await supabase
                     .from('patients')
                     .select('id')
@@ -178,10 +189,14 @@ export const AdminAppointments: React.FC = () => {
                     .eq('parent_name', appointment.parent_name)
                     .maybeSingle();
 
-                if (!error && data) existingPatientId = data.id;
+                if (!error && data) {
+                    existingPatientId = data.id;
+                    console.log(`[Diagnostic] Found existing patient by Name Fallback: ${existingPatientId}`);
+                }
             }
 
             if (!existingPatientId) {
+                console.log(`[Diagnostic] No existing patient found. Creating new one...`);
                 const { data: newPatient, error: insertError } = await supabase
                     .from('patients')
                     .insert({
@@ -197,27 +212,27 @@ export const AdminAppointments: React.FC = () => {
                     .single();
 
                 if (insertError) {
-                    console.error('Error creating patient record:', insertError);
-                    alert('Aviso: Não foi possível criar o registro do paciente automaticamente (possível CPF duplicado).');
+                    console.error('[Diagnostic] Patient insert error:', insertError);
+                    alert(`Aviso: Erro ao criar registro do paciente: ${insertError.message}. Verifique se a tabela 'patients' tem as colunas corretas.`);
                     return null;
                 } else if (newPatient) {
-                    console.log('Patient record created successfully');
+                    console.log(`[Diagnostic] New patient created with ID: ${newPatient.id}`);
                     return newPatient.id;
                 }
             } else {
-                console.log('Patient already exists, activating patient...');
+                console.log(`[Diagnostic] Activating existing patient ID: ${existingPatientId}`);
                 const { error: updateError } = await supabase
                     .from('patients')
                     .update({ status: 'active' })
                     .eq('id', existingPatientId);
 
                 if (updateError) {
-                    console.error('Error activating patient:', updateError);
+                    console.error('[Diagnostic] Error activating patient:', updateError);
                 }
                 return existingPatientId;
             }
-        } catch (err) {
-            console.error('Unexpected error creating patient:', err);
+        } catch (err: any) {
+            console.error('[Diagnostic] Unexpected error in handlePatientCreation:', err);
         }
         return null;
     };

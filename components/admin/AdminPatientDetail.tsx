@@ -10,10 +10,6 @@ import {
     BtnNumberedList,
     BtnBulletList,
     BtnLink,
-    BtnUnlink,
-    BtnAlignLeft,
-    BtnAlignCenter,
-    BtnAlignRight,
     BtnClearFormatting,
     ContentEditable,
     EditorProvider,
@@ -855,19 +851,12 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
 
                                             <div className="w-px h-6 bg-slate-200 mx-1" />
 
-                                            <BtnAlignLeft title="Alinhar Esquerda" />
-                                            <BtnAlignCenter title="Centralizar" />
-                                            <BtnAlignRight title="Alinhar Direita" />
-
-                                            <div className="w-px h-6 bg-slate-200 mx-1" />
-
                                             <BtnNumberedList title="Lista Numerada" />
                                             <BtnBulletList title="Marcadores" />
 
                                             <div className="w-px h-6 bg-slate-200 mx-1" />
 
                                             <BtnLink title="Inserir Link" />
-                                            <BtnUnlink title="Remover Link" />
                                             <BtnClearFormatting title="Limpar Formatação" />
                                         </div>
                                     </Toolbar>

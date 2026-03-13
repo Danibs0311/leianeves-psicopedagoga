@@ -75,24 +75,30 @@ export const AdminAppointments: React.FC = () => {
 
     const updateStatus = async (id: number, verifyStatus: string) => {
         try {
-            // First update the appointment status
+            // If marking as confirmed or completed, check/create patient record first
+            let currentPatientId = null;
+            if (verifyStatus === 'confirmed' || verifyStatus === 'completed') {
+                const appointment = appointments.find(app => app.id === id);
+                if (appointment) {
+                    currentPatientId = await handlePatientCreation(appointment);
+                }
+            }
+
+            // Update the appointment status and patient_id if we have one
+            const updateData: any = { status: verifyStatus };
+            if (currentPatientId) {
+                updateData.patient_id = currentPatientId;
+            }
+
             const { error } = await supabase
                 .from('appointments')
-                .update({ status: verifyStatus })
+                .update(updateData)
                 .eq('id', id);
 
             if (error) throw error;
 
-            // If marking as confirmed, check/create patient record and set to active
-            if (verifyStatus === 'confirmed') {
-                const appointment = appointments.find(app => app.id === id);
-                if (appointment) {
-                    await handlePatientCreation(appointment);
-                }
-            }
-
             setAppointments(appointments.map(app =>
-                app.id === id ? { ...app, status: verifyStatus } : app
+                app.id === id ? { ...app, ...updateData } : app
             ));
         } catch (error) {
             console.error('Error updating status:', error);
@@ -148,81 +154,72 @@ export const AdminAppointments: React.FC = () => {
         }
     };
 
-    const handlePatientCreation = async (appointment: Appointment) => {
+    const handlePatientCreation = async (appointment: Appointment): Promise<number | null> => {
         try {
             // Check if patient already exists by patient_id, CPF (Priority) or fallback to name
-            let existingPatient = null;
+            let existingPatientId = appointment.patient_id || null;
 
-            if (appointment.patient_id) {
-                const { data, error } = await supabase
-                    .from('patients')
-                    .select('id')
-                    .eq('id', appointment.patient_id)
-                    .single();
-
-                if (!error) existingPatient = data;
-            }
-
-            if (!existingPatient && appointment.cpf) {
+            if (!existingPatientId && appointment.cpf) {
                 const { data, error } = await supabase
                     .from('patients')
                     .select('id')
                     .eq('cpf', appointment.cpf)
-                    .single();
+                    .maybeSingle();
 
-                if (!error) existingPatient = data;
-            } else if (!existingPatient) {
+                if (!error && data) existingPatientId = data.id;
+            }
+
+            if (!existingPatientId) {
                 // Fallback for old records without CPF
                 const { data, error } = await supabase
                     .from('patients')
                     .select('id')
                     .eq('child_name', appointment.child_name)
                     .eq('parent_name', appointment.parent_name)
-                    .single();
+                    .maybeSingle();
 
-                if (!error) existingPatient = data;
+                if (!error && data) existingPatientId = data.id;
             }
 
-            if (!existingPatient) {
-                const { error: insertError } = await supabase
+            if (!existingPatientId) {
+                const { data: newPatient, error: insertError } = await supabase
                     .from('patients')
                     .insert({
                         child_name: appointment.child_name,
                         parent_name: appointment.parent_name,
                         phone: appointment.phone,
-                        cpf: appointment.cpf, // Save CPF
+                        cpf: appointment.cpf,
                         email: appointment.email,
                         status: 'active',
                         notes: `Paciente criado automaticamente a partir do agendamento #${appointment.id}. Queixa: ${appointment.concern}`,
-                    });
+                    })
+                    .select('id')
+                    .single();
 
                 if (insertError) {
                     console.error('Error creating patient record:', insertError);
                     alert('Aviso: Não foi possível criar o registro do paciente automaticamente (possível CPF duplicado).');
-                } else {
+                    return null;
+                } else if (newPatient) {
                     console.log('Patient record created successfully');
+                    return newPatient.id;
                 }
             } else {
                 console.log('Patient already exists, activating patient...');
                 const { error: updateError } = await supabase
                     .from('patients')
                     .update({ status: 'active' })
-                    .eq('id', existingPatient.id);
+                    .eq('id', existingPatientId);
 
                 if (updateError) {
                     console.error('Error activating patient:', updateError);
                 }
-
-                if (!appointment.patient_id) {
-                    await supabase
-                        .from('appointments')
-                        .update({ patient_id: existingPatient.id })
-                        .eq('id', appointment.id);
-                }
+                return existingPatientId;
             }
         } catch (err) {
             console.error('Unexpected error creating patient:', err);
         }
+        return null;
     };
 
     const filteredAppointments = appointments.filter(app => {

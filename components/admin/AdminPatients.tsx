@@ -8,6 +8,7 @@ interface Patient {
     parent_name: string;
     phone: string;
     email: string;
+    cpf?: string;
     created_at: string;
     status: string;
 }

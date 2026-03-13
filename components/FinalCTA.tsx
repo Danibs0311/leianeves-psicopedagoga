@@ -9,11 +9,11 @@ export const FinalCTA: React.FC<FinalCTAProps> = ({ onOpenScheduling }) => {
   return (
     <section className="py-24 bg-soft-gradient relative overflow-hidden">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        <h2 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-8">
-          Pronta para dar o primeiro passo para o desenvolvimento do seu filho?
+        <h2 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-8 leading-tight">
+          O potencial do seu filho é único, e o momento de agir por ele é agora.
         </h2>
         <p className="text-xl text-slate-700 mb-12 leading-relaxed">
-          Cada dia de atraso na intervenção é uma oportunidade perdida de aprendizagem. Agende uma conversa inicial e vamos descobrir como posso ajudar sua família.
+          Janelas de desenvolvimento se abrem e fecham em ritmos próprios; cada dia de espera é uma chance de aprendizado que não volta. Uma intervenção psicopedagógica profunda e sensível pode ser a chave que faltava para desbloquear o futuro dele. Não deixe para amanhã a evolução que ele pode começar a viver hoje. Agende nossa conversa inicial e vamos dar esse passo decisivo juntos.
         </p>
         <div className="flex flex-col items-center gap-6">
           <button

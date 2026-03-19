@@ -11,8 +11,7 @@ import {
     BtnBulletList,
     BtnLink,
     BtnClearFormatting,
-    ContentEditable,
-    EditorProvider,
+    Editor,
     Toolbar
 } from 'react-simple-wysiwyg';
 
@@ -830,7 +829,19 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                     title={editorTitle}
                                 />
                             ) : (
-                                <EditorProvider key={editingRecordId ? `rec-${editingRecordId}` : (selectedTemplate ? `temp-${selectedTemplate.id}` : 'new-empty')} value={editorContent} onChange={(e: any) => setEditorContent(e.target.value)}>
+                                <Editor 
+                                    key={editingRecordId ? `rec-${editingRecordId}` : (selectedTemplate ? `temp-${selectedTemplate.id}` : 'new-empty')} 
+                                    value={editorContent} 
+                                    onChange={(e: any) => setEditorContent(e.target.value)}
+                                    containerProps={{ style: { display: 'flex', flexDirection: 'column', height: '100%' } }}
+                                    style={{
+                                        minHeight: '1000px',
+                                        padding: '40px',
+                                        border: 'none',
+                                        outline: 'none',
+                                        backgroundColor: 'white'
+                                    }}
+                                >
                                     <Toolbar>
                                         <div className="flex flex-wrap gap-1 p-1 items-center">
                                             {/* Font Family Selector */}
@@ -884,16 +895,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                             <BtnClearFormatting title="Limpar Formatação" />
                                         </div>
                                     </Toolbar>
-                                    <ContentEditable
-                                        style={{
-                                            minHeight: '1000px',
-                                            padding: '40px',
-                                            border: 'none',
-                                            outline: 'none',
-                                            backgroundColor: 'white'
-                                        }}
-                                    />
-                                </EditorProvider>
+                                </Editor>
                             )}
                         </div>
                     </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, User, Phone, Mail, FileText, Upload, Trash2, Clock, FilePlus, Save, Eye, X, Plus, ChevronDown, Bold, Italic, Underline, List, ListOrdered, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
-import {
+import Editor, {
     BtnBold,
     BtnItalic,
     BtnUnderline,
@@ -11,7 +11,6 @@ import {
     BtnBulletList,
     BtnLink,
     BtnClearFormatting,
-    Editor,
     Toolbar
 } from 'react-simple-wysiwyg';
 

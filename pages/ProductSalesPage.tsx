@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, ShieldCheck, Star, AlertCircle, ChevronDown, ChevronUp, BookOpen, ArrowRight, Quote } from 'lucide-react';
 import { getProductById } from '../data/products';
+import profileImage from '../images/leia_psicoped.webp';
 
 export const ProductSalesPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -236,11 +237,7 @@ export const ProductSalesPage: React.FC = () => {
                         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                             <div className="flex flex-col md:flex-row items-center gap-12 sm:gap-16 bg-white/5 backdrop-blur-lg border border-white/10 p-8 sm:p-12 rounded-[3rem]">
                                 <div className="w-48 h-48 rounded-full border-4 border-sky-500 overflow-hidden flex-shrink-0 bg-sky-900 shadow-[0_0_30px_rgba(14,165,233,0.3)]">
-                                    {/* Placeholder for Author Photo - can be replaced via props/data later */}
-                                    <div className="w-full h-full flex flex-col justify-center items-center text-sky-200">
-                                        <span className="text-5xl font-black">LN</span>
-                                        <span className="text-[10px] tracking-widest mt-1 uppercase opacity-50">Léia Neves</span>
-                                    </div>
+                                    <img src={profileImage} alt="Léia Neves" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="text-center md:text-left text-white">
                                     <div className="inline-block px-3 py-1 bg-sky-500/20 text-sky-300 rounded-full text-sm font-bold tracking-wider mb-4 border border-sky-500/30">

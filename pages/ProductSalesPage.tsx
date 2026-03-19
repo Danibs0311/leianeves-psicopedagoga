@@ -244,10 +244,10 @@ export const ProductSalesPage: React.FC = () => {
                                 </div>
                                 <div className="text-center md:text-left text-white">
                                     <div className="inline-block px-3 py-1 bg-sky-500/20 text-sky-300 rounded-full text-sm font-bold tracking-wider mb-4 border border-sky-500/30">
-                                        QUEM ESCREVEU O MATERIAL
+                                        AUTORA
                                     </div>
                                     <h2 className="text-3xl sm:text-4xl font-black mb-3 text-white">Léia Neves</h2>
-                                    <h3 className="text-xl text-sky-400 font-semibold mb-6">Psicopedagoga Institucional e Clínica</h3>
+                                    <h3 className="text-xl text-sky-400 font-semibold mb-6">Psicopedagoga Especialista em TEA e TDAH, Neuropsicopedagoga</h3>
                                     <p className="text-slate-300 text-lg leading-relaxed font-light">
                                         Com prática diária e escuta clínica aguçada, Léia desenvolve trilhas de desenvolvimento para crianças que aprendem e sentem o mundo de outra forma. 
                                         Sua missão é clara: traduzir a neurociência e a pedagogia em estratégias simples, amorosas e firmes para que as famílias construam autonomia real em seus lares.

@@ -121,7 +121,7 @@ export const ProductSalesPage: React.FC = () => {
                                         }}
                                         className="w-full py-4 bg-sky-600 hover:bg-sky-700 text-white text-lg font-bold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] animate-pulse-subtle"
                                     >
-                                        Garantir Meu Acesso Agora
+                                        Adquira Já o Seu
                                     </button>
                                 </div>
                                 <p className="text-slate-500 text-sm flex items-center gap-2">
@@ -180,9 +180,9 @@ export const ProductSalesPage: React.FC = () => {
                                 onClick={() => {
                                     if (product.checkoutUrl) window.location.href = product.checkoutUrl;
                                 }}
-                                className="px-10 py-4 bg-amber-500 hover:bg-amber-600 text-white text-lg font-bold rounded-full transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
+                                className="px-10 py-4 bg-sky-600 hover:bg-sky-700 text-white text-lg font-bold rounded-full transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
                             >
-                                Quero a Solução Agora
+                                Adquira Já o Seu
                             </button>
                         </div>
                     </div>

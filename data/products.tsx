@@ -82,7 +82,6 @@ export const products: Product[] = [
         originalPrice: null,
         rating: 5.0,
         icon: <BookOpen className="w-12 h-12 text-sky-600 mb-4" />,
-        tag: "Magnético",
         imageUrl: "/capa ebook.png",
         checkoutUrl: "https://chk.eduzz.com/39VK4JRKWR",
         authorSection: true,

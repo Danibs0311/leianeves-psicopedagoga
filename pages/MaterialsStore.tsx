@@ -45,16 +45,20 @@ export const MaterialsStore: React.FC = () => {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {products.map((product) => (
                         <div key={product.id} className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col">
-                            {/* Card Image Cover (Simulated with colorful gradient and icon) */}
-                            <div className="h-48 bg-gradient-to-br from-sky-50 to-indigo-50 relative flex items-center justify-center">
+                            {/* Card Image Cover */}
+                            <div className={`h-48 relative flex items-center justify-center overflow-hidden ${product.imageUrl ? 'bg-white' : 'bg-gradient-to-br from-sky-50 to-indigo-50'}`}>
                                 {product.tag && (
-                                    <div className="absolute top-4 left-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                    <div className="absolute top-4 left-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider z-10">
                                         {product.tag}
                                     </div>
                                 )}
-                                <div className="group-hover:scale-110 transition-transform duration-500">
-                                    {product.icon}
-                                </div>
+                                {product.imageUrl ? (
+                                    <img src={product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 p-2" />
+                                ) : (
+                                    <div className="group-hover:scale-110 transition-transform duration-500">
+                                        {product.icon}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Card Body */}

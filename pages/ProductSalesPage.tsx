@@ -255,35 +255,40 @@ export const ProductSalesPage: React.FC = () => {
                     </section>
                 )}
 
-                {/* FAQ SECTION */}
+                {/* FAQ SECTION - Vibrant & Premium */}
                 {product.faq && product.faq.length > 0 && (
-                    <section className="py-24 bg-white">
-                        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <section className="py-24 bg-gradient-to-b from-slate-900 to-sky-950 relative overflow-hidden">
+                        {/* Decorative background element */}
+                        <div className="absolute left-0 top-1/4 w-96 h-96 bg-sky-500/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse"></div>
+                        <div className="absolute right-0 bottom-0 w-80 h-80 bg-indigo-500/10 rounded-full mix-blend-screen filter blur-[80px]"></div>
+                        
+                        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                             <div className="text-center mb-16">
-                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Dúvidas Frequentes</h2>
+                                <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-4 drop-shadow-sm">Dúvidas Frequentes</h2>
+                                <p className="text-sky-200/80 text-lg lg:text-xl font-medium tracking-wide">Tudo que você precisa saber antes de dar esse passo.</p>
                             </div>
                             
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                                 {product.faq.map((item, index) => {
                                     const isOpen = openFaq === index;
                                     return (
                                         <div 
                                             key={index} 
-                                            className={`rounded-2xl border transition-all duration-300 overflow-hidden ${isOpen ? 'border-sky-300 bg-sky-50/30 shadow-md' : 'border-slate-200 bg-white hover:border-sky-200'}`}
+                                            className={`rounded-3xl border transition-all duration-500 overflow-hidden backdrop-blur-md ${isOpen ? 'border-sky-400 bg-sky-900/60 shadow-[0_0_30px_rgba(14,165,233,0.2)]' : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'}`}
                                         >
                                             <button 
-                                                className="w-full text-left px-6 py-5 flex items-center justify-between gap-4"
+                                                className="w-full text-left px-8 py-6 flex items-center justify-between gap-6 outline-none"
                                                 onClick={() => setOpenFaq(isOpen ? null : index)}
                                             >
-                                                <span className="text-lg font-bold text-slate-800">{item.q}</span>
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${isOpen ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
-                                                    {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                                <span className={`text-xl font-bold transition-colors ${isOpen ? 'text-white' : 'text-sky-100'}`}>{item.q}</span>
+                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-transform duration-500 ease-spring ${isOpen ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/50 rotate-180' : 'bg-white/10 text-sky-300 hover:bg-white/20'}`}>
+                                                    <ChevronDown size={24} />
                                                 </div>
                                             </button>
                                             
-                                            <div className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                                <div className="w-12 h-1 bg-sky-200 mb-4 rounded-full"></div>
-                                                <p className="text-slate-600 text-lg leading-relaxed">{item.a}</p>
+                                            <div className={`px-8 overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-96 pb-8 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                                <div className="w-16 h-1 bg-gradient-to-r from-sky-400 to-transparent mb-6 rounded-full"></div>
+                                                <p className="text-sky-50/90 text-lg leading-loose font-medium">{item.a}</p>
                                             </div>
                                         </div>
                                     )
@@ -293,21 +298,39 @@ export const ProductSalesPage: React.FC = () => {
                     </section>
                 )}
 
-                {/* FINAL CTA FIXO */}
-                <section className="py-20 bg-gradient-to-t from-sky-900 to-slate-900 text-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 mix-blend-overlay"></div>
-                    <div className="max-w-3xl mx-auto px-4 relative z-10">
-                        <h2 className="text-3xl sm:text-5xl font-black text-white mb-8">
+                {/* FINAL CTA FIXO - Explosão de Vida */}
+                <section className="py-24 sm:py-32 bg-sky-600 text-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+                    <div className="absolute -top-40 -right-40 w-96 h-96 bg-amber-400 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-pulse"></div>
+                    <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-pulse" style={{ animationDelay: '2s' }}></div>
+                    
+                    <div className="max-w-4xl mx-auto px-4 relative z-10 flex flex-col items-center">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 border border-white/30 backdrop-blur-md mb-10 shadow-xl">
+                            <Star size={18} className="text-amber-300 fill-amber-300" />
+                            <span className="text-white text-sm font-bold tracking-widest uppercase">Oferta Por Tempo Limitado</span>
+                            <Star size={18} className="text-amber-300 fill-amber-300" />
+                        </div>
+                        
+                        <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-8 leading-[1.1] drop-shadow-2xl">
                             Pronto para mudar a dinâmica da sua casa?
                         </h2>
+                        
+                        <p className="text-xl sm:text-2xl text-sky-100 font-medium mb-16 max-w-2xl drop-shadow">
+                            O acesso imediato a todas as ferramentas e roteiros práticos está a um clique de distância.
+                        </p>
+                        
                         <button
                             onClick={handleCheckout}
-                            className="group relative inline-flex items-center justify-center gap-2 px-10 py-5 bg-sky-500 hover:bg-sky-400 text-white text-2xl font-extrabold rounded-full transition-all shadow-[0_0_40px_rgba(14,165,233,0.5)] hover:shadow-[0_0_60px_rgba(14,165,233,0.7)] hover:-translate-y-1 overflow-hidden"
+                            className="group relative inline-flex items-center justify-center gap-4 px-12 py-6 sm:py-8 bg-white hover:bg-slate-50 text-sky-700 text-2xl sm:text-3xl font-black rounded-[2rem] transition-all shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)] hover:-translate-y-2 overflow-hidden w-full sm:w-auto"
                         >
-                            <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-                            Adquira Já o Seu
-                            <ArrowRight size={28} className="group-hover:translate-x-2 transition-transform" />
+                            <div className="absolute inset-0 bg-sky-100/30 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                            <span>Adquira Já o Seu</span>
+                            <ArrowRight size={36} className="text-amber-500 group-hover:translate-x-3 transition-transform duration-300" />
                         </button>
+                        
+                        <div className="mt-10 flex items-center justify-center gap-3 text-white text-sm lg:text-base font-bold bg-black/15 px-8 py-4 rounded-full backdrop-blur-md shadow-inner border border-white/10">
+                            <ShieldCheck size={24} className="text-green-400 drop-shadow-md" /> Acesso Seguro e Imediato direto no e-mail
+                        </div>
                     </div>
                 </section>
             </main>

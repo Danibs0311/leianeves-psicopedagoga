@@ -140,44 +140,52 @@ export const ProductSalesPage: React.FC = () => {
                     </div>
                 </section>
 
-                {/* PAIN POINTS - Magnetic Connection */}
+                {/* PAIN POINTS - Magnetic Connection (Dramatic UI) */}
                 {product.painPoints && product.painPoints.length > 0 && (
-                    <section className="py-24 bg-white relative">
-                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="text-center mb-16">
-                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
-                                    Isso soa <span className="text-red-500 relative inline-block">
+                    <section className="py-24 sm:py-32 bg-gradient-to-b from-slate-900 via-rose-950 to-slate-900 relative overflow-hidden">
+                        {/* Dramatic Lighting Effects */}
+                        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-rose-500/50 to-transparent"></div>
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-rose-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+                        
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                            <div className="text-center mb-20">
+                                <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight mb-6 drop-shadow-xl">
+                                    Isso soa <span className="text-rose-400 relative inline-block">
                                         familiar
-                                        <svg className="absolute w-full h-3 -bottom-1 left-0 text-red-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none"/></svg>
+                                        <svg className="absolute w-full h-4 -bottom-2 left-0 text-rose-500/50 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none"/></svg>
                                     </span> para você?
                                 </h2>
-                                <p className="text-xl text-slate-500 font-medium">O desgaste diário que suga a sua energia e a do seu filho.</p>
+                                <p className="text-xl sm:text-2xl text-rose-200/80 font-medium tracking-wide max-w-3xl mx-auto">O desgaste diário que suga a sua energia e mina a confiança do seu filho e da sua família.</p>
                             </div>
 
-                            <div className="grid sm:grid-cols-2 gap-6">
+                            <div className="grid sm:grid-cols-2 gap-6 lg:gap-8">
                                 {product.painPoints.map((point, index) => (
-                                    <div key={index} className="flex gap-4 p-6 sm:p-8 rounded-3xl bg-slate-50 border hover:border-red-200 hover:bg-red-50/50 transition-colors group">
-                                        <div className="mt-1 bg-white shadow-sm text-red-500 rounded-full p-2 h-10 w-10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-red-500 group-hover:text-white transition-all">
-                                            <AlertCircle size={20} strokeWidth={2.5} />
+                                    <div key={index} className="flex gap-5 p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-rose-400/50 hover:bg-rose-900/40 backdrop-blur-xl transition-all duration-300 group shadow-2xl hover:-translate-y-1">
+                                        <div className="mt-1 bg-rose-500/20 shadow-inner text-rose-400 rounded-full h-12 w-12 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300 border border-rose-500/30">
+                                            <AlertCircle size={24} strokeWidth={2.5} />
                                         </div>
-                                        <p className="text-slate-700 text-lg leading-relaxed font-medium">{point}</p>
+                                        <p className="text-rose-50 text-lg lg:text-xl leading-relaxed font-medium">{point}</p>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="mt-16 text-center max-w-3xl mx-auto bg-amber-50 rounded-3xl p-8 sm:p-12 border border-amber-100 shadow-sm relative overflow-hidden">
-                                <div className="absolute -right-10 -top-10 text-amber-500/10">
-                                    <BookOpen size={160} />
+                            <div className="mt-20 text-center max-w-4xl mx-auto bg-gradient-to-br from-amber-500 to-orange-600 rounded-[3rem] p-10 sm:p-14 shadow-[0_0_50px_rgba(245,158,11,0.3)] relative overflow-hidden group">
+                                <div className="absolute -right-20 -top-20 text-white/10 group-hover:scale-110 transition-transform duration-700">
+                                    <BookOpen size={250} />
                                 </div>
-                                <h3 className="text-2xl font-bold text-slate-900 mb-4 relative z-10">Esse cenário não precisa ser para sempre.</h3>
-                                <p className="text-lg text-slate-600 mb-8 font-medium leading-relaxed relative z-10">
-                                    A dificuldade de aprendizagem ou as crises emocionais não definem quem a criança é. Elas indicam que o aprendizado e a segurança dela acontecem por caminhos diferentes.
+                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-scales.png')] opacity-10 mix-blend-overlay"></div>
+                                
+                                <h3 className="text-3xl sm:text-5xl font-black text-white mb-6 relative z-10 drop-shadow-md">Esse cenário não precisa ser para sempre.</h3>
+                                <p className="text-xl text-amber-50 mb-10 font-medium leading-relaxed relative z-10 max-w-2xl mx-auto drop-shadow-sm">
+                                    A dificuldade de aprendizagem ou as crises emocionais não definem a identidade da criança. Elas indicam que a segurança dela acontece por caminhos diferentes.
                                 </p>
                                 <button
                                     onClick={handleCheckout}
-                                    className="relative z-10 inline-flex items-center justify-center gap-2 px-10 py-4 bg-sky-600 hover:bg-sky-500 text-white text-xl font-extrabold rounded-full transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
+                                    className="relative z-10 inline-flex items-center justify-center gap-3 px-10 py-5 bg-slate-900 hover:bg-black text-white text-xl sm:text-2xl font-black rounded-full transition-all shadow-2xl hover:-translate-y-1 w-full sm:w-auto overflow-hidden group/btn border border-slate-700"
                                 >
-                                    Adquira Já o Seu Resolva Isso
+                                    <div className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]"></div>
+                                    Resolver Isso Agora Mesmo
+                                    <ArrowRight size={28} className="text-amber-400 group-hover/btn:translate-x-2 transition-transform" />
                                 </button>
                             </div>
                         </div>

@@ -10,7 +10,14 @@ export const ProductSalesPage: React.FC = () => {
     useEffect(() => {
         // Rola a página para o topo sempre que carregar um novo produto
         window.scrollTo(0, 0);
-    }, [id]);
+        if (product) {
+            document.title = `${product.title} | Léia Neves Psicopedagoga`;
+            const metaDescription = document.querySelector('meta[name="description"]');
+            if (metaDescription) {
+                metaDescription.setAttribute("content", product.description);
+            }
+        }
+    }, [id, product]);
 
     if (!product) {
         return (
@@ -51,16 +58,22 @@ export const ProductSalesPage: React.FC = () => {
                             <div className="w-full lg:w-1/2 flex justify-center">
                                 <div className="max-w-sm w-full bg-gradient-to-br from-sky-50 to-indigo-100 rounded-[2rem] p-12 aspect-[4/5] flex flex-col items-center justify-center shadow-lg relative border border-white">
                                     {product.tag && (
-                                        <div className="absolute top-6 left-6 bg-yellow-400 text-yellow-900 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
+                                        <div className="absolute top-6 left-6 bg-yellow-400 text-yellow-900 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm z-10">
                                             {product.tag}
                                         </div>
                                     )}
-                                    <div className="transform scale-150 mb-8 opacity-90 drop-shadow-md">
-                                        {product.icon}
-                                    </div>
-                                    <h2 className="text-center font-bold text-slate-800 text-xl leading-tight">
-                                        {product.title}
-                                    </h2>
+                                    {product.imageUrl ? (
+                                        <img src={product.imageUrl} alt={product.title} className="w-full h-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-500" />
+                                    ) : (
+                                        <>
+                                            <div className="transform scale-150 mb-8 opacity-90 drop-shadow-md">
+                                                {product.icon}
+                                            </div>
+                                            <h2 className="text-center font-bold text-slate-800 text-xl leading-tight">
+                                                {product.title}
+                                            </h2>
+                                        </>
+                                    )}
                                 </div>
                             </div>
 
@@ -99,7 +112,13 @@ export const ProductSalesPage: React.FC = () => {
                                     </p>
 
                                     <button
-                                        onClick={() => alert("Integração de pagamento pendente (Ex: Checkout Hotmart/Kiwify).")}
+                                        onClick={() => {
+                                            if (product.checkoutUrl) {
+                                                window.location.href = product.checkoutUrl;
+                                            } else {
+                                                alert("Integração de pagamento pendente (Ex: Checkout Hotmart/Kiwify).")
+                                            }
+                                        }}
                                         className="w-full py-4 bg-sky-600 hover:bg-sky-700 text-white text-lg font-bold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] animate-pulse-subtle"
                                     >
                                         Garantir Meu Acesso Agora
@@ -137,6 +156,77 @@ export const ProductSalesPage: React.FC = () => {
                     </section>
                 )}
             </main>
+
+            {/* Pain Points Section */}
+            {product.painPoints && product.painPoints.length > 0 && (
+                <section className="py-20 bg-white">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-center text-slate-900 mb-12">
+                            Isso soa <span className="text-sky-600">familiar</span> para você?
+                        </h2>
+                        <div className="space-y-4">
+                            {product.painPoints.map((point, index) => (
+                                <div key={index} className="flex items-start gap-4 p-6 rounded-2xl bg-sky-50 border border-sky-100 hover:shadow-md transition-shadow">
+                                    <div className="mt-1 bg-red-100 text-red-500 rounded-full p-1.5 flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                    </div>
+                                    <span className="text-slate-700 text-lg font-medium">{point}</span>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-12 text-center">
+                            <p className="text-xl text-slate-600 font-medium mb-8">Se você respondeu "sim" a alguma dessas perguntas, este material é exatamente o que você precisa.</p>
+                            <button
+                                onClick={() => {
+                                    if (product.checkoutUrl) window.location.href = product.checkoutUrl;
+                                }}
+                                className="px-10 py-4 bg-amber-500 hover:bg-amber-600 text-white text-lg font-bold rounded-full transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
+                            >
+                                Quero a Solução Agora
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* FAQ Section */}
+            {product.faq && product.faq.length > 0 && (
+                <section className="py-20 bg-slate-50 border-t border-slate-200">
+                    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">Dúvidas Frequentes</h2>
+                        <div className="space-y-6">
+                            {product.faq.map((item, index) => (
+                                <div key={index} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                                    <h3 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-sm">?</div>
+                                        {item.q}
+                                    </h3>
+                                    <p className="text-slate-600 pl-8">{item.a}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* Author Section */}
+            {product.authorSection && (
+                <section className="py-20 bg-sky-900 text-white">
+                    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-12">
+                        <div className="w-48 h-48 rounded-full border-4 border-sky-700 overflow-hidden flex-shrink-0 bg-sky-800 flex items-center justify-center">
+                            <span className="text-5xl font-bold text-sky-300">LN</span>
+                        </div>
+                        <div className="text-center md:text-left">
+                            <h2 className="text-3xl font-bold mb-4">Sobre a Autora</h2>
+                            <h3 className="text-xl text-sky-300 font-medium mb-6">Léia Neves | Psicopedagoga Especializada</h3>
+                            <p className="text-sky-100 text-lg leading-relaxed mb-6">
+                                Com anos de experiência clínica e escolar, Léia dedica sua vida a ajudar famílias e crianças que aprendem e sentem o mundo de outra forma. 
+                                Seu método une acolhimento, embasamento científico e práticas testadas diariamente no consultório para transformar a dinâmica de aprendizagem dos lares.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            )}
 
             <footer className="bg-slate-900 text-slate-400 py-12 text-center">
                 <div className="max-w-7xl mx-auto px-4">

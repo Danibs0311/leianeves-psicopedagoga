@@ -12,6 +12,11 @@ export interface Product {
     icon: React.ReactNode;
     tag?: string;
     benefits?: string[];
+    imageUrl?: string;
+    checkoutUrl?: string;
+    painPoints?: string[];
+    faq?: { q: string; a: string }[];
+    authorSection?: boolean;
 }
 
 export const products: Product[] = [
@@ -66,6 +71,48 @@ export const products: Product[] = [
             "Melhora o rastreio visual e processamento cognitivo.",
             "Folhas projetadas para evitar sobrecarga sensorial e visual.",
             "Totalmente imprimível para usar quantas vezes precisar."
+        ]
+    },
+    {
+        id: 4,
+        title: "Quando Aprender Não é Simples",
+        description: "O guia prático para famílias entenderem o comportamento e apoiarem os filhos neurodivergentes de forma eficaz e sem sofrimento.",
+        longDescription: "Seu filho se frustra facilmente? A hora da tarefa escolar vira um campo de batalha? A previsibilidade e a adaptação do ambiente são vitais para reduzir crises infantis. Este e-book é um manual prático e acolhedor (escrito por uma profissional que atua diariamente com famílias atípicas) focado em ensinar adultos a olharem o comportamento como comunicação, criar rotinas que abraçam e construir autonomia emocional real.",
+        price: 24.90,
+        originalPrice: null,
+        rating: 5.0,
+        icon: <BookOpen className="w-12 h-12 text-sky-600 mb-4" />,
+        tag: "Magnético",
+        imageUrl: "/capa ebook.png",
+        checkoutUrl: "https://chk.eduzz.com/39VK4JRKWR",
+        authorSection: true,
+        painPoints: [
+            "Seu filho tem dificuldade para se concentrar ou acompanhar a escola?",
+            "Ele se frustra com facilidade e a hora da tarefa vira um campo de batalha?",
+            "As queixas da escola são frequentes, mas as soluções parecem não funcionar?",
+            "As famosas ''birras'' escondem crises de sobrecarga sensorial que você não sabe como intervir?",
+            "Você se sente esgotado(a) e culpado(a) tentando entender como ajudar sem causar mais crises?"
+        ],
+        benefits: [
+            "Transforme birras e explosões em momentos de compreensão sabendo agir corretamente.",
+            "Crie uma rotina que acolhe, estrutura a mente e organiza sem ser uma prisão.",
+            "Aprenda as mesmas estratégias do consultório para fazer a tarefa de casa sem choro.",
+            "Construa uma parceria prática e exigente com a escola sabendo os seus direitos.",
+            "Eleve a autoestima da criança para que ela acredite no seu potencial real."
+        ],
+        faq: [
+            {
+                q: "Para qual idade este material é recomendado?",
+                a: "As orientações valem desde a primeira infância até a pré-adolescência, pois são focadas nas bases do neurodesenvolvimento infantil e na regulação emocional."
+            },
+            {
+                q: "Este guia é apenas para autistas ou portadores de TDAH?",
+                a: "Não! Ele é para qualquer criança que sinta e processe o mundo de forma mais intensa ou demande um modelo adaptado de aprendizagem."
+            },
+            {
+                q: "Vou receber um livro físico?",
+                a: "Não, o material é 100% digital (e-book em PDF). Assim que confirmar a compra, ele vai direto para o seu e-mail e você acessa na mesma hora pelo celular ou computador."
+            }
         ]
     }
 ];

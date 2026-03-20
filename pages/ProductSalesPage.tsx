@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, ShieldCheck, Star, AlertCircle, ChevronDown, ChevronUp, BookOpen, ArrowRight, Quote } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ShieldCheck, Star, AlertCircle, ChevronDown, ChevronUp, BookOpen, Quote, HeartHandshake } from 'lucide-react';
 import { getProductById } from '../data/products';
 import profileImage from '../images/leia_psicoped.webp';
 
@@ -40,58 +40,50 @@ export const ProductSalesPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 font-inter selection:bg-sky-200 selection:text-sky-900">
-            {/* Minimal Sticky Header */}
-            <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+        <div className="min-h-screen bg-white font-inter text-slate-900 selection:bg-sky-100 selection:text-sky-900">
+            {/* CLEAN HEADER */}
+            <header className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16 sm:h-20">
                         <Link to="/materiais" className="text-slate-500 hover:text-sky-600 transition-colors flex items-center gap-2 text-sm font-semibold uppercase tracking-wider">
                             <ArrowLeft size={16} /> Voltar
                         </Link>
-                        <span className="text-lg font-black text-sky-800 tracking-tighter">
-                            Léia<span className="text-sky-500">Neves</span>
+                        <span className="text-lg font-black text-slate-900 tracking-tighter">
+                            Léia<span className="text-sky-600">Neves</span>
                         </span>
                     </div>
                 </div>
             </header>
 
             <main>
-                {/* HERO SECTION - Premium Dark/Gradient */}
-                <section className="relative bg-slate-900 overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-32">
-                    {/* Dynamic background accents */}
-                    <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-                        <div className="absolute -top-40 -right-40 w-96 h-96 bg-sky-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-                        <div className="absolute top-40 -left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '2s' }}></div>
-                    </div>
-
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+                {/* HERO SECTION - Trusted & Academic Elegance */}
+                <section className="bg-slate-50 py-16 lg:py-24 border-b border-slate-200">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
                             
                             {/* Text Content */}
                             <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm mb-6">
-                                    <Star size={14} className="text-amber-400 fill-amber-400" />
-                                    <span className="text-sky-100 text-sm font-semibold tracking-wide">
-                                        Avaliação {product.rating.toFixed(1)}/5 pelos Pais
-                                    </span>
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-sm font-semibold tracking-wide mb-6">
+                                    <Star size={14} className="fill-amber-500 text-amber-500" />
+                                    <span>Material Recomendado por Pais e Educadores</span>
                                 </div>
 
-                                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-[1.1] tracking-tight">
+                                <h1 className="text-4xl sm:text-5xl font-black text-slate-900 mb-6 leading-[1.15] tracking-tight">
                                     {product.title}
                                 </h1>
                                 
-                                <p className="text-lg sm:text-xl text-sky-100/90 mb-10 leading-relaxed font-light max-w-2xl">
+                                <p className="text-lg sm:text-xl text-slate-600 mb-10 leading-relaxed max-w-2xl">
                                     {product.description}
                                 </p>
 
-                                {/* Buy Card Floating */}
-                                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl relative">
-                                    <div className="flex items-baseline gap-3 mb-6">
-                                        <span className="text-5xl font-black text-white">
+                                {/* Elegance Pricing Card */}
+                                <div className="bg-white border border-slate-200 rounded-3xl p-8 w-full max-w-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                                    <div className="flex items-end gap-3 mb-6 justify-center lg:justify-start">
+                                        <span className="text-5xl font-black text-slate-900">
                                             R$ {product.price.toFixed(2).replace('.', ',')}
                                         </span>
                                         {product.originalPrice && (
-                                            <span className="text-xl text-sky-200/50 line-through font-medium">
+                                            <span className="text-lg text-slate-400 line-through font-medium mb-1">
                                                 R$ {product.originalPrice.toFixed(2).replace('.', ',')}
                                             </span>
                                         )}
@@ -99,37 +91,35 @@ export const ProductSalesPage: React.FC = () => {
                                     
                                     <button
                                         onClick={handleCheckout}
-                                        className="group relative w-full flex items-center justify-center gap-2 py-4 px-8 bg-sky-500 hover:bg-sky-400 text-white text-xl font-extrabold rounded-2xl transition-all shadow-[0_0_40px_rgba(14,165,233,0.4)] hover:shadow-[0_0_60px_rgba(14,165,233,0.6)] hover:-translate-y-1 overflow-hidden"
+                                        className="w-full py-4 px-8 bg-sky-600 hover:bg-sky-700 text-white text-xl font-bold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] flex items-center justify-center gap-2"
                                     >
-                                        <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                                         Adquira Já o Seu
-                                        <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
                                     </button>
                                     
-                                    <div className="mt-5 flex items-center justify-center gap-2 text-sky-200 text-sm font-medium">
-                                        <ShieldCheck size={18} className="text-green-400" />
-                                        <span>Pagamento Seguro Geração de Acesso Imediato</span>
+                                    <div className="mt-4 flex items-center justify-center gap-2 text-slate-500 text-sm font-medium">
+                                        <ShieldCheck size={18} className="text-green-500" />
+                                        <span>Compra Criptografada e Segura pela Eduzz</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Image Content */}
-                            <div className="w-full lg:w-1/2 flex justify-center lg:justify-end relative">
-                                <div className="relative w-full max-w-[400px] group">
-                                    <div className="absolute inset-0 bg-sky-500 rounded-3xl transform rotate-3 scale-105 opacity-20 group-hover:rotate-6 transition-transform duration-500"></div>
-                                    <div className="absolute inset-0 bg-indigo-500 rounded-3xl transform -rotate-3 scale-105 opacity-20 group-hover:-rotate-6 transition-transform duration-500"></div>
+                            <div className="w-full lg:w-1/2 flex justify-center">
+                                <div className="relative w-full max-w-[420px]">
+                                    {/* Soft shadow under the book */}
+                                    <div className="absolute -bottom-6 lg:-bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-black/20 blur-xl rounded-[100%]"></div>
                                     
-                                    <div className="relative z-10 bg-gradient-to-tr from-slate-100 to-white rounded-3xl p-4 shadow-2xl overflow-hidden group-hover:-translate-y-2 transition-transform duration-500 border border-slate-200/50">
+                                    <div className="relative z-10 bg-white rounded-3xl p-4 shadow-xl border border-slate-100 hover:-translate-y-2 transition-transform duration-500">
                                         {product.imageUrl ? (
                                             <img src={product.imageUrl} alt={product.title} className="w-full h-auto object-contain rounded-2xl" />
                                         ) : (
-                                            <div className="aspect-[4/5] flex flex-col items-center justify-center bg-sky-50 rounded-2xl">
-                                                <div className="transform scale-[2] text-sky-600 opacity-80 mb-6">{product.icon}</div>
+                                            <div className="aspect-[4/5] flex flex-col items-center justify-center bg-slate-50 rounded-2xl">
+                                                <div className="transform scale-[2] text-slate-300 mb-6">{product.icon}</div>
                                                 <span className="text-slate-400 font-bold uppercase tracking-widest text-sm">Capa Ilustrativa</span>
                                             </div>
                                         )}
                                         {product.tag && (
-                                            <div className="absolute top-8 left-0 bg-amber-400 text-amber-900 font-black px-6 py-2 uppercase tracking-widest text-sm shadow-lg transform -translate-x-2">
+                                            <div className="absolute -top-4 -right-4 bg-amber-400 text-amber-950 font-black px-6 py-2 rounded-full uppercase tracking-widest text-sm shadow-md">
                                                 {product.tag}
                                             </div>
                                         )}
@@ -140,122 +130,108 @@ export const ProductSalesPage: React.FC = () => {
                     </div>
                 </section>
 
-                {/* PAIN POINTS - Magnetic Connection (Dramatic UI) */}
+                {/* EMPATHETIC PROBLEM SECTION ("Isso soa familiar?") */}
                 {product.painPoints && product.painPoints.length > 0 && (
-                    <section className="py-24 sm:py-32 bg-gradient-to-b from-slate-900 via-rose-950 to-slate-900 relative overflow-hidden">
-                        {/* Dramatic Lighting Effects */}
-                        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-rose-500/50 to-transparent"></div>
-                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-rose-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+                    <section className="py-20 lg:py-28 bg-white overflow-hidden relative border-b border-slate-100">
+                        {/* Soft background shape for harmony */}
+                        <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-50/50 -skew-x-12 origin-top-right -z-10"></div>
                         
-                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                            <div className="text-center mb-20">
-                                <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight mb-6 drop-shadow-xl">
-                                    Isso soa <span className="text-rose-400 relative inline-block">
-                                        familiar
-                                        <svg className="absolute w-full h-4 -bottom-2 left-0 text-rose-500/50 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none"/></svg>
-                                    </span> para você?
+                        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center md:text-left mb-16 max-w-3xl">
+                                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-6">
+                                    O desgaste diário soa familiar para você?
                                 </h2>
-                                <p className="text-xl sm:text-2xl text-rose-200/80 font-medium tracking-wide max-w-3xl mx-auto">O desgaste diário que suga a sua energia e mina a confiança do seu filho e da sua família.</p>
+                                <p className="text-xl text-slate-600 leading-relaxed">
+                                    Muitas famílias vivenciam uma rotina exaustiva tentando adequar o ritmo da criança ao que é esperado, gerando desgaste e frustração para ambos os lados.
+                                </p>
                             </div>
 
-                            <div className="grid sm:grid-cols-2 gap-6 lg:gap-8">
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {product.painPoints.map((point, index) => (
-                                    <div key={index} className="flex gap-5 p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-rose-400/50 hover:bg-rose-900/40 backdrop-blur-xl transition-all duration-300 group shadow-2xl hover:-translate-y-1">
-                                        <div className="mt-1 bg-rose-500/20 shadow-inner text-rose-400 rounded-full h-12 w-12 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300 border border-rose-500/30">
-                                            <AlertCircle size={24} strokeWidth={2.5} />
-                                        </div>
-                                        <p className="text-rose-50 text-lg lg:text-xl leading-relaxed font-medium">{point}</p>
+                                    <div key={index} className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                                        <AlertCircle className="text-rose-400 mb-4 w-8 h-8" strokeWidth={2} />
+                                        <p className="text-slate-700 text-lg leading-relaxed">{point}</p>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="mt-20 text-center max-w-4xl mx-auto bg-gradient-to-br from-amber-500 to-orange-600 rounded-[3rem] p-10 sm:p-14 shadow-[0_0_50px_rgba(245,158,11,0.3)] relative overflow-hidden group">
-                                <div className="absolute -right-20 -top-20 text-white/10 group-hover:scale-110 transition-transform duration-700">
-                                    <BookOpen size={250} />
+                            {/* The Bridge (Connecting problem to solution beautifully) */}
+                            <div className="mt-20 bg-sky-50 rounded-3xl p-10 lg:p-16 border border-sky-100 flex flex-col md:flex-row items-center justify-between gap-10">
+                                <div className="max-w-xl text-center md:text-left">
+                                    <h3 className="text-2xl sm:text-3xl font-bold text-sky-950 mb-4">
+                                        Esse cenário não precisa ser para sempre.
+                                    </h3>
+                                    <p className="text-lg text-sky-800/80 leading-relaxed font-medium">
+                                        A dificuldade de aprendizagem não define quem a criança é. Ela apenas mostra que a jornada dela precisa de rotas diferentes.
+                                    </p>
                                 </div>
-                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-scales.png')] opacity-10 mix-blend-overlay"></div>
-                                
-                                <h3 className="text-3xl sm:text-5xl font-black text-white mb-6 relative z-10 drop-shadow-md">Esse cenário não precisa ser para sempre.</h3>
-                                <p className="text-xl text-amber-50 mb-10 font-medium leading-relaxed relative z-10 max-w-2xl mx-auto drop-shadow-sm">
-                                    A dificuldade de aprendizagem ou as crises emocionais não definem a identidade da criança. Elas indicam que a segurança dela acontece por caminhos diferentes.
-                                </p>
-                                <button
-                                    onClick={handleCheckout}
-                                    className="relative z-10 inline-flex items-center justify-center gap-3 px-10 py-5 bg-slate-900 hover:bg-black text-white text-xl sm:text-2xl font-black rounded-full transition-all shadow-2xl hover:-translate-y-1 w-full sm:w-auto overflow-hidden group/btn border border-slate-700"
-                                >
-                                    <div className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]"></div>
-                                    Resolver Isso Agora Mesmo
-                                    <ArrowRight size={28} className="text-amber-400 group-hover/btn:translate-x-2 transition-transform" />
-                                </button>
+                                <div className="shrink-0 w-full md:w-auto">
+                                    <button
+                                        onClick={handleCheckout}
+                                        className="w-full md:w-auto px-8 py-4 bg-sky-600 hover:bg-sky-700 text-white text-lg font-bold rounded-xl transition-all shadow-md active:scale-[0.98]"
+                                    >
+                                        Quero Iniciar a Mudança
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </section>
                 )}
 
-                {/* THE SOLUTION (Long Description & Benefits) */}
-                <section className="py-24 bg-sky-50/50 border-y border-sky-100 relative overflow-hidden">
+                {/* THE SOLUTION (Benefits & Deep Explanation) */}
+                <section className="py-20 lg:py-28 bg-slate-900 border-b border-slate-800 text-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex flex-col lg:flex-row gap-16 items-center">
-                            <div className="w-full lg:w-1/2">
-                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6 leading-tight">
-                                    O caminho prático para uma rotina <span className="text-sky-600">sem sofrimento</span>.
+                        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                            <div>
+                                <h2 className="text-3xl sm:text-4xl font-black mb-8 leading-tight text-white">
+                                    O caminho prático para uma <span className="text-sky-400">rotina sem sofrimento</span>.
                                 </h2>
-                                <div className="text-lg text-slate-600 space-y-6 leading-relaxed">
-                                    <p className="font-semibold text-slate-800 text-xl border-l-4 border-sky-500 pl-4">
+                                <div className="text-lg text-slate-300 space-y-6 leading-relaxed">
+                                    <p className="font-semibold text-white/90 text-xl border-l-4 border-sky-500 pl-5">
                                         Entendimento gera empatia. Empatia gera ajuste. Ajuste gera desenvolvimento.
                                     </p>
-                                    <p>
+                                    <p className="font-light">
                                         {product.longDescription}
                                     </p>
-                                    {/* Quote Block */}
-                                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 italic">
-                                        <Quote size={24} className="text-sky-300 mb-2" />
+                                    
+                                    <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 italic mt-8 font-light text-slate-400">
+                                        <Quote size={24} className="text-sky-500/50 mb-3" />
                                         "Nenhuma criança aprende melhor quando não é compreendida. Este guia é o mapa para apoiar sem fazer pelo filho, e amar sem adoecer."
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="w-full lg:w-1/2">
-                                <div className="bg-white rounded-[2rem] p-8 sm:p-10 shadow-xl border border-slate-100">
-                                    <h3 className="text-2xl font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">O que você vai descobrir:</h3>
-                                    <ul className="space-y-6">
-                                        {product.benefits?.map((benefit, index) => (
-                                            <li key={index} className="flex items-start gap-4">
-                                                <div className="mt-1 bg-emerald-100 text-emerald-600 rounded-full p-1.5 flex-shrink-0 shadow-sm">
-                                                    <CheckCircle2 size={20} className="fill-emerald-100" strokeWidth={2.5} />
-                                                </div>
-                                                <span className="text-slate-700 text-lg leading-relaxed font-medium">{benefit}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                            <div className="bg-slate-800 border border-slate-700 rounded-3xl p-8 sm:p-10 shadow-2xl">
+                                <h3 className="text-2xl font-bold text-white mb-8">O que você vai descobrir:</h3>
+                                <ul className="space-y-6">
+                                    {product.benefits?.map((benefit, index) => (
+                                        <li key={index} className="flex items-start gap-4">
+                                            <CheckCircle2 size={24} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                                            <span className="text-slate-200 text-lg leading-relaxed">{benefit}</span>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* AUTHOR SECTION - Authority */}
+                {/* AUTHOR SECTION - Clear & Trusted */}
                 {product.authorSection && (
-                    <section className="py-24 bg-slate-900 border-t border-slate-800 relative overflow-hidden">
-                        {/* Decorative background element */}
-                        <div className="absolute right-0 bottom-0 text-sky-500/5 transform translate-x-1/4 translate-y-1/4">
-                            <Star size={600} />
-                        </div>
-
-                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                            <div className="flex flex-col md:flex-row items-center gap-12 sm:gap-16 bg-white/5 backdrop-blur-lg border border-white/10 p-8 sm:p-12 rounded-[3rem]">
-                                <div className="w-48 h-48 rounded-full border-4 border-sky-500 overflow-hidden flex-shrink-0 bg-sky-900 shadow-[0_0_30px_rgba(14,165,233,0.3)]">
+                    <section className="py-20 bg-slate-50 border-b border-slate-200">
+                        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="bg-white border border-slate-200 rounded-[2.5rem] p-10 sm:p-16 shadow-sm flex flex-col md:flex-row items-center gap-10 md:gap-16">
+                                <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-full border-4 border-slate-100 overflow-hidden shrink-0 shadow-lg">
                                     <img src={profileImage} alt="Léia Neves" className="w-full h-full object-cover" />
                                 </div>
-                                <div className="text-center md:text-left text-white">
-                                    <div className="inline-block px-3 py-1 bg-sky-500/20 text-sky-300 rounded-full text-sm font-bold tracking-wider mb-4 border border-sky-500/30">
-                                        AUTORA
+                                <div className="text-center md:text-left">
+                                    <div className="inline-block px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold tracking-widest uppercase mb-4">
+                                        Especialista Responsável
                                     </div>
-                                    <h2 className="text-3xl sm:text-4xl font-black mb-3 text-white">Léia Neves</h2>
-                                    <h3 className="text-xl text-sky-400 font-semibold mb-6">Psicopedagoga Especialista em TEA e TDAH, Neuropsicopedagoga</h3>
-                                    <p className="text-slate-300 text-lg leading-relaxed font-light">
-                                        Com prática diária e escuta clínica aguçada, Léia desenvolve trilhas de desenvolvimento para crianças que aprendem e sentem o mundo de outra forma. 
-                                        Sua missão é clara: traduzir a neurociência e a pedagogia em estratégias simples, amorosas e firmes para que as famílias construam autonomia real em seus lares.
+                                    <h2 className="text-3xl sm:text-4xl font-black mb-2 text-slate-900">Léia Neves</h2>
+                                    <h3 className="text-xl text-sky-600 font-semibold mb-6">Psicopedagoga Especialista em TEA e TDAH, Neuropsicopedagoga</h3>
+                                    <p className="text-slate-600 text-lg leading-relaxed">
+                                        Com prática clínica diária, Léia desenvolve trilhas terapêuticas focadas na autonomia de crianças com desenvolvimento atípico. Sua missão é traduzir conhecimentos da neurociência para uma linguagem acolhedora, ajudando pais a estruturarem lares firmes e amorosos.
                                     </p>
                                 </div>
                             </div>
@@ -263,40 +239,37 @@ export const ProductSalesPage: React.FC = () => {
                     </section>
                 )}
 
-                {/* FAQ SECTION - Vibrant & Premium */}
+                {/* FAQ SECTION - Clean Accordion */}
                 {product.faq && product.faq.length > 0 && (
-                    <section className="py-24 bg-gradient-to-b from-slate-900 to-sky-950 relative overflow-hidden">
-                        {/* Decorative background element */}
-                        <div className="absolute left-0 top-1/4 w-96 h-96 bg-sky-500/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse"></div>
-                        <div className="absolute right-0 bottom-0 w-80 h-80 bg-indigo-500/10 rounded-full mix-blend-screen filter blur-[80px]"></div>
-                        
-                        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <section className="py-20 lg:py-28 bg-white">
+                        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="text-center mb-16">
-                                <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-4 drop-shadow-sm">Dúvidas Frequentes</h2>
-                                <p className="text-sky-200/80 text-lg lg:text-xl font-medium tracking-wide">Tudo que você precisa saber antes de dar esse passo.</p>
+                                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">Perguntas Frequentes</h2>
+                                <p className="text-slate-500 mt-4 text-lg">Esclareça suas dúvidas antes de garantir seu acesso.</p>
                             </div>
                             
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 {product.faq.map((item, index) => {
                                     const isOpen = openFaq === index;
                                     return (
                                         <div 
                                             key={index} 
-                                            className={`rounded-3xl border transition-all duration-500 overflow-hidden backdrop-blur-md ${isOpen ? 'border-sky-400 bg-sky-900/60 shadow-[0_0_30px_rgba(14,165,233,0.2)]' : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'}`}
+                                            className="border-b border-slate-200 last:border-0 pb-4"
                                         >
                                             <button 
-                                                className="w-full text-left px-8 py-6 flex items-center justify-between gap-6 outline-none"
+                                                className="w-full text-left py-4 flex items-center justify-between gap-6 group outline-none"
                                                 onClick={() => setOpenFaq(isOpen ? null : index)}
                                             >
-                                                <span className={`text-xl font-bold transition-colors ${isOpen ? 'text-white' : 'text-sky-100'}`}>{item.q}</span>
-                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-transform duration-500 ease-spring ${isOpen ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/50 rotate-180' : 'bg-white/10 text-sky-300 hover:bg-white/20'}`}>
+                                                <span className={`text-xl font-bold transition-colors ${isOpen ? 'text-sky-600' : 'text-slate-800 group-hover:text-sky-600'}`}>
+                                                    {item.q}
+                                                </span>
+                                                <div className={`shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-sky-600' : 'text-slate-400 group-hover:text-sky-600'}`}>
                                                     <ChevronDown size={24} />
                                                 </div>
                                             </button>
                                             
-                                            <div className={`px-8 overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-96 pb-8 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                                <div className="w-16 h-1 bg-gradient-to-r from-sky-400 to-transparent mb-6 rounded-full"></div>
-                                                <p className="text-sky-50/90 text-lg leading-loose font-medium">{item.a}</p>
+                                            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                                <p className="text-slate-600 text-lg leading-relaxed pb-6 pt-2 pr-12">{item.a}</p>
                                             </div>
                                         </div>
                                     )
@@ -306,50 +279,34 @@ export const ProductSalesPage: React.FC = () => {
                     </section>
                 )}
 
-                {/* FINAL CTA FIXO - Explosão de Vida */}
-                <section className="py-24 sm:py-32 bg-sky-600 text-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
-                    <div className="absolute -top-40 -right-40 w-96 h-96 bg-amber-400 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-pulse"></div>
-                    <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-pulse" style={{ animationDelay: '2s' }}></div>
-                    
-                    <div className="max-w-4xl mx-auto px-4 relative z-10 flex flex-col items-center">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 border border-white/30 backdrop-blur-md mb-10 shadow-xl">
-                            <Star size={18} className="text-amber-300 fill-amber-300" />
-                            <span className="text-white text-sm font-bold tracking-widest uppercase">Oferta Por Tempo Limitado</span>
-                            <Star size={18} className="text-amber-300 fill-amber-300" />
-                        </div>
-                        
-                        <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-8 leading-[1.1] drop-shadow-2xl">
-                            Pronto para mudar a dinâmica da sua casa?
+                {/* FINAL SIMPLE CTA */}
+                <section className="py-20 bg-sky-600 text-center">
+                    <div className="max-w-4xl mx-auto px-4">
+                        <HeartHandshake size={48} className="text-sky-200 mx-auto mb-8" />
+                        <h2 className="text-3xl sm:text-5xl font-black text-white mb-6">
+                            Pronto para essa transformação?
                         </h2>
-                        
-                        <p className="text-xl sm:text-2xl text-sky-100 font-medium mb-16 max-w-2xl drop-shadow">
-                            O acesso imediato a todas as ferramentas e roteiros práticos está a um clique de distância.
+                        <p className="text-xl text-sky-100 font-medium mb-10 max-w-2xl mx-auto">
+                            O material completo chegará diretamente no seu e-mail de forma imediata.
                         </p>
-                        
                         <button
                             onClick={handleCheckout}
-                            className="group relative inline-flex items-center justify-center gap-4 px-12 py-6 sm:py-8 bg-white hover:bg-slate-50 text-sky-700 text-2xl sm:text-3xl font-black rounded-[2rem] transition-all shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)] hover:-translate-y-2 overflow-hidden w-full sm:w-auto"
+                            className="inline-flex items-center justify-center px-10 py-5 bg-white hover:bg-slate-50 text-sky-700 text-xl sm:text-2xl font-bold rounded-full transition-all shadow-lg active:scale-[0.98]"
                         >
-                            <div className="absolute inset-0 bg-sky-100/30 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-                            <span>Adquira Já o Seu</span>
-                            <ArrowRight size={36} className="text-amber-500 group-hover:translate-x-3 transition-transform duration-300" />
+                            Adquira Já o Seu
                         </button>
-                        
-                        <div className="mt-10 flex items-center justify-center gap-3 text-white text-sm lg:text-base font-bold bg-black/15 px-8 py-4 rounded-full backdrop-blur-md shadow-inner border border-white/10">
-                            <ShieldCheck size={24} className="text-green-400 drop-shadow-md" /> Acesso Seguro e Imediato direto no e-mail
-                        </div>
                     </div>
                 </section>
             </main>
 
-            <footer className="bg-slate-950 text-slate-500 py-12 text-center">
+            {/* MINIMAL FOOTER */}
+            <footer className="bg-slate-900 text-slate-500 py-12 text-center border-t border-slate-800">
                 <div className="max-w-7xl mx-auto px-4">
-                    <span className="text-2xl font-black text-slate-700 tracking-tight block mb-6">
-                        Léia<span className="text-sky-900">Neves</span>
+                    <span className="text-xl font-black text-white opacity-20 tracking-tight block mb-6">
+                        LéiaNeves
                     </span>
                     <p className="text-sm mb-2 font-medium">Este site não faz parte dos produtos da plataforma Meta (Facebook, Instagram) nem do Google Inc.</p>
-                    <p className="text-sm mb-6 font-medium">Os resultados apresentados dependem do engajamento e aplicação prática de cada família.</p>
+                    <p className="text-sm mb-6 font-medium">Os resultados podem variar de acordo com a aplicação de cada família.</p>
                     <p className="text-xs tracking-wider">© {new Date().getFullYear()} Léia Neves. Todos os direitos reservados.</p>
                 </div>
             </footer>

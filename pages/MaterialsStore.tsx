@@ -2,8 +2,15 @@ import React from 'react';
 import { ArrowLeft, ShoppingBag, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { products } from '../data/products';
+import { setDynamicSEO } from '../utils/seo';
 
 export const MaterialsStore: React.FC = () => {
+    React.useEffect(() => {
+        setDynamicSEO(
+            "Materiais e Recursos | Léia Neves",
+            "Recursos desenvolvidos com cuidado especializado para apoiar o desenvolvimento, a alfabetização e a rotina da criança atípica."
+        );
+    }, []);
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -83,7 +90,7 @@ export const MaterialsStore: React.FC = () => {
                                             </span>
                                         )}
                                     </div>
-                                    <Link to={`/materiais/${product.id}`} className="w-full bg-sky-600 text-white font-bold py-3 rounded-xl hover:bg-sky-700 transition-colors shadow-sm active:scale-[0.98] text-center inline-block">
+                                    <Link to={`/materiais/${product.slug}`} className="w-full bg-sky-600 text-white font-bold py-3 rounded-xl hover:bg-sky-700 transition-colors shadow-sm active:scale-[0.98] text-center inline-block">
                                         Ver Detalhes do Produto
                                     </Link>
                                 </div>

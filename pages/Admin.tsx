@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { AdminLogin } from '../components/admin/AdminLogin';
 import { AdminLayout } from '../components/admin/AdminLayout';
@@ -10,16 +10,39 @@ import { AdminPatientDetail } from '../components/admin/AdminPatientDetail';
 
 export const Admin: React.FC = () => {
     const { user, loading: authLoading } = useAuth();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const { tab, id } = useParams<{ tab?: string; id?: string }>();
+    const navigate = useNavigate();
 
-    // Derived State from URL
-    const activeView = (searchParams.get('view') as 'dashboard' | 'patients' | 'settings') || 'dashboard';
-    const selectedPatientId = searchParams.get('patient') ? Number(searchParams.get('patient')) : null;
+    // Map Portuguese URL chunks to internal component views
+    const urlToView: Record<string, 'dashboard' | 'patients' | 'settings'> = {
+        'agenda': 'dashboard',
+        'pacientes': 'patients',
+        'configuracoes': 'settings'
+    };
+    
+    const viewToUrl: Record<string, string> = {
+        'dashboard': 'agenda',
+        'patients': 'pacientes',
+        'settings': 'configuracoes'
+    };
+
+    const activeView = tab && urlToView[tab] ? urlToView[tab] : 'dashboard';
+    const selectedPatientId = id ? Number(id) : null;
+
+    useEffect(() => {
+        // Start default route cleanly
+        if (!tab && user) {
+            navigate('/admin/agenda', { replace: true });
+        }
+    }, [tab, user, navigate]);
 
     const navigateTo = (view: 'dashboard' | 'patients' | 'settings', patientId: number | null = null) => {
-        const params: any = { view };
-        if (patientId) params.patient = patientId.toString();
-        setSearchParams(params);
+        const urlChunk = viewToUrl[view];
+        if (patientId) {
+            navigate(`/admin/${urlChunk}/${patientId}`);
+        } else {
+            navigate(`/admin/${urlChunk}`);
+        }
     };
 
     if (authLoading) {

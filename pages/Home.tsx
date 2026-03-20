@@ -10,11 +10,17 @@ import { Authority } from '../components/Authority';
 import { FinalCTA } from '../components/FinalCTA';
 import { Footer } from '../components/Footer';
 import { SchedulingModal } from '../components/SchedulingModal';
+import { setDynamicSEO } from '../utils/seo';
 
 export const Home: React.FC = () => {
     const [isSchedulingModalOpen, setIsSchedulingModalOpen] = useState(false);
 
     useEffect(() => {
+        setDynamicSEO(
+            "Léia Neves | Psicopedagogia Especializada",
+            "Trilhas terapêuticas focadas na autonomia de crianças com desenvolvimento atípico. Especialista em TEA e TDAH."
+        );
+        
         // Add smooth scrolling to all anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {

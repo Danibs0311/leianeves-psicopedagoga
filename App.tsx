@@ -16,6 +16,8 @@ const App: React.FC = () => {
           <Route path="/materiais" element={<MaterialsStore />} />
           <Route path="/materiais/:id" element={<ProductSalesPage />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/:tab" element={<Admin />} />
+          <Route path="/admin/:tab/:id" element={<Admin />} />
         </Routes>
       </Router>
     </AuthProvider>

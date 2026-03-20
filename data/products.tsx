@@ -3,6 +3,7 @@ import { BookOpen, Puzzle, FileText } from 'lucide-react';
 
 export interface Product {
     id: number;
+    slug: string;
     title: string;
     description: string;
     longDescription?: string;
@@ -22,6 +23,7 @@ export interface Product {
 export const products: Product[] = [
     {
         id: 1,
+        slug: "guia-completo-rotina-visual-tea",
         title: "Guia Completo: Rotina Visual para TEA",
         description: "Kit contendo 50 cards ilustrados imprimíveis, planner semanal e manual de instruções para estruturar a rotina de crianças no espectro autista.",
         longDescription: "A previsibilidade é fundamental para crianças no espectro autista. Este Guia Completo de Rotina Visual foi cuidadosamente elaborado com base em práticas baseadas em evidências para reduzir a ansiedade e promover a autonomia do seu filho no dia a dia. Chega de lutas diárias nas transições de atividades!",
@@ -40,6 +42,7 @@ export const products: Product[] = [
     },
     {
         id: 2,
+        slug: "cartilha-adaptacao-escolar-sem-choro",
         title: "Cartilha: Adaptação Escolar Sem Choro",
         description: "E-book prático com 30 páginas de estratégias cientificamente comprovadas para uma transição escolar suave e acolhedora.",
         longDescription: "A adaptação escolar pode ser o período mais estressante tanto para a criança atípica quanto para a família. Esta cartilha traz as mesmas estratégias que utilizo nas orientações de pais em meu consultório para transformar o choro e a insegurança escolar em entusiasmo e cooperação.",
@@ -57,6 +60,7 @@ export const products: Product[] = [
     },
     {
         id: 3,
+        slug: "caderno-atividades-foco-atencao-tdah",
         title: "Caderno de Atividades: Foco e Atenção (TDAH)",
         description: "100 atividades lúdicas em PDF prontas para impressão, focadas no desenvolvimento da coordenação motora fina e atenção sustentada.",
         longDescription: "Estimular o foco em crianças com TDAH exige que o formato seja atrativo e com nível de desafio ideal. Este caderno possui 100 páginas de labirintos, rastreios visuais, pareamento e exercícios de coordenação motora fina desenvolvidos para treinar o cérebro brincando.",
@@ -75,6 +79,7 @@ export const products: Product[] = [
     },
     {
         id: 4,
+        slug: "quando-aprender-nao-e-simples",
         title: "Quando Aprender Não é Simples",
         description: "O guia prático para famílias entenderem o comportamento e apoiarem os filhos neurodivergentes de forma eficaz e sem sofrimento.",
         longDescription: "Seu filho se frustra facilmente? A hora da tarefa escolar vira um campo de batalha? A previsibilidade e a adaptação do ambiente são vitais para reduzir crises infantis. Este e-book é um manual prático e acolhedor (escrito por uma profissional que atua diariamente com famílias atípicas) focado em ensinar adultos a olharem o comportamento como comunicação, criar rotinas que abraçam e construir autonomia emocional real.",
@@ -118,4 +123,8 @@ export const products: Product[] = [
 
 export const getProductById = (id: number): Product | undefined => {
     return products.find(product => product.id === id);
+};
+
+export const getProductByIdOrSlug = (idOrSlug: string | number): Product | undefined => {
+    return products.find(product => product.id.toString() === idOrSlug.toString() || product.slug === idOrSlug);
 };

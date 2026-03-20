@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, ShieldCheck, Star, AlertCircle, ChevronDown, ChevronUp, BookOpen, Quote, HeartHandshake } from 'lucide-react';
-import { getProductById } from '../data/products';
+import { getProductByIdOrSlug } from '../data/products';
 import profileImage from '../images/leia_psicoped.webp';
+import { setDynamicSEO } from '../utils/seo';
 
 export const ProductSalesPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const product = getProductById(Number(id));
+    const product = getProductByIdOrSlug(id || '');
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
     useEffect(() => {
         window.scrollTo(0, 0);
         if (product) {
-            document.title = `${product.title} | Léia Neves Psicopedagoga`;
-            const metaDescription = document.querySelector('meta[name="description"]');
-            if (metaDescription) {
-                metaDescription.setAttribute("content", product.description);
-            }
+            setDynamicSEO(
+                `${product.title} | Léia Neves Psicopedagoga`,
+                product.description,
+                product.imageUrl || '/capa ebook.png'
+            );
         }
     }, [id, product]);
 

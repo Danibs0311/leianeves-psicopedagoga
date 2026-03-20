@@ -11,9 +11,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenScheduling }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 sm:h-20">
           <div className="flex-shrink-0 flex items-center">
-            <span className="text-2xl font-bold text-sky-700 tracking-tight">
+            <Link to="/" className="text-2xl font-bold text-sky-700 tracking-tight hover:text-sky-800 transition-colors">
               Léia<span className="text-sky-500">Neves</span>
-            </span>
+            </Link>
           </div>
           <div className="hidden md:flex space-x-8 items-center">
             <a href="#sobre" className="text-slate-600 hover:text-sky-600 font-medium transition-colors">Sobre</a>

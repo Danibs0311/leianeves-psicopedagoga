@@ -49,9 +49,9 @@ export const ProductSalesPage: React.FC = () => {
                         <Link to="/materiais" className="text-slate-500 hover:text-sky-600 transition-colors flex items-center gap-2 text-sm font-semibold uppercase tracking-wider">
                             <ArrowLeft size={16} /> Voltar
                         </Link>
-                        <span className="text-lg font-black text-slate-900 tracking-tighter">
+                        <Link to="/" className="text-lg font-black text-slate-900 tracking-tighter hover:text-sky-600 transition-colors">
                             Léia<span className="text-sky-600">Neves</span>
-                        </span>
+                        </Link>
                     </div>
                 </div>
             </header>

@@ -23,8 +23,11 @@ export const MaterialsStore: React.FC = () => {
                             Voltar ao Início
                         </Link>
                         <div className="flex-shrink-0 flex items-center">
-                            <span className="text-xl font-bold text-sky-700 tracking-tight">
-                                Léia<span className="text-sky-500">Neves</span> <span className="text-slate-300 font-light mx-2">|</span> <span className="text-slate-800">Materiais</span>
+                            <Link to="/" className="text-xl font-bold text-sky-700 tracking-tight hover:text-sky-800 transition-colors">
+                                Léia<span className="text-sky-500">Neves</span>
+                            </Link>
+                            <span className="text-xl font-bold tracking-tight">
+                                <span className="text-slate-300 font-light mx-2">|</span> <span className="text-slate-800">Materiais</span>
                             </span>
                         </div>
                         <button className="text-slate-400 hover:text-sky-600 transition-colors relative">

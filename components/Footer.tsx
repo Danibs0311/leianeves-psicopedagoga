@@ -72,13 +72,19 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-slate-100 text-center">
+        <div className="pt-8 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
           <p className="text-sm text-slate-400">
             &copy; {new Date().getFullYear()} Léia Neves. Todos os direitos reservados.
             <br className="sm:hidden" />
             <span className="hidden sm:inline"> | </span>
             Psicopedagoga, Especialista em TEA e TDAH.
           </p>
+          <Link 
+            to="/admin" 
+            className="text-[10px] text-slate-300 hover:text-slate-400 transition-colors uppercase tracking-widest font-medium"
+          >
+            Área do Profissional
+          </Link>
         </div>
       </div>
     </footer>

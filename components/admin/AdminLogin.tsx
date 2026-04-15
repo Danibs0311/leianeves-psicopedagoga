@@ -93,7 +93,7 @@ export const AdminLogin: React.FC = () => {
                     <button
                         type="submit"
                         disabled={loginLoading}
-                        className={`w-full text-white py-2 rounded-lg font-bold transition-colors disabled:opacity-70 flex justify-center ${isLoginMode ? 'bg-sky-600 hover:bg-sky-700' : 'bg-green-600 hover:bg-green-700'}`}
+                        className={`w-full text-white py-3 rounded-lg font-bold transition-colors disabled:opacity-70 flex justify-center ${isLoginMode ? 'bg-sky-600 hover:bg-sky-700' : 'bg-green-600 hover:bg-green-700'}`}
                     >
                         {loginLoading ? 'Carregando...' : isLoginMode ? 'Entrar' : 'Criar Conta Agora'}
                     </button>

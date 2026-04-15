@@ -125,6 +125,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenScheduling }) => {
             </svg>
             <span className="font-medium">Siga no Instagram</span>
           </a>
+
+          <Link
+            to="/admin"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="text-[10px] text-slate-300 hover:text-slate-400 transition-colors uppercase tracking-widest font-medium text-center py-2"
+          >
+            Área do Profissional
+          </Link>
         </div>
       )}
     </nav>

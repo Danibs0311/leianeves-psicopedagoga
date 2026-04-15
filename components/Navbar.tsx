@@ -51,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenScheduling }) => {
           {/* Mobile Menu Actions */}
           <div className="md:hidden flex items-center gap-3">
             <a
-              href="https://wa.me/5575983507283"
+              href="https://biolink.info/leianeves_psicopedagoga"
               className="bg-sky-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-sky-700 transition-all shadow-md"
               target="_blank"
               rel="noopener noreferrer"

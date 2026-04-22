@@ -21,48 +21,65 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const genAI = new GoogleGenerativeAI(geminiApiKey);
 
 async function generateImage(title) {
-    console.log('🎨 Tentando gerar imagem (Imagen 4.0 -> Unsplash Fallback)...');
+    console.log(`🎨 Iniciando processo de imagem para: "${title}"`);
+    
     try {
-        // Tentativa com Imagen 4.0
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${geminiApiKey}`, {
+        // Tentativa com Imagen 4.0 Fast (Mais chance de ter cota)
+        const prompt = `A professional and high-quality photography for a blog about child psychology. Theme: ${title}. Soft lighting, clean environment, realistic style. No text.`;
+        
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${geminiApiKey}`, {
             method: 'POST',
             body: JSON.stringify({
-                instances: [{ prompt: `Professional child psychology illustration about ${title}. Soft colors, high resolution.` }],
+                instances: [{ prompt }],
                 parameters: { sampleCount: 1 }
             })
         });
 
         const data = await response.json();
+        
         if (data.predictions && data.predictions[0].bytesBase64Encoded) {
+            console.log('✅ Imagem gerada pela IA com sucesso!');
             const buffer = Buffer.from(data.predictions[0].bytesBase64Encoded, 'base64');
-            const fileName = `blog-${Date.now()}.png`;
-            const { error: uploadError } = await supabase.storage.from('blog-images').upload(fileName, buffer, { contentType: 'image/png' });
-            if (!uploadError) {
-                const { data: urlData } = supabase.storage.from('blog-images').getPublicUrl(fileName);
-                return urlData.publicUrl;
+            const fileName = `post-${Date.now()}.png`;
+
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('blog-images')
+                .upload(fileName, buffer, { contentType: 'image/png', upsert: true });
+
+            if (uploadError) {
+                console.warn('⚠️ Erro ao subir para o Storage:', uploadError.message);
+                throw uploadError;
             }
+
+            const { data: urlData } = supabase.storage.from('blog-images').getPublicUrl(fileName);
+            console.log('🔗 Imagem salva no Storage:', urlData.publicUrl);
+            return urlData.publicUrl;
+        } else {
+            console.warn('⚠️ Imagen 4.0 não retornou dados (Cota ou Erro). Usando Unsplash...');
         }
     } catch (e) {
-        console.warn('⚠️ Imagen 4.0 falhou, usando Unsplash...');
+        console.warn('⚠️ Falha no motor de imagem:', e.message);
     }
     
-    // Fallback: Unsplash (Garante que nunca fique sem imagem)
-    const keywords = title.split(' ').slice(0, 3).join(',');
-    return `https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28?auto=format&fit=crop&q=80&w=1000&sig=${Date.now()}`;
+    // Backup garantido: Unsplash de alta qualidade
+    const keywords = encodeURIComponent(title.split(' ').slice(0, 3).join(','));
+    const unsplashUrl = `https://source.unsplash.com/featured/1200x800/?child,psychology,${keywords}&sig=${Date.now()}`;
+    console.log('📸 Usando imagem do Unsplash como backup:', unsplashUrl);
+    return unsplashUrl;
 }
 
 async function runEngine() {
-    console.log('🚀 Gerando Artigo de Autoridade (Foco Amplo)...');
+    console.log('🚀 Iniciando Motor de Autoridade...');
 
     const modelsToTry = ["gemini-2.0-flash-lite", "gemma-3-27b-it", "gemini-pro-latest"];
     let responseText = null;
 
     const topics = [
-        "Sinais precoces de Autismo: O que observar nos primeiros anos",
-        "Como o TDAH impacta o aprendizado e como ajudar seu filho",
-        "Dislexia: Estratégias práticas para pais e educadores",
-        "A importância do acolhimento familiar em diagnósticos atípicos",
-        "Desenvolvimento infantil: Marcos importantes e quando se preocupar"
+        "Como identificar sinais de autismo (TEA) em crianças de 2 a 5 anos",
+        "TDAH ou apenas agitação? Como saber a hora de procurar ajuda",
+        "A importância do diagnóstico precoce no desenvolvimento infantil",
+        "Dificuldades de alfabetização: Quando é hora de intervir?",
+        "Estratégias para lidar com crises sensoriais no dia a dia"
     ];
     const chosenTopic = topics[Math.floor(Math.random() * topics.length)];
 
@@ -72,14 +89,10 @@ async function runEngine() {
             const currentModel = genAI.getGenerativeModel({ model: modelName });
             
             const masterPrompt = `
-                Atue como um especialista em psicopedagogia e marketing de conteúdo.
-                Crie um artigo de blog profundo e informativo.
+                Atue como um especialista em psicopedagogia. Crie um artigo completo.
                 TEMA: ${chosenTopic}
-                REQUISITO: Texto longo (800+ palavras), tom profissional e acolhedor.
-                ESTRUTURA: H2, H3, Introdução emocional, Lista de sinais, Dicas práticas.
-                IMPORTANTE: Não foque o texto ou título em uma região específica. Foque no conhecimento técnico e humano.
-                CTA FINAL: Inclua um convite para atendimento especializado com Léia Neves em Cajazeiras, Salvador.
-
+                REQUISITO: 800+ palavras, tom acolhedor.
+                CTA: Atendimento em Salvador com Léia Neves.
                 RETORNE APENAS JSON:
                 {
                     "title": "...",
@@ -95,11 +108,11 @@ async function runEngine() {
             responseText = result.response.text();
             if (responseText) break;
         } catch (err) {
-            console.warn(`⚠️ Erro no modelo ${modelName}`);
+            console.warn(`⚠️ Modelo ${modelName} indisponível.`);
         }
     }
 
-    if (!responseText) return console.error('❌ Cota esgotada.');
+    if (!responseText) return console.error('❌ Cota de texto esgotada.');
 
     try {
         const data = JSON.parse(responseText.replace(/```json|```/g, '').trim());
@@ -122,15 +135,14 @@ async function runEngine() {
         const { error } = await supabase.from('blog_posts').insert([post]);
         if (error) throw error;
 
-        console.log('🎉 PUBLICADO: ' + post.title);
-        console.log('🔗 /blog/' + post.slug);
-
-        // Chamar sincronização automática do Git
+        console.log(`🎉 PUBLICADO: ${post.title}`);
+        
+        // Auto-Sync Git
         try {
-            console.log('🔄 Iniciando sincronização do código...');
+            console.log('🔄 Sincronizando código...');
             execSync(`${process.execPath} scripts/auto_sync.js`);
-        } catch (syncErr) {
-            console.warn('⚠️ Post publicado, mas falha no Sync Git:', syncErr.message);
+        } catch (s) {
+            console.warn('⚠️ Falha no sync git, mas post foi publicado.');
         }
     } catch (e) {
         console.error('❌ Erro final:', e.message);

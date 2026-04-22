@@ -6,6 +6,8 @@ import { Home } from './pages/Home';
 import { Admin } from './pages/Admin';
 import { MaterialsStore } from './pages/MaterialsStore';
 import { ProductSalesPage } from './pages/ProductSalesPage';
+import { Blog } from './pages/Blog';
+import { BlogPost } from './pages/BlogPost';
 
 const App: React.FC = () => {
   return (
@@ -13,6 +15,8 @@ const App: React.FC = () => {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/materiais" element={<MaterialsStore />} />
           <Route path="/materiais/:id" element={<ProductSalesPage />} />
           <Route path="/admin" element={<Admin />} />

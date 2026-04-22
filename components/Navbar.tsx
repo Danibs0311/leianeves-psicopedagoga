@@ -27,6 +27,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenScheduling }) => {
             <Link to="/materiais" className="text-slate-600 hover:text-sky-600 font-medium transition-colors">
               Materiais
             </Link>
+            <Link to="/blog" className="text-slate-600 hover:text-sky-600 font-medium transition-colors">
+              Blog
+            </Link>
             <div className="flex items-center gap-4">
               <a
                 href="https://www.instagram.com/leianeves.psicopedagoga?igsh=d3UwMHBxdzByODYz"
@@ -99,6 +102,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenScheduling }) => {
             className="text-slate-600 hover:text-sky-600 hover:bg-slate-50 font-medium transition-colors block py-3 px-2 rounded-md"
           >
             Materiais
+          </Link>
+          <Link
+            to="/blog"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="text-slate-600 hover:text-sky-600 hover:bg-slate-50 font-medium transition-colors block py-3 px-2 rounded-md"
+          >
+            Blog
           </Link>
           
           <div className="h-px bg-slate-200 my-2 w-full"></div>

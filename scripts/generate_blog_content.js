@@ -42,35 +42,31 @@ function getGitCmd() {
 }
 
 async function generateImage(title) {
-    console.log(`🎨 Gerando imagem personalizada via Pollinations AI para: "${title}"`);
+    const seed = Math.floor(Math.random() * 1000000);
+    console.log(`🎨 Gerando imagem ÚNICA (Seed: ${seed}) para: "${title}"`);
     
-    // Criando um prompt visual rico baseado no título do artigo
-    const visualPrompt = `Professional editorial photography for a child psychology clinic. Topic: ${title}. Soft natural lighting, realistic style, 8k resolution, emotional and caring atmosphere. No text or watermarks.`;
+    // Prompt ultra-específico para evitar generalização
+    const visualPrompt = `High-end clinical photography, realistic, child psychology, theme: ${title}, cinematic lighting, professional gear, 8k, highly detailed. No text.`;
     const encodedPrompt = encodeURIComponent(visualPrompt);
-    const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1200&height=800&nologo=true&model=flux`;
+    const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1200&height=800&nologo=true&seed=${seed}&model=flux`;
 
     try {
-        console.log('📡 Baixando imagem única gerada pela IA...');
+        console.log('📡 Capturando imagem exclusiva da IA...');
         const response = await fetch(pollinationsUrl);
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
-        const fileName = `poll-post-${Date.now()}.png`;
+        const fileName = `unique-post-${Date.now()}-${seed}.png`;
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from('blog-images')
             .upload(fileName, buffer, { contentType: 'image/png' });
 
-        if (uploadError) {
-            console.warn('⚠️ Erro ao salvar no Supabase, usando link direto da IA.');
-            return pollinationsUrl;
-        }
+        if (uploadError) return pollinationsUrl;
 
         const { data: urlData } = supabase.storage.from('blog-images').getPublicUrl(fileName);
-        console.log('✅ Imagem salva e sincronizada com o artigo!');
         return urlData.publicUrl;
     } catch (e) {
-        console.error('❌ Falha no motor Pollinations:', e.message);
-        return "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200";
+        return `https://images.unsplash.com/featured/?psychology,child,${title.split(' ')[0]}`;
     }
 }
 

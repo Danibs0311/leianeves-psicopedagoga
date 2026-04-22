@@ -16,7 +16,7 @@ $CommonPaths = @(
 
 foreach ($Path in $CommonPaths) {
     if (Test-Path $Path) {
-        $GitPath = "`"$Path`""
+        $GitPath = $Path
         break
     }
 }
@@ -39,7 +39,7 @@ while($true) {
             Write-Host "DONE: Sincronizado com sucesso no GitHub!"
         }
     } catch {
-        Write-Host "ERRO: Ocorreu um problema na sincronizacao. Verifique se o Git esta pronto."
+        Write-Host "ERRO: $($_.Exception.Message)"
     }
     
     Start-Sleep -Seconds $IntervaloSegundos

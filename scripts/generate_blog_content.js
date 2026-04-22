@@ -86,23 +86,32 @@ async function runEngine() {
 
     for (const modelName of modelsToTry) {
         try {
-            console.log(`📡 Gerando conteúdo com: ${modelName}...`);
+            console.log(`📡 Gerando conteúdo e descrição visual com: ${modelName}...`);
             const currentModel = genAI.getGenerativeModel({ model: modelName });
             const result = await currentModel.generateContent(`
                 Atue como especialista em psicopedagogia. Crie um artigo magistral sobre: ${chosenTopic}.
-                Retorne APENAS JSON com title, content (HTML), excerpt, meta_title, meta_description, category.
-                Foque em autoridade clínica e tom acolhedor.
+                
+                Retorne APENAS JSON com os campos:
+                - title: Título forte
+                - content: HTML completo do artigo
+                - excerpt: Resumo curto
+                - visual_description: Uma descrição detalhada (em inglês) de uma foto profissional para este artigo. Exemplo: "A young child playing with colorful wooden blocks in a sunlit room, soft focus, high-end photography".
+                - meta_title, meta_description, category.
             `);
             responseText = result.response.text();
             if (responseText) break;
         } catch (err) { console.warn(`⚠️ Modelo ${modelName} ocupado.`); }
     }
 
-    if (!responseText) return console.error('❌ Falha na geração de texto.');
+    if (!responseText) return console.error('❌ Falha na geração.');
 
     try {
         const data = JSON.parse(responseText.replace(/```json|```/g, '').trim());
-        const imageUrl = await generateImage(data.title);
+        
+        // Usando a descrição visual ÚNICA gerada pela IA
+        const seed = Math.floor(Math.random() * 999999);
+        const visualPrompt = encodeURIComponent(data.visual_description + ", professional clinical style, no text, 8k");
+        const imageUrl = `https://image.pollinations.ai/prompt/${visualPrompt}?width=1200&height=800&nologo=true&seed=${seed}&model=flux`;
         const slug = data.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') + '-' + Date.now();
 
         const post = {

@@ -22,26 +22,20 @@ if (!supabaseUrl || !supabaseKey || !geminiApiKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 const genAI = new GoogleGenerativeAI(geminiApiKey);
 
-// Função para encontrar o Git de forma robusta (Windows/GitHub Desktop)
 function getGitCmd() {
     const localAppData = process.env.LOCALAPPDATA;
     const githubDesktopPath = join(localAppData, 'GitHubDesktop');
     const possiblePaths = [
         'git',
         join(githubDesktopPath, 'bin', 'github-git.exe'),
-        'C:\\Program Files\\Git\\bin\\git.exe',
-        'C:\\Program Files (x86)\\Git\\bin\\git.exe'
+        'C:\\Program Files\\Git\\bin\\git.exe'
     ];
-
     if (existsSync(githubDesktopPath)) {
         try {
             const apps = readdirSync(githubDesktopPath).filter(f => f.startsWith('app-'));
-            if (apps.length > 0) {
-                possiblePaths.push(join(githubDesktopPath, apps[apps.length - 1], 'resources', 'app', 'git', 'cmd', 'git.exe'));
-            }
+            if (apps.length > 0) possiblePaths.push(join(githubDesktopPath, apps[apps.length - 1], 'resources', 'app', 'git', 'cmd', 'git.exe'));
         } catch (e) {}
     }
-
     for (const p of possiblePaths) {
         try {
             execSync(`"${p}" --version`, { stdio: 'ignore' });
@@ -52,54 +46,52 @@ function getGitCmd() {
 }
 
 async function generateImage(title) {
-    console.log(`🎨 Criando imagem sob medida para: "${title}"`);
+    console.log(`🎨 Buscando imagem profissional para: "${title}"`);
     
-    // Extrair palavras-chave do título para busca
-    const keywords = title.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^\w\s]/g, '')
-        .split(' ')
-        .filter(w => w.length > 3)
-        .slice(0, 3)
-        .join(',');
+    // Banco de imagens reais (Unsplash IDs) relacionadas a psicopedagogia
+    const gallery = [
+        "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9", // Criança estudando
+        "https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28", // Blocos de montar
+        "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c", // Crianças brincando
+        "https://images.unsplash.com/photo-1516627145497-ae6968895b74", // Criança feliz
+        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b", // Apoio e cuidado
+        "https://images.unsplash.com/photo-1513258496099-48168024adb0"  // Escrita e aprendizado
+    ];
 
     try {
-        const prompt = `Highly professional editorial photography for a clinical psychology blog. Theme: ${title}. High resolution, 8k, soft natural lighting, emotional and professional context. No text in image.`;
-        
+        // Tentativa de IA (Imagen 4.0)
+        const prompt = `Premium photography for a child psychology blog. Topic: ${title}. Soft focus, high resolution, professional.`;
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${geminiApiKey}`, {
             method: 'POST',
-            body: JSON.stringify({
-                instances: [{ prompt }],
-                parameters: { sampleCount: 1 }
-            })
+            body: JSON.stringify({ instances: [{ prompt }], parameters: { sampleCount: 1 } })
         });
 
         if (response.ok) {
             const data = await response.json();
             if (data.predictions && data.predictions[0].bytesBase64Encoded) {
-                console.log('✅ IA gerou uma imagem exclusiva e relacionada!');
                 const buffer = Buffer.from(data.predictions[0].bytesBase64Encoded, 'base64');
                 const fileName = `ai-post-${Date.now()}.png`;
-                const { data: uploadData, error: uploadError } = await supabase.storage.from('blog-images').upload(fileName, buffer, { contentType: 'image/png' });
+                const { error: uploadError } = await supabase.storage.from('blog-images').upload(fileName, buffer, { contentType: 'image/png' });
                 if (!uploadError) {
                     const { data: urlData } = supabase.storage.from('blog-images').getPublicUrl(fileName);
+                    console.log('✅ IA gerou uma imagem exclusiva!');
                     return urlData.publicUrl;
                 }
             }
         }
     } catch (e) {
-        console.warn('⚠️ Falha na IA, ativando busca dinâmica...');
+        console.warn('⚠️ IA sem cota, selecionando imagem da galeria premium...');
     }
-    
-    // Fallback Dinâmico: Busca no Unsplash usando as palavras-chave do artigo
-    const fallbackUrl = `https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28?auto=format&fit=crop&q=80&w=1200&q=80&search=${keywords}`;
-    console.log(`📸 Buscando imagem real relacionada a: [${keywords}]`);
-    return fallbackUrl;
+
+    // Escolha aleatória da galeria profissional caso a IA falhe
+    const randomImg = gallery[Math.floor(Math.random() * gallery.length)];
+    const finalUrl = `${randomImg}?auto=format&fit=crop&q=80&w=1200`;
+    console.log('📸 Imagem selecionada:', finalUrl);
+    return finalUrl;
 }
 
 async function runEngine() {
     console.log('🚀 MOTOR DE AUTORIDADE LÉIA NEVES 2026');
-
     const modelsToTry = ["gemini-2.0-flash-lite", "gemma-3-27b-it", "gemini-pro-latest"];
     let responseText = null;
 
@@ -114,38 +106,18 @@ async function runEngine() {
 
     for (const modelName of modelsToTry) {
         try {
-            console.log(`📡 Consultando Inteligência: ${modelName}...`);
+            console.log(`📡 Consultando: ${modelName}...`);
             const currentModel = genAI.getGenerativeModel({ model: modelName });
-            
-            const masterPrompt = `
-                Atue como o maior especialista em Psicopedagogia e Conteúdo Educativo do Brasil.
-                Escreva um artigo MAGISTRAL para o blog de Léia Neves.
-                
-                TEMA: ${chosenTopic}
-                TOM: Clínico porém acolhedor, autoridade total, sem regionalismos excessivos no título.
-                ESTRUTURA: H2 atraentes, H3 explicativos, listas de sinais, conclusão com esperança.
-                REQUISITO: 1000+ palavras de puro valor.
-                
-                SAÍDA EM JSON:
-                {
-                    "title": "Título Impactante SEO",
-                    "content": "HTML semântico...",
-                    "excerpt": "Resumo magnético para o card...",
-                    "meta_title": "SEO Title...",
-                    "meta_description": "Meta description...",
-                    "category": "Saúde/Educação/Família"
-                }
-            `;
-
-            const result = await currentModel.generateContent(masterPrompt);
+            const result = await currentModel.generateContent(`
+                Atue como especialista em psicopedagogia. Crie um artigo magistral sobre: ${chosenTopic}.
+                Retorne JSON com title, content (HTML), excerpt, meta_title, meta_description, category.
+            `);
             responseText = result.response.text();
             if (responseText) break;
-        } catch (err) {
-            console.warn(`⚠️ Modelo ${modelName} ignorado.`);
-        }
+        } catch (err) { console.warn(`⚠️ Modelo ${modelName} falhou.`); }
     }
 
-    if (!responseText) return console.error('❌ Falha crítica: Cota esgotada em todos os modelos.');
+    if (!responseText) return console.error('❌ Cota esgotada.');
 
     try {
         const data = JSON.parse(responseText.replace(/```json|```/g, '').trim());
@@ -168,24 +140,17 @@ async function runEngine() {
         const { error } = await supabase.from('blog_posts').insert([post]);
         if (error) throw error;
 
-        console.log(`🎉 ARTIGO PUBLICADO COM SUCESSO!`);
-        console.log(`🔗 Link: /blog/${post.slug}`);
-        console.log(`🖼️ Imagem: ${post.image_url}`);
+        console.log(`🎉 PUBLICADO: ${post.title}`);
+        console.log(`🖼️ IMAGEM: ${post.image_url}`);
 
-        // Sincronização Automática Git sem confirmação
         try {
-            console.log('🔄 Sincronizando alterações no Git...');
             const gitCmd = getGitCmd();
             execSync(`${gitCmd} add .`);
             execSync(`${gitCmd} commit -m "Auto-publish: ${data.title}"`);
             execSync(`${gitCmd} push`);
             console.log('✅ Git Sincronizado.');
-        } catch (sErr) {
-            console.warn('⚠️ Git Sync falhou (normal se não houver mudanças de código).');
-        }
-    } catch (e) {
-        console.error('❌ Erro no processamento do artigo:', e.message);
-    }
+        } catch (sErr) {}
+    } catch (e) { console.error('❌ Erro:', e.message); }
 }
 
 runEngine();

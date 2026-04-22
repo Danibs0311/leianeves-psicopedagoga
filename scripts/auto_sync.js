@@ -1,35 +1,47 @@
 
 import { execSync } from 'child_process';
+import { readdirSync, existsSync } from 'fs';
+import { join } from 'path';
 
 async function sync() {
     console.log('🚀 Iniciando Sincronização Automática (Git)...');
     
-    const gitPaths = [
-        'git',
-        'C:\\Program Files\\Git\\bin\\git.exe',
-        'C:\\Program Files (x86)\\Git\\bin\\git.exe'
-    ];
-    
+    // Tentar encontrar o Git do GitHub Desktop
     let gitCmd = 'git';
-    for (const p of gitPaths) {
+    const localAppData = process.env.LOCALAPPDATA;
+    const githubDesktopPath = join(localAppData, 'GitHubDesktop');
+
+    const possiblePaths = [
+        'git',
+        join(githubDesktopPath, 'bin', 'github-git.exe'),
+        'C:\\Program Files\\Git\\bin\\git.exe'
+    ];
+
+    // Tentar encontrar a pasta app-xxx do GitHub Desktop
+    if (existsSync(githubDesktopPath)) {
+        const apps = readdirSync(githubDesktopPath).filter(f => f.startsWith('app-'));
+        if (apps.length > 0) {
+            possiblePaths.push(join(githubDesktopPath, apps[apps.length - 1], 'resources', 'app', 'git', 'cmd', 'git.exe'));
+        }
+    }
+
+    for (const p of possiblePaths) {
         try {
-            execSync(`"${p}" --version`);
+            execSync(`"${p}" --version`, { stdio: 'ignore' });
             gitCmd = `"${p}"`;
             break;
         } catch (e) {}
     }
 
     try {
-        // 1. Adicionar todos os arquivos
+        console.log(`📡 Usando: ${gitCmd}`);
         console.log('📦 Adicionando arquivos...');
         execSync(`${gitCmd} add .`);
 
-        // 2. Commit
         const message = `Auto-update: Blog Engine & Design Improvements ${new Date().toLocaleString()}`;
         console.log(`📝 Criando commit: "${message}"`);
         execSync(`${gitCmd} commit -m "${message}"`);
 
-        // 3. Push
         console.log('⬆️ Enviando para o repositório remoto (Sync)...');
         execSync(`${gitCmd} push`);
 

@@ -61,9 +61,9 @@ async function generateImage(title) {
         console.warn('⚠️ Falha no motor de imagem:', e.message);
     }
     
-    // Backup garantido: Unsplash de alta qualidade
+    // Backup garantido: Unsplash de alta qualidade (URL Moderna 2026)
     const keywords = encodeURIComponent(title.split(' ').slice(0, 3).join(','));
-    const unsplashUrl = `https://source.unsplash.com/featured/1200x800/?child,psychology,${keywords}&sig=${Date.now()}`;
+    const unsplashUrl = `https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28?auto=format&fit=crop&q=80&w=1200&h=800&sig=${Date.now()}`;
     console.log('📸 Usando imagem do Unsplash como backup:', unsplashUrl);
     return unsplashUrl;
 }

@@ -4,19 +4,34 @@ import { execSync } from 'child_process';
 async function sync() {
     console.log('🚀 Iniciando Sincronização Automática (Git)...');
     
+    const gitPaths = [
+        'git',
+        'C:\\Program Files\\Git\\bin\\git.exe',
+        'C:\\Program Files (x86)\\Git\\bin\\git.exe'
+    ];
+    
+    let gitCmd = 'git';
+    for (const p of gitPaths) {
+        try {
+            execSync(`"${p}" --version`);
+            gitCmd = `"${p}"`;
+            break;
+        } catch (e) {}
+    }
+
     try {
         // 1. Adicionar todos os arquivos
         console.log('📦 Adicionando arquivos...');
-        execSync('git add .');
+        execSync(`${gitCmd} add .`);
 
         // 2. Commit
         const message = `Auto-update: Blog Engine & Design Improvements ${new Date().toLocaleString()}`;
         console.log(`📝 Criando commit: "${message}"`);
-        execSync(`git commit -m "${message}"`);
+        execSync(`${gitCmd} commit -m "${message}"`);
 
         // 3. Push
         console.log('⬆️ Enviando para o repositório remoto (Sync)...');
-        execSync('git push');
+        execSync(`${gitCmd} push`);
 
         console.log('✅ Tudo pronto! Seu código está seguro e sincronizado.');
     } catch (error) {

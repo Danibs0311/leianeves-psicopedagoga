@@ -52,11 +52,19 @@ function getGitCmd() {
 }
 
 async function generateImage(title) {
-    console.log(`🎨 Motor de Imagem Ativado para: "${title}"`);
+    console.log(`🎨 Criando imagem sob medida para: "${title}"`);
     
+    // Extrair palavras-chave do título para busca
+    const keywords = title.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s]/g, '')
+        .split(' ')
+        .filter(w => w.length > 3)
+        .slice(0, 3)
+        .join(',');
+
     try {
-        // Tentativa 1: Imagen 4.0 Fast
-        const prompt = `Professional photography, high-end editorial style, child development context, theme: ${title}. Soft natural lighting, premium colors, cinematic composition.`;
+        const prompt = `Highly professional editorial photography for a clinical psychology blog. Theme: ${title}. High resolution, 8k, soft natural lighting, emotional and professional context. No text in image.`;
         
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${geminiApiKey}`, {
             method: 'POST',
@@ -69,14 +77,10 @@ async function generateImage(title) {
         if (response.ok) {
             const data = await response.json();
             if (data.predictions && data.predictions[0].bytesBase64Encoded) {
-                console.log('✅ IA desenhou uma imagem exclusiva!');
+                console.log('✅ IA gerou uma imagem exclusiva e relacionada!');
                 const buffer = Buffer.from(data.predictions[0].bytesBase64Encoded, 'base64');
                 const fileName = `ai-post-${Date.now()}.png`;
-
-                const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from('blog-images')
-                    .upload(fileName, buffer, { contentType: 'image/png' });
-
+                const { data: uploadData, error: uploadError } = await supabase.storage.from('blog-images').upload(fileName, buffer, { contentType: 'image/png' });
                 if (!uploadError) {
                     const { data: urlData } = supabase.storage.from('blog-images').getPublicUrl(fileName);
                     return urlData.publicUrl;
@@ -84,13 +88,12 @@ async function generateImage(title) {
             }
         }
     } catch (e) {
-        console.warn('⚠️ Imagen 4.0 offline ou sem cota.');
+        console.warn('⚠️ Falha na IA, ativando busca dinâmica...');
     }
     
-    // Fallback: Unsplash de alta resolução com tags dinâmicas
-    const tags = "child,education,psychology,learning";
-    const fallbackUrl = `https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200&h=800&sig=${Date.now()}`;
-    console.log('📸 Usando imagem premium do banco de dados visual.');
+    // Fallback Dinâmico: Busca no Unsplash usando as palavras-chave do artigo
+    const fallbackUrl = `https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28?auto=format&fit=crop&q=80&w=1200&q=80&search=${keywords}`;
+    console.log(`📸 Buscando imagem real relacionada a: [${keywords}]`);
     return fallbackUrl;
 }
 

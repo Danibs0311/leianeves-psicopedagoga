@@ -32,7 +32,7 @@ async function generateWithFallback() {
     console.log('🤖 Iniciando Motor de IA com Auto-Tentativa...');
 
     // Lista de modelos para tentar (em ordem de preferência)
-    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro", "models/gemini-1.5-flash"];
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro", "gemini-1.0-pro", "models/gemini-1.5-flash"];
     
     let model;
     let responseText;

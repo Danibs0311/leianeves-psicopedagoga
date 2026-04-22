@@ -53,9 +53,9 @@ async function generateImage(imageDescription) {
 async function runEngine() {
     console.log('🚀 Iniciando Motor de Autoridade (Prompt Master)...');
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+    const modelsToTry = ["gemini-2.0-flash-lite", "gemma-3-27b-it", "gemini-pro-latest"];
+    let responseText = null;
 
-    // Temas sugeridos para rotação
     const topics = [
         "Como identificar sinais de autismo (TEA) em crianças de 2 a 5 anos",
         "TDAH ou apenas agitação? Como saber a hora de procurar ajuda",
@@ -65,57 +65,49 @@ async function runEngine() {
     ];
     const chosenTopic = topics[Math.floor(Math.random() * topics.length)];
 
-    const masterPrompt = `
-        Atue como um especialista em marketing de conteúdo, SEO e psicopedagogia.
-        Crie um artigo completo para blog voltado para pais, responsáveis e educadores, com foco em dificuldades de aprendizagem infantil.
+    for (const modelName of modelsToTry) {
+        try {
+            console.log(`📡 Tentando modelo: ${modelName}...`);
+            const currentModel = genAI.getGenerativeModel({ model: modelName });
+            
+            const masterPrompt = `
+                Atue como um especialista em marketing de conteúdo, SEO e psicopedagogia.
+                Crie um artigo completo para blog voltado para pais e educadores.
+                TEMA: ${chosenTopic}
+                FOCO: Cajazeiras, Salvador. Léia Neves Psicopedagoga.
+                REQUISITO: Texto longo (800+ palavras), tom acolhedor, estrutura H2/H3.
+                
+                RETORNE APENAS JSON:
+                {
+                    "title": "...",
+                    "content": "HTML...",
+                    "excerpt": "...",
+                    "image_description": "Cena realista para IA...",
+                    "meta_title": "...",
+                    "meta_description": "...",
+                    "category": "..."
+                }
+            `;
 
-        🎯 OBJETIVO:
-        Educar, gerar autoridade profissional e converter visitantes em possíveis clientes para atendimento psicopedagógico de Léia Neves em Cajazeiras, Salvador.
-
-        📌 TEMA DO ARTIGO:
-        ${chosenTopic}
-
-        📌 ESTRUTURA OBRIGATÓRIA:
-        1. Título altamente chamativo e otimizado para SEO
-        2. Introdução com conexão emocional (dor dos pais)
-        3. Explicação clara e simples do problema
-        4. Principais sinais ou sintomas (em lista)
-        5. Causas possíveis (linguagem acessível)
-        6. Como ajudar a criança na prática (dicas aplicáveis)
-        7. Quando procurar um psicopedagogo
-        8. Conclusão com reforço emocional e orientação
-        9. CTA (chamada para ação) incentivando agendamento em Salvador
-
-        📌 TOM DE VOZ:
-        Acolhedor, profissional, simples e confiável (evitar termos muito técnicos)
-
-        📌 SEO:
-        - Incluir palavra-chave principal no título, introdução e subtítulos
-        - Usar subtítulos H2 e H3
-        - Texto com no mínimo 800 palavras
-
-        📌 DIFERENCIAL:
-        Incluir exemplos reais do dia a dia e mencionar a legislação atualizada de Salvador até Abril de 2026.
-
-        SAÍDA (JSON):
-        {
-            "title": "...",
-            "content": "HTML completo...",
-            "excerpt": "...",
-            "image_description": "Descrição detalhada para geração de imagem com IA (estilo realista), relacionada ao tema...",
-            "meta_title": "...",
-            "meta_description": "...",
-            "category": "..."
+            const result = await currentModel.generateContent(masterPrompt);
+            responseText = result.response.text();
+            if (responseText) {
+                console.log(`✅ Sucesso com o modelo: ${modelName}`);
+                break;
+            }
+        } catch (err) {
+            console.warn(`⚠️ Modelo ${modelName} falhou: ${err.message.substring(0, 50)}...`);
         }
-    `;
+    }
+
+    if (!responseText) {
+        console.error('❌ Todos os modelos falharam devido à cota gratuita.');
+        return;
+    }
 
     try {
-        const result = await model.generateContent(masterPrompt);
-        const data = JSON.parse(result.response.text().replace(/```json|```/g, '').trim());
-
-        // Geração da Imagem com base na descrição da própria IA
+        const data = JSON.parse(responseText.replace(/```json|```/g, '').trim());
         const imageUrl = await generateImage(data.image_description);
-
         const slug = data.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') + '-' + Date.now();
 
         const post = {
@@ -137,9 +129,8 @@ async function runEngine() {
 
         console.log('🎉 SUCESSO! Artigo de autoridade publicado!');
         console.log(`🔗 Link: /blog/${post.slug}`);
-
     } catch (e) {
-        console.error('❌ Erro:', e.message);
+        console.error('❌ Erro no processamento final:', e.message);
     }
 }
 

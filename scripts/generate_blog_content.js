@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
+import { execSync } from 'child_process';
 
 // Configuração
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
@@ -121,8 +122,16 @@ async function runEngine() {
         const { error } = await supabase.from('blog_posts').insert([post]);
         if (error) throw error;
 
-        console.log(`🎉 PUBLICADO: ${post.title}`);
-        console.log(`🔗 /blog/${post.slug}`);
+        console.log('🎉 PUBLICADO: ' + post.title);
+        console.log('🔗 /blog/' + post.slug);
+
+        // Chamar sincronização automática do Git
+        try {
+            console.log('🔄 Iniciando sincronização do código...');
+            execSync(`${process.execPath} scripts/auto_sync.js`);
+        } catch (syncErr) {
+            console.warn('⚠️ Post publicado, mas falha no Sync Git:', syncErr.message);
+        }
     } catch (e) {
         console.error('❌ Erro final:', e.message);
     }

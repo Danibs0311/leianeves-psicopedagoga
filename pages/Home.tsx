@@ -7,6 +7,7 @@ import { ProfessionalProfile } from '../components/ProfessionalProfile';
 import { HowItWorks } from '../components/HowItWorks';
 import { Benefits } from '../components/Benefits';
 import { Authority } from '../components/Authority';
+import { BlogPreview } from '../components/BlogPreview';
 import { FinalCTA } from '../components/FinalCTA';
 import { Footer } from '../components/Footer';
 import { SchedulingModal } from '../components/SchedulingModal';
@@ -45,6 +46,7 @@ export const Home: React.FC = () => {
                 <HowItWorks />
                 <Benefits />
                 <Authority />
+                <BlogPreview />
                 <FinalCTA onOpenScheduling={() => setIsSchedulingModalOpen(true)} />
             </main>
             <Footer />

@@ -40,7 +40,7 @@ const knowledgeBase = {
 async function generateAutomatedPost() {
     console.log('🤖 Iniciando Motor de IA (Versão Autoridade 2026)...');
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const systemPrompt = `
         Você é Léia Neves, uma Psicopedagoga experiente e acolhedora de Salvador, Bahia.

@@ -53,7 +53,7 @@ async function generateImage(imageDescription) {
 async function runEngine() {
     console.log('🚀 Iniciando Motor de Autoridade (Prompt Master)...');
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
     // Temas sugeridos para rotação
     const topics = [

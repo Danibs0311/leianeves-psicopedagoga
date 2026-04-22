@@ -135,9 +135,9 @@ async function runEngine() {
         const { error } = await supabase.from('blog_posts').insert([post]);
         if (error) throw error;
 
-        console.log(`🎉 PUBLICADO: ${post.title}`);
-        
-        // Auto-Sync Git
+        console.log('🎉 PUBLICADO: ' + post.title);
+        console.log('🔗 Link do Post: /blog/' + post.slug);
+        console.log('🖼️ Link da Imagem: ' + post.image_url);
         try {
             console.log('🔄 Sincronizando código...');
             execSync(`${process.execPath} scripts/auto_sync.js`);

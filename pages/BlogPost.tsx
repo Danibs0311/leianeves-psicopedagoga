@@ -122,8 +122,12 @@ export const BlogPost: React.FC = () => {
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[2.5rem] blur opacity-15 group-hover:opacity-25 transition duration-1000 group-hover:duration-200"></div>
             <img 
-              src={post.image_url} 
+              src={post.image_url || 'https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28?auto=format&fit=crop&q=80&w=1000'} 
               alt={post.title} 
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = 'https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28?auto=format&fit=crop&q=80&w=1000';
+              }}
               className="relative w-full h-[450px] md:h-[650px] object-cover rounded-[2rem] shadow-2xl"
             />
           </div>

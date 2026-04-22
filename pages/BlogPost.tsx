@@ -104,74 +104,84 @@ export const BlogPost: React.FC = () => {
               </div>
               <div className="text-left">
                 <p className="text-slate-900 font-bold text-base leading-none mb-1">Léia Neves</p>
-                <p className="text-xs uppercase tracking-wider font-semibold text-indigo-600/70">Psicopedagoga Clínica</p>
-              </div>
+      
+      <main className="flex-grow pt-24 pb-20">
+        <article className="max-w-4xl mx-auto px-6">
+          {/* Article Header */}
+          <header className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-6 py-2 bg-sky-50 text-sky-600 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-8">
+              {post.category || 'Conhecimento'}
             </div>
-            
-            <div className="h-8 w-px bg-slate-200 hidden md:block"></div>
-
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <Calendar className="w-4 h-4 text-indigo-500" />
-              {new Date(post.published_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
+            <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] tracking-tighter mb-10">
+              {post.title}
+            </h1>
+            <div className="flex items-center justify-center gap-8 text-slate-400 font-bold text-[11px] uppercase tracking-widest">
+              <span className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-sky-500" />
+                {new Date(post.created_at || post.published_at).toLocaleDateString('pt-BR')}
+              </span>
+              <span className="flex items-center gap-2">
+                <User className="w-4 h-4 text-sky-500" />
+                Léia Neves
+              </span>
             </div>
-          </div>
-        </div>
+          </header>
 
-        {/* Featured Image - Ultra Premium Shadow */}
-        <div className="max-w-6xl mx-auto px-4 mb-20">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[2.5rem] blur opacity-15 group-hover:opacity-25 transition duration-1000 group-hover:duration-200"></div>
+          {/* Main Image */}
+          <div className="relative mb-20 group">
+            <div className="absolute inset-0 bg-sky-600/5 rounded-[3rem] blur-3xl transform translate-y-8 -z-10 group-hover:scale-105 transition-transform duration-700"></div>
             <img 
-              src={post.image_url || 'https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28?auto=format&fit=crop&q=80&w=1000'} 
+              src={post.image_url || 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200'} 
               alt={post.title} 
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = 'https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28?auto=format&fit=crop&q=80&w=1000';
+                target.src = 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200';
               }}
-              className="relative w-full h-[450px] md:h-[650px] object-cover rounded-[2rem] shadow-2xl"
+              className="w-full h-[500px] md:h-[700px] object-cover rounded-[3rem] shadow-2xl border-4 border-white"
             />
           </div>
-        </div>
 
-        {/* Content with Enhanced Typography */}
-        <div className="max-w-3xl mx-auto px-6">
-          <div 
-            className="prose prose-xl prose-slate max-w-none 
-              prose-headings:text-slate-900 prose-headings:font-black prose-headings:tracking-tight
-              prose-p:text-slate-600 prose-p:leading-[1.8] prose-p:text-lg
-              prose-strong:text-indigo-900 prose-strong:font-bold
-              prose-ul:list-disc prose-ul:marker:text-indigo-500
-              prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-8 prose-h2:border-b prose-h2:pb-4 prose-h2:border-slate-100"
+          {/* Article Content */}
+          <div className="prose prose-xl prose-slate max-w-none 
+            prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight
+            prose-p:text-slate-600 prose-p:leading-[1.8] prose-p:font-medium
+            prose-li:text-slate-600 prose-li:font-medium
+            prose-strong:text-slate-900 prose-strong:font-black
+            prose-blockquote:border-sky-500 prose-blockquote:bg-sky-50/50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-2xl prose-blockquote:font-bold prose-blockquote:text-sky-900 prose-blockquote:italic
+            prose-img:rounded-3xl prose-img:shadow-xl"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
-          
-          {/* Enhanced Call to Action */}
-          <div className="mt-24 p-12 bg-gradient-to-br from-slate-900 to-indigo-950 rounded-[2.5rem] relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full -ml-32 -mb-32 blur-3xl"></div>
-            
-            <div className="relative z-10 text-center md:text-left">
-              <h3 className="text-3xl md:text-4xl font-black text-white mb-6 leading-tight">
-                Apoio especializado para seu filho em <span className="text-indigo-400">Cajazeiras</span>.
-              </h3>
-              <p className="text-slate-300 text-lg mb-10 max-w-xl leading-relaxed">
-                Cada criança é única. Léia Neves utiliza trilhas terapêuticas personalizadas para transformar desafios em conquistas reais.
-              </p>
-              <div className="flex flex-col md:flex-row gap-4">
-                <a 
-                  href="https://wa.me/5571999999999" 
-                  className="bg-indigo-600 text-white px-10 py-5 rounded-2xl font-black text-center hover:bg-indigo-500 transition-all shadow-xl hover:shadow-indigo-500/20 active:scale-95"
-                >
-                  Agendar Consulta Agora
-                </a>
-                <button className="bg-white/5 border border-white/10 text-white px-10 py-5 rounded-2xl font-bold text-center hover:bg-white/10 transition-all">
-                  Saber mais sobre o método
-                </button>
+
+          {/* CTA Section */}
+          <footer className="mt-24 pt-16 border-t border-slate-100">
+            <div className="bg-slate-900 rounded-[3rem] p-10 md:p-16 text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
+              <div className="relative z-10">
+                <h2 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">
+                  Precisa de uma orientação <br/> <span className="text-sky-400">especializada?</span>
+                </h2>
+                <p className="text-slate-400 text-lg mb-10 max-w-xl mx-auto font-medium">
+                  A psicopedagogia pode abrir novos caminhos para o desenvolvimento do seu filho. Entre em contato e agende uma conversa.
+                </p>
+                <div className="flex flex-col md:flex-row gap-4 justify-center">
+                  <a 
+                    href="https://wa.me/5571991823722" 
+                    className="bg-sky-500 text-white px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-400 transition-all shadow-xl shadow-sky-500/20"
+                  >
+                    Agendar via WhatsApp
+                  </a>
+                  <Link 
+                    to="/blog" 
+                    className="bg-white/10 text-white px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white/20 transition-all backdrop-blur-sm"
+                  >
+                    Voltar ao Blog
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </article>
+          </footer>
+        </article>
+      </main>
 
       <Footer />
     </div>

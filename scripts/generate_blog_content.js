@@ -4,6 +4,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
 import { execSync } from 'child_process';
+import { existsSync, readdirSync } from 'fs';
+import { join } from 'path';
 
 // Configuração
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
@@ -20,12 +22,41 @@ if (!supabaseUrl || !supabaseKey || !geminiApiKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 const genAI = new GoogleGenerativeAI(geminiApiKey);
 
+// Função para encontrar o Git de forma robusta (Windows/GitHub Desktop)
+function getGitCmd() {
+    const localAppData = process.env.LOCALAPPDATA;
+    const githubDesktopPath = join(localAppData, 'GitHubDesktop');
+    const possiblePaths = [
+        'git',
+        join(githubDesktopPath, 'bin', 'github-git.exe'),
+        'C:\\Program Files\\Git\\bin\\git.exe',
+        'C:\\Program Files (x86)\\Git\\bin\\git.exe'
+    ];
+
+    if (existsSync(githubDesktopPath)) {
+        try {
+            const apps = readdirSync(githubDesktopPath).filter(f => f.startsWith('app-'));
+            if (apps.length > 0) {
+                possiblePaths.push(join(githubDesktopPath, apps[apps.length - 1], 'resources', 'app', 'git', 'cmd', 'git.exe'));
+            }
+        } catch (e) {}
+    }
+
+    for (const p of possiblePaths) {
+        try {
+            execSync(`"${p}" --version`, { stdio: 'ignore' });
+            return `"${p}"`;
+        } catch (e) {}
+    }
+    return 'git';
+}
+
 async function generateImage(title) {
-    console.log(`🎨 Iniciando processo de imagem para: "${title}"`);
+    console.log(`🎨 Motor de Imagem Ativado para: "${title}"`);
     
     try {
-        // Tentativa com Imagen 4.0 Fast (Mais chance de ter cota)
-        const prompt = `A professional and high-quality photography for a blog about child psychology. Theme: ${title}. Soft lighting, clean environment, realistic style. No text.`;
+        // Tentativa 1: Imagen 4.0 Fast
+        const prompt = `Professional photography, high-end editorial style, child development context, theme: ${title}. Soft natural lighting, premium colors, cinematic composition.`;
         
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${geminiApiKey}`, {
             method: 'POST',
@@ -35,72 +66,71 @@ async function generateImage(title) {
             })
         });
 
-        const data = await response.json();
-        
-        if (data.predictions && data.predictions[0].bytesBase64Encoded) {
-            console.log('✅ Imagem gerada pela IA com sucesso!');
-            const buffer = Buffer.from(data.predictions[0].bytesBase64Encoded, 'base64');
-            const fileName = `post-${Date.now()}.png`;
+        if (response.ok) {
+            const data = await response.json();
+            if (data.predictions && data.predictions[0].bytesBase64Encoded) {
+                console.log('✅ IA desenhou uma imagem exclusiva!');
+                const buffer = Buffer.from(data.predictions[0].bytesBase64Encoded, 'base64');
+                const fileName = `ai-post-${Date.now()}.png`;
 
-            const { data: uploadData, error: uploadError } = await supabase.storage
-                .from('blog-images')
-                .upload(fileName, buffer, { contentType: 'image/png', upsert: true });
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('blog-images')
+                    .upload(fileName, buffer, { contentType: 'image/png' });
 
-            if (uploadError) {
-                console.warn('⚠️ Erro ao subir para o Storage:', uploadError.message);
-                throw uploadError;
+                if (!uploadError) {
+                    const { data: urlData } = supabase.storage.from('blog-images').getPublicUrl(fileName);
+                    return urlData.publicUrl;
+                }
             }
-
-            const { data: urlData } = supabase.storage.from('blog-images').getPublicUrl(fileName);
-            console.log('🔗 Imagem salva no Storage:', urlData.publicUrl);
-            return urlData.publicUrl;
-        } else {
-            console.warn('⚠️ Imagen 4.0 não retornou dados (Cota ou Erro). Usando Unsplash...');
         }
     } catch (e) {
-        console.warn('⚠️ Falha no motor de imagem:', e.message);
+        console.warn('⚠️ Imagen 4.0 offline ou sem cota.');
     }
     
-    // Backup garantido: Unsplash de alta qualidade (URL Moderna 2026)
-    const keywords = encodeURIComponent(title.split(' ').slice(0, 3).join(','));
-    const unsplashUrl = `https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28?auto=format&fit=crop&q=80&w=1200&h=800&sig=${Date.now()}`;
-    console.log('📸 Usando imagem do Unsplash como backup:', unsplashUrl);
-    return unsplashUrl;
+    // Fallback: Unsplash de alta resolução com tags dinâmicas
+    const tags = "child,education,psychology,learning";
+    const fallbackUrl = `https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200&h=800&sig=${Date.now()}`;
+    console.log('📸 Usando imagem premium do banco de dados visual.');
+    return fallbackUrl;
 }
 
 async function runEngine() {
-    console.log('🚀 Iniciando Motor de Autoridade...');
+    console.log('🚀 MOTOR DE AUTORIDADE LÉIA NEVES 2026');
 
     const modelsToTry = ["gemini-2.0-flash-lite", "gemma-3-27b-it", "gemini-pro-latest"];
     let responseText = null;
 
     const topics = [
-        "Como identificar sinais de autismo (TEA) em crianças de 2 a 5 anos",
-        "TDAH ou apenas agitação? Como saber a hora de procurar ajuda",
-        "A importância do diagnóstico precoce no desenvolvimento infantil",
-        "Dificuldades de alfabetização: Quando é hora de intervir?",
-        "Estratégias para lidar com crises sensoriais no dia a dia"
+        "Sinais de TEA: Guia definitivo para pais e cuidadores",
+        "TDAH e Alfabetização: Como superar os desafios na escola",
+        "O impacto da tecnologia no desenvolvimento emocional infantil",
+        "Legislação de Inclusão 2026: Direitos garantidos na escola",
+        "Ansiedade infantil: Como identificar e acolher seu filho"
     ];
     const chosenTopic = topics[Math.floor(Math.random() * topics.length)];
 
     for (const modelName of modelsToTry) {
         try {
-            console.log(`📡 Usando: ${modelName}...`);
+            console.log(`📡 Consultando Inteligência: ${modelName}...`);
             const currentModel = genAI.getGenerativeModel({ model: modelName });
             
             const masterPrompt = `
-                Atue como um especialista em psicopedagogia. Crie um artigo completo.
+                Atue como o maior especialista em Psicopedagogia e Conteúdo Educativo do Brasil.
+                Escreva um artigo MAGISTRAL para o blog de Léia Neves.
+                
                 TEMA: ${chosenTopic}
-                REQUISITO: 800+ palavras, tom acolhedor.
-                CTA: Atendimento em Salvador com Léia Neves.
-                RETORNE APENAS JSON:
+                TOM: Clínico porém acolhedor, autoridade total, sem regionalismos excessivos no título.
+                ESTRUTURA: H2 atraentes, H3 explicativos, listas de sinais, conclusão com esperança.
+                REQUISITO: 1000+ palavras de puro valor.
+                
+                SAÍDA EM JSON:
                 {
-                    "title": "...",
-                    "content": "HTML...",
-                    "excerpt": "...",
-                    "meta_title": "...",
-                    "meta_description": "...",
-                    "category": "..."
+                    "title": "Título Impactante SEO",
+                    "content": "HTML semântico...",
+                    "excerpt": "Resumo magnético para o card...",
+                    "meta_title": "SEO Title...",
+                    "meta_description": "Meta description...",
+                    "category": "Saúde/Educação/Família"
                 }
             `;
 
@@ -108,11 +138,11 @@ async function runEngine() {
             responseText = result.response.text();
             if (responseText) break;
         } catch (err) {
-            console.warn(`⚠️ Modelo ${modelName} indisponível.`);
+            console.warn(`⚠️ Modelo ${modelName} ignorado.`);
         }
     }
 
-    if (!responseText) return console.error('❌ Cota de texto esgotada.');
+    if (!responseText) return console.error('❌ Falha crítica: Cota esgotada em todos os modelos.');
 
     try {
         const data = JSON.parse(responseText.replace(/```json|```/g, '').trim());
@@ -135,17 +165,23 @@ async function runEngine() {
         const { error } = await supabase.from('blog_posts').insert([post]);
         if (error) throw error;
 
-        console.log('🎉 PUBLICADO: ' + post.title);
-        console.log('🔗 Link do Post: /blog/' + post.slug);
-        console.log('🖼️ Link da Imagem: ' + post.image_url);
+        console.log(`🎉 ARTIGO PUBLICADO COM SUCESSO!`);
+        console.log(`🔗 Link: /blog/${post.slug}`);
+        console.log(`🖼️ Imagem: ${post.image_url}`);
+
+        // Sincronização Automática Git sem confirmação
         try {
-            console.log('🔄 Sincronizando código...');
-            execSync(`${process.execPath} scripts/auto_sync.js`);
-        } catch (s) {
-            console.warn('⚠️ Falha no sync git, mas post foi publicado.');
+            console.log('🔄 Sincronizando alterações no Git...');
+            const gitCmd = getGitCmd();
+            execSync(`${gitCmd} add .`);
+            execSync(`${gitCmd} commit -m "Auto-publish: ${data.title}"`);
+            execSync(`${gitCmd} push`);
+            console.log('✅ Git Sincronizado.');
+        } catch (sErr) {
+            console.warn('⚠️ Git Sync falhou (normal se não houver mudanças de código).');
         }
     } catch (e) {
-        console.error('❌ Erro final:', e.message);
+        console.error('❌ Erro no processamento do artigo:', e.message);
     }
 }
 

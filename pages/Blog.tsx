@@ -153,47 +153,42 @@ export const Blog: React.FC = () => {
             </section>
           </aside>
 
-          {/* ARTICLES GRID - RIGHT */}
+          {/* ARTICLES LIST - RIGHT */}
           <section className="lg:col-span-8 xl:col-span-9">
             {loading ? (
               <div className="flex justify-center py-40">
                 <div className="w-12 h-12 border-4 border-slate-50 border-t-sky-600 rounded-full animate-spin"></div>
               </div>
             ) : filteredPosts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12">
+              <div className="flex flex-col gap-6">
                 {filteredPosts.map((post) => (
                   <Link 
                     key={post.id} 
                     to={`/blog/${post.slug}`} 
-                    className="group flex flex-col bg-white rounded-[2rem] border border-slate-100 hover:border-sky-100 hover:shadow-2xl hover:shadow-sky-100/30 transition-all duration-500 overflow-hidden"
+                    className="group flex gap-5 items-start bg-white p-5 rounded-[1.5rem] border border-slate-100 hover:border-sky-100 hover:shadow-xl hover:shadow-sky-50/50 transition-all duration-300"
                   >
-                    <div className="relative aspect-[21/9] overflow-hidden bg-slate-50 border-b border-slate-50">
+                    <div className="w-20 h-20 md:w-28 md:h-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-50 shadow-sm">
                       <img 
                         src={post.image_url} 
                         alt={post.title} 
                         loading="lazy" 
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
                       />
-                      <div className="absolute top-3 left-3">
-                        <span className="bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg text-[8px] font-black text-sky-600 uppercase tracking-widest shadow-sm">
-                          {post.category}
-                        </span>
-                      </div>
                     </div>
-                    <div className="p-6 flex flex-col gap-3">
-                      <div className="flex items-center gap-2 text-[9px] font-bold text-slate-300 uppercase tracking-widest">
-                        <span>{new Date(post.created_at).toLocaleDateString('pt-BR')}</span>
+                    <div className="flex flex-col gap-2 py-0.5">
+                      <div className="flex items-center gap-2 text-[8px] font-black text-sky-500 uppercase tracking-widest">
+                        <span>{post.category}</span>
                         <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
-                        <span className="text-sky-500 font-black">Léia Neves</span>
+                        <span className="text-slate-300">{new Date(post.created_at).toLocaleDateString('pt-BR')}</span>
                       </div>
-                      <h3 className="text-base font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2">
+                      <h3 className="text-sm md:text-lg font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2">
                         {post.title}
                       </h3>
-                      <p className="text-slate-500 text-[12px] leading-relaxed line-clamp-2 font-medium">
+                      <p className="hidden md:block text-slate-500 text-[11px] leading-relaxed line-clamp-2 font-medium max-w-2xl">
                         {post.excerpt}
                       </p>
-                      <div className="mt-2 flex items-center gap-2 text-sky-600 font-black text-[9px] uppercase tracking-widest">
-                        Ler Artigo <ChevronRight className="w-3 h-3" strokeWidth={3} />
+                      <div className="mt-1 flex items-center gap-1.5 text-sky-600 font-black text-[8px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                        Continuar Lendo <ChevronRight className="w-3 h-3" strokeWidth={3} />
                       </div>
                     </div>
                   </Link>

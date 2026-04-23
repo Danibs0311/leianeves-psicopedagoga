@@ -13,8 +13,8 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
-        <div style={{ backgroundColor: '#10b981', color: '#fff', padding: '10px', textAlign: 'center', fontWeight: 'bold', fontSize: '12px', zIndex: 9999, position: 'relative' }}>
-          CONTROLE DE VERSÃO: V13 - MINIATURAS COMPACTAS ATIVAS
+        <div style={{ backgroundColor: '#7c3aed', color: '#fff', padding: '10px', textAlign: 'center', fontWeight: 'bold', fontSize: '12px', zIndex: 9999, position: 'relative' }}>
+          CONTROLE DE VERSÃO: V14 - INTERFACE VITRINE (MARKETPLACE) ATIVA
         </div>
         <Routes>
           <Route path="/" element={<Home />} />

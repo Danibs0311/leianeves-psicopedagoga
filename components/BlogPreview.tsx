@@ -51,39 +51,34 @@ export const BlogPreview: React.FC = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {posts.map((post) => (
             <Link 
               key={post.id} 
               to={`/blog/${post.slug}`}
-              className="group flex flex-col bg-white rounded-[2.5rem] p-6 border border-slate-100 hover:border-sky-200 hover:shadow-2xl hover:shadow-sky-100/50 transition-all duration-500"
+              className="group flex gap-5 items-start bg-white p-5 rounded-[2rem] border border-slate-100 hover:border-sky-100 hover:shadow-xl hover:shadow-sky-50/50 transition-all duration-300"
             >
-              <div className="relative aspect-[16/10] overflow-hidden rounded-[1.5rem] mb-6 shadow-sm bg-slate-50">
+              <div className="relative w-20 h-20 md:w-28 md:h-28 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-50 shadow-sm">
                 <img 
                   src={post.image_url || 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200'} 
                   alt={post.title}
                   loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute top-4 left-4">
-                  <span className="bg-white/95 backdrop-blur-sm text-sky-600 text-[8px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">
-                    Blog
-                  </span>
-                </div>
               </div>
-              <div className="flex flex-col flex-grow">
-                <div className="flex items-center text-slate-300 text-[10px] font-bold uppercase tracking-widest mb-3">
+              <div className="flex flex-col gap-2 py-1">
+                <div className="flex items-center text-slate-300 text-[9px] font-black uppercase tracking-widest">
                   <Calendar className="w-3 h-3 mr-2 text-sky-400" />
                   {new Date(post.created_at).toLocaleDateString('pt-BR')}
                 </div>
-                <h3 className="text-xl font-black text-slate-900 mb-4 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 font-display">
+                <h3 className="text-sm md:text-base font-black text-slate-900 mb-1 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 font-display">
                   {post.title}
                 </h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-8 line-clamp-2 font-medium">
+                <p className="text-slate-500 text-[11px] leading-relaxed line-clamp-2 font-medium">
                   {post.excerpt}
                 </p>
-                <div className="mt-auto flex items-center text-sky-600 font-black text-[10px] uppercase tracking-wider gap-2 group-hover:gap-4 transition-all">
-                  Ler artigo <ChevronRight className="w-4 h-4" strokeWidth={3} />
+                <div className="mt-2 flex items-center text-sky-600 font-black text-[9px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                  Ver Post <ChevronRight className="w-3 h-3" strokeWidth={3} />
                 </div>
               </div>
             </Link>

@@ -153,57 +153,56 @@ export const Blog: React.FC = () => {
             </section>
           </aside>
 
-          {/* ARTICLES GRID - RIGHT */}
+          {/* ARTICLES LIST - RIGHT */}
           <section className="lg:col-span-8 xl:col-span-9">
             {loading ? (
               <div className="flex justify-center py-40">
                 <div className="w-12 h-12 border-4 border-slate-50 border-t-sky-600 rounded-full animate-spin"></div>
               </div>
             ) : filteredPosts.length > 0 ? (
-              <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-4">
                 {filteredPosts.map((post) => (
                   <Link 
                     key={post.id} 
                     to={`/blog/${post.slug}`} 
-                    className="group flex flex-col md:flex-row gap-8 items-center bg-white p-5 md:p-6 rounded-[2rem] border border-slate-100 hover:border-sky-200 hover:shadow-2xl hover:shadow-sky-100/30 transition-all duration-500"
+                    className="group flex gap-6 items-start bg-white p-4 md:p-6 rounded-[1.5rem] border border-slate-100 hover:border-sky-100 hover:shadow-xl hover:shadow-sky-50/50 transition-all duration-300"
                   >
-                    <div className="relative w-full md:w-56 lg:w-64 aspect-[16/10] md:aspect-square flex-shrink-0 overflow-hidden rounded-[1.25rem] shadow-sm bg-slate-50">
+                    <div className="relative w-24 h-24 md:w-40 md:h-40 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-50 shadow-sm">
                       <img 
                         src={post.image_url} 
                         alt={post.title} 
                         loading="lazy" 
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
-                    <div className="flex flex-col gap-3 w-full pr-4">
-                      <div className="flex items-center gap-3 text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">
-                        <span className="text-sky-500 font-black">{post.category}</span>
+                    <div className="flex flex-col gap-2 py-1">
+                      <div className="flex items-center gap-3 text-[9px] font-black text-sky-500 uppercase tracking-widest">
+                        <span>{post.category}</span>
                         <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
-                        <span>{new Date(post.created_at).toLocaleDateString('pt-BR')}</span>
+                        <span className="text-slate-300">{new Date(post.created_at).toLocaleDateString('pt-BR')}</span>
                       </div>
-                      <h3 className="text-xl lg:text-2xl font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 font-display">
+                      <h3 className="text-base md:text-xl font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-snug line-clamp-2">
                         {post.title}
                       </h3>
-                      <p className="text-slate-500 text-sm lg:text-base leading-relaxed line-clamp-2 font-medium max-w-2xl">
+                      <p className="hidden md:block text-slate-500 text-sm leading-relaxed line-clamp-2 font-medium max-w-2xl">
                         {post.excerpt}
                       </p>
-                      <div className="mt-2 flex items-center gap-3 text-sky-600 font-black text-[10px] uppercase tracking-[0.2em] group-hover:translate-x-2 transition-transform duration-500">
-                        Ler Artigo Completo <ChevronRight className="w-4 h-4" strokeWidth={3} />
+                      <div className="mt-1 flex items-center gap-2 text-sky-600 font-black text-[9px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                        Ler Artigo <ChevronRight className="w-3 h-3" strokeWidth={3} />
                       </div>
                     </div>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-40 bg-slate-50/50 rounded-[4rem] border border-slate-100 border-dashed">
-                <AlertCircle size={40} className="mx-auto text-slate-200 mb-6" />
-                <p className="text-slate-400 font-bold uppercase tracking-widest text-[11px]">Nenhum artigo encontrado para sua busca.</p>
+              <div className="text-center py-40 bg-slate-50/50 rounded-[3rem] border border-slate-100 border-dashed">
+                <AlertCircle size={32} className="mx-auto text-slate-200 mb-4" />
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Nenhum artigo encontrado.</p>
                 <button 
                   onClick={() => {setSearchTerm(''); setSelectedCategory(null);}}
-                  className="mt-6 px-8 py-4 bg-white border border-slate-200 rounded-xl text-sky-600 font-black text-[10px] uppercase tracking-widest hover:bg-sky-50 transition-colors shadow-sm"
+                  className="mt-4 text-sky-600 font-black text-[10px] uppercase tracking-widest hover:underline"
                 >
-                  Ver todos os artigos
+                  Ver todos
                 </button>
               </div>
             )}

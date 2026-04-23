@@ -135,22 +135,6 @@ export const Blog: React.FC = () => {
                 ))}
               </div>
             </section>
-
-            {/* Instagram Widget */}
-            <section className="bg-sky-600 p-8 rounded-[2rem] text-white overflow-hidden relative group">
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.3em] mb-6 relative z-10">Instagram</h3>
-              <div className="grid grid-cols-3 gap-2 relative z-10">
-                {[1,2,3,4,5,6].map((i) => (
-                  <div key={i} className="aspect-square bg-white/10 rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer border border-white/5">
-                    <img src={`https://images.unsplash.com/photo-1594608661623-aa0bd3a67d28?auto=format&fit=crop&q=80&w=200&sig=${i}`} alt="ig" className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-              <button className="w-full mt-6 py-3 bg-white/10 hover:bg-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all hover:text-sky-600 border border-white/20 relative z-10">
-                Seguir @leianeves
-              </button>
-            </section>
           </aside>
 
           {/* ARTICLES LIST - RIGHT */}

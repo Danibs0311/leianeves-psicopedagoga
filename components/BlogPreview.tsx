@@ -62,6 +62,7 @@ export const BlogPreview: React.FC = () => {
                 <img 
                   src={post.image_url || 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200'} 
                   alt={post.title}
+                  loading="lazy"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200';
@@ -69,8 +70,8 @@ export const BlogPreview: React.FC = () => {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute top-6 left-6">
-                  <span className="bg-white/95 backdrop-blur-sm text-sky-600 text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest shadow-lg">
-                    Destaque
+                  <span className="bg-white/95 backdrop-blur-sm text-sky-600 text-[9px] font-black px-4 py-2 rounded-lg uppercase tracking-widest shadow-lg" aria-label="Post em destaque">
+                    Blog
                   </span>
                 </div>
               </div>

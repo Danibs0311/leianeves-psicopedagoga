@@ -7,36 +7,38 @@ import { AdminAppointments } from '../components/admin/AdminAppointments';
 import { AdminSettings } from '../components/admin/AdminSettings';
 import { AdminPatients } from '../components/admin/AdminPatients';
 import { AdminPatientDetail } from '../components/admin/AdminPatientDetail';
+import { AdminBlog } from '../components/admin/AdminBlog';
 
 export const Admin: React.FC = () => {
     const { user, loading: authLoading } = useAuth();
     const { tab, id } = useParams<{ tab?: string; id?: string }>();
     const navigate = useNavigate();
 
-    // Map Portuguese URL chunks to internal component views
-    const urlToView: Record<string, 'dashboard' | 'patients' | 'settings'> = {
+    // Map URL chunks to view states
+    const urlToView: Record<string, 'dashboard' | 'patients' | 'settings' | 'blog'> = {
         'agenda': 'dashboard',
         'pacientes': 'patients',
-        'configuracoes': 'settings'
+        'configuracoes': 'settings',
+        'blog': 'blog'
     };
     
     const viewToUrl: Record<string, string> = {
         'dashboard': 'agenda',
         'patients': 'pacientes',
-        'settings': 'configuracoes'
+        'settings': 'configuracoes',
+        'blog': 'blog'
     };
 
     const activeView = tab && urlToView[tab] ? urlToView[tab] : 'dashboard';
     const selectedPatientId = id ? Number(id) : null;
 
     useEffect(() => {
-        // Start default route cleanly
         if (!tab && user) {
             navigate('/admin/agenda', { replace: true });
         }
     }, [tab, user, navigate]);
 
-    const navigateTo = (view: 'dashboard' | 'patients' | 'settings', patientId: number | null = null) => {
+    const navigateTo = (view: 'dashboard' | 'patients' | 'settings' | 'blog', patientId: number | null = null) => {
         const urlChunk = viewToUrl[view];
         if (patientId) {
             navigate(`/admin/${urlChunk}/${patientId}`);
@@ -47,10 +49,10 @@ export const Admin: React.FC = () => {
 
     if (authLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="flex flex-col items-center gap-2">
-                    <div className="animate-spin w-8 h-8 border-4 border-sky-600 border-t-transparent rounded-full"></div>
-                    <p className="text-slate-500">Verificando segurança...</p>
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 font-sans">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="animate-spin w-10 h-10 border-4 border-sky-600 border-t-transparent rounded-full"></div>
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Autenticando...</p>
                 </div>
             </div>
         );
@@ -63,6 +65,8 @@ export const Admin: React.FC = () => {
     return (
         <AdminLayout activeView={activeView} onNavigate={(view) => navigateTo(view)}>
             {activeView === 'dashboard' && <AdminAppointments />}
+
+            {activeView === 'blog' && <AdminBlog />}
 
             {activeView === 'patients' && (
                 selectedPatientId ? (

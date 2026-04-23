@@ -89,14 +89,25 @@ async function runEngine() {
             console.log(`📡 Gerando conteúdo e descrição visual com: ${modelName}...`);
             const currentModel = genAI.getGenerativeModel({ model: modelName });
             const result = await currentModel.generateContent(`
-                Atue como especialista em psicopedagogia. Crie um artigo magistral sobre: ${chosenTopic}.
+                Atue como uma Psicopedagoga Clínica de renome, especialista em TEA e TDAH. 
+                Seu objetivo é escrever um artigo de autoridade para o blog da Léia Neves.
                 
-                Retorne APENAS JSON com os campos:
-                - title: Título forte
-                - content: HTML completo do artigo
-                - excerpt: Resumo curto
-                - visual_description: Uma descrição detalhada (em inglês) de uma foto profissional para este artigo. Exemplo: "A young child playing with colorful wooden blocks in a sunlit room, soft focus, high-end photography".
-                - meta_title, meta_description, category.
+                Tópico: ${chosenTopic}
+
+                REGRAS DE OURO:
+                1. TOM DE VOZ: Acolhedor, técnico porém simples, e profundamente empático.
+                2. ESTRUTURA: Use títulos (h2, h3), listas e uma citação forte (blockquote).
+                3. CONTEÚDO: Comece com a dor do pai/mãe, apresente a solução clínica e termine com esperança.
+                4. CTA: No final do texto, convide suavemente para uma conversa no WhatsApp para avaliação.
+
+                Retorne APENAS um JSON:
+                - title: Título magnético e focado em SEO.
+                - content: O HTML completo do artigo (mínimo 600 palavras).
+                - excerpt: Um gancho inicial de 2 frases que instigue a leitura.
+                - visual_description: Uma descrição detalhada para a IA criar uma foto. Ex: "A close-up of a child's hands carefully placing a puzzle piece, warm evening sunlight, high-end photography".
+                - meta_title: Para o Google (máx 60 chars).
+                - meta_description: Para o Google (máx 160 chars).
+                - category: Escolha a mais adequada.
             `);
             responseText = result.response.text();
             if (responseText) break;

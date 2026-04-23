@@ -1,19 +1,19 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
-import { Calendar, User, ArrowLeft, Share2 } from 'lucide-react';
+import { Calendar, User, ChevronLeft, Share2, MessageCircle } from 'lucide-react';
 
 interface Post {
+  id: string;
   title: string;
   content: string;
   image_url: string;
-  published_at: string;
   category: string;
-  meta_title: string;
-  meta_description: string;
+  created_at: string;
+  meta_title?: string;
+  meta_description?: string;
 }
 
 export const BlogPost: React.FC = () => {
@@ -22,10 +22,16 @@ export const BlogPost: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (slug) {
-      fetchPost();
-    }
+    fetchPost();
   }, [slug]);
+
+  useEffect(() => {
+    if (post) {
+      document.title = `${post.meta_title || post.title} | Léia Neves`;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', post.meta_description || post.title);
+    }
+  }, [post]);
 
   const fetchPost = async () => {
     try {
@@ -37,150 +43,118 @@ export const BlogPost: React.FC = () => {
 
       if (error) throw error;
       setPost(data);
-
-      // Atualizar SEO dinamicamente
-      if (data) {
-        document.title = data.meta_title || data.title;
-        const metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc) {
-          metaDesc.setAttribute('content', data.meta_description || '');
-        } else {
-          const meta = document.createElement('meta');
-          meta.name = "description";
-          meta.content = data.meta_description || '';
-          document.head.appendChild(meta);
-        }
-      }
     } catch (error) {
-      console.error('Erro ao buscar post:', error);
+      console.error('Error fetching post:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  const shareArticle = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: post?.title,
+        url: window.location.href
+      });
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-slate-100 border-t-sky-600 rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">Post não encontrado</h2>
-        <Link to="/blog" className="text-indigo-600 hover:underline">Voltar para o blog</Link>
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">Artigo não encontrado</h2>
+        <Link to="/blog" className="text-sky-600 font-bold flex items-center gap-2">
+          <ChevronLeft className="w-4 h-4" /> Voltar ao Blog
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#fafbfc]">
-      <Navbar />
+    <div className="min-h-screen bg-white flex flex-col font-sans">
+      <Navbar onOpenScheduling={() => {}} />
 
-      <article className="pt-28 pb-20">
-        {/* Post Header */}
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <Link to="/blog" className="inline-flex items-center text-slate-400 hover:text-indigo-600 mb-10 transition-all font-medium group">
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Voltar para a Galeria de Conhecimento
-          </Link>
-          
-          <div className="mb-8">
-            <span className="bg-indigo-600/10 text-indigo-700 text-xs font-bold px-5 py-2 rounded-full uppercase tracking-[0.2em] border border-indigo-100">
-              {post.category}
-            </span>
-          </div>
+      {/* Article Header */}
+      <header className="max-w-4xl mx-auto px-6 pt-16 pb-8 w-full">
+        <Link to="/blog" className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-8 inline-flex items-center gap-2 hover:text-sky-600 transition-colors">
+          <ChevronLeft className="w-3 h-3" /> Back to Articles
+        </Link>
+        
+        <div className="flex items-center gap-3 text-[10px] font-black text-sky-600 uppercase tracking-[0.2em] mb-6">
+          <span>{post.category}</span>
+          <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+          <span className="text-slate-300 font-bold">{new Date(post.created_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+        </div>
+        
+        <h1 className="text-4xl md:text-5xl font-black text-slate-900 leading-[1.1] mb-8 tracking-tight">
+          {post.title}
+        </h1>
 
-          <h1 className="text-4xl md:text-6xl font-black text-slate-900 mb-8 leading-[1.1] tracking-tight">
-            {post.title}
-          </h1>
-
-          <div className="flex items-center justify-center gap-8 text-slate-500 mb-12">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                LN
-              </div>
-              <div className="text-left">
-                <p className="text-slate-900 font-bold text-base leading-none mb-1">Léia Neves</p>
-      
-      <main className="flex-grow pt-24 pb-20">
-        <article className="max-w-4xl mx-auto px-6">
-          {/* Article Header */}
-          <header className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-6 py-2 bg-sky-50 text-sky-600 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-8">
-              {post.category || 'Conhecimento'}
+        <div className="flex items-center justify-between py-6 border-y border-slate-50">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-600">
+              <User className="w-5 h-5" />
             </div>
-            <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] tracking-tighter mb-10">
-              {post.title}
-            </h1>
-            <div className="flex items-center justify-center gap-8 text-slate-400 font-bold text-[11px] uppercase tracking-widest">
-              <span className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-sky-500" />
-                {new Date(post.created_at || post.published_at).toLocaleDateString('pt-BR')}
-              </span>
-              <span className="flex items-center gap-2">
-                <User className="w-4 h-4 text-sky-500" />
-                Léia Neves
-              </span>
+            <div>
+              <span className="block text-[11px] font-black text-slate-900 uppercase tracking-widest">Léia Neves</span>
+              <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-widest">Psicopedagoga Clínica</span>
             </div>
-          </header>
-
-          {/* Main Image */}
-          <div className="relative mb-20 group">
-            <div className="absolute inset-0 bg-sky-600/5 rounded-[3rem] blur-3xl transform translate-y-8 -z-10 group-hover:scale-105 transition-transform duration-700"></div>
-            <img 
-              src={post.image_url || 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200'} 
-              alt={post.title} 
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200';
-              }}
-              className="w-full h-[500px] md:h-[700px] object-cover rounded-[3rem] shadow-2xl border-4 border-white"
-            />
           </div>
+          <button 
+            onClick={shareArticle}
+            className="p-3 rounded-full bg-slate-50 text-slate-400 hover:bg-sky-50 hover:text-sky-600 transition-all"
+            aria-label="Compartilhar artigo"
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
 
-          {/* Article Content */}
-          <div className="prose prose-xl prose-slate max-w-none 
-            prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight
-            prose-p:text-slate-600 prose-p:leading-[1.8] prose-p:font-medium
-            prose-li:text-slate-600 prose-li:font-medium
-            prose-strong:text-slate-900 prose-strong:font-black
-            prose-blockquote:border-sky-500 prose-blockquote:bg-sky-50/50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-2xl prose-blockquote:font-bold prose-blockquote:text-sky-900 prose-blockquote:italic
-            prose-img:rounded-3xl prose-img:shadow-xl"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+      <main className="max-w-4xl mx-auto px-6 pb-24 w-full">
+        <div className="relative aspect-[16/9] mb-16 rounded-2xl overflow-hidden shadow-2xl shadow-slate-100 bg-slate-50">
+          <img 
+            src={post.image_url} 
+            alt={post.title}
+            loading="lazy"
+            className="w-full h-full object-cover"
           />
+        </div>
 
-          {/* CTA Section */}
-          <footer className="mt-24 pt-16 border-t border-slate-100">
-            <div className="bg-slate-900 rounded-[3rem] p-10 md:p-16 text-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
-              <div className="relative z-10">
-                <h2 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">
-                  Precisa de uma orientação <br/> <span className="text-sky-400">especializada?</span>
-                </h2>
-                <p className="text-slate-400 text-lg mb-10 max-w-xl mx-auto font-medium">
-                  A psicopedagogia pode abrir novos caminhos para o desenvolvimento do seu filho. Entre em contato e agende uma conversa.
-                </p>
-                <div className="flex flex-col md:flex-row gap-4 justify-center">
-                  <a 
-                    href="https://wa.me/5571991823722" 
-                    className="bg-sky-500 text-white px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-400 transition-all shadow-xl shadow-sky-500/20"
-                  >
-                    Agendar via WhatsApp
-                  </a>
-                  <Link 
-                    to="/blog" 
-                    className="bg-white/10 text-white px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white/20 transition-all backdrop-blur-sm"
-                  >
-                    Voltar ao Blog
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </footer>
-        </article>
+        <article 
+          className="prose prose-slate prose-lg max-w-none 
+          prose-headings:text-slate-900 prose-headings:font-black prose-headings:tracking-tight
+          prose-p:text-slate-600 prose-p:leading-relaxed prose-p:font-medium
+          prose-strong:text-slate-900 prose-strong:font-black
+          prose-blockquote:border-sky-500 prose-blockquote:bg-sky-50/50 prose-blockquote:py-2 prose-blockquote:rounded-r-xl
+          prose-li:text-slate-600
+          mb-20"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
+
+        {/* Dynamic CTA Footer */}
+        <section className="bg-slate-900 rounded-[2rem] p-10 md:p-16 text-center text-white relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-400 to-indigo-500"></div>
+          <h2 className="text-3xl font-black mb-6 leading-tight">Precisa de orientação especializada para o seu filho?</h2>
+          <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto font-medium">
+            Entender o desenvolvimento atípico é o primeiro passo para a autonomia. Agende uma conversa agora.
+          </p>
+          <a 
+            href="https://wa.me/5583999999999" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 bg-sky-500 hover:bg-sky-600 text-white px-10 py-5 rounded-2xl font-black transition-all hover:scale-105 shadow-xl shadow-sky-500/20"
+          >
+            <MessageCircle className="w-6 h-6" /> Falar com a Léia Neves
+          </a>
+        </section>
       </main>
 
       <Footer />

@@ -143,14 +143,17 @@ export const Blog: React.FC = () => {
                     <img 
                       src={post.image_url} 
                       alt={post.title}
+                      loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     />
                   </div>
                   
                   <div className="flex items-center gap-2 text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3">
-                    <span>Admin</span>
-                    <span>•</span>
-                    <span>{new Date(post.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                    <span aria-hidden="true">Admin</span>
+                    <span className="w-1 h-1 bg-slate-100 rounded-full"></span>
+                    <span aria-label={`Publicado em ${new Date(post.created_at).toLocaleDateString('pt-BR')}`}>
+                      {new Date(post.created_at).toLocaleDateString('pt-BR', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </span>
                   </div>
                   
                   <h3 className="text-lg font-black text-slate-800 mb-3 group-hover:text-sky-600 transition-colors leading-tight">

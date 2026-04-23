@@ -51,14 +51,14 @@ export const BlogPreview: React.FC = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {posts.map((post) => (
             <Link 
               key={post.id} 
               to={`/blog/${post.slug}`}
-              className="group flex gap-5 items-start bg-white p-5 rounded-[2rem] border border-slate-100 hover:border-sky-100 hover:shadow-xl hover:shadow-sky-50/50 transition-all duration-300"
+              className="group flex flex-col bg-white rounded-[1.5rem] border border-slate-100 hover:border-sky-100 hover:shadow-xl hover:shadow-sky-50/50 transition-all duration-300 overflow-hidden"
             >
-              <div className="relative w-20 h-20 md:w-28 md:h-28 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-50 shadow-sm">
+              <div className="relative aspect-[21/9] overflow-hidden bg-slate-50 border-b border-slate-50">
                 <img 
                   src={post.image_url || 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200'} 
                   alt={post.title}
@@ -66,19 +66,19 @@ export const BlogPreview: React.FC = () => {
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
               </div>
-              <div className="flex flex-col gap-2 py-1">
-                <div className="flex items-center text-slate-300 text-[9px] font-black uppercase tracking-widest">
+              <div className="p-5 flex flex-col gap-2">
+                <div className="flex items-center text-slate-300 text-[8px] font-black uppercase tracking-widest">
                   <Calendar className="w-3 h-3 mr-2 text-sky-400" />
                   {new Date(post.created_at).toLocaleDateString('pt-BR')}
                 </div>
-                <h3 className="text-sm md:text-base font-black text-slate-900 mb-1 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 font-display">
+                <h3 className="text-sm font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2">
                   {post.title}
                 </h3>
-                <p className="text-slate-500 text-[11px] leading-relaxed line-clamp-2 font-medium">
+                <p className="text-slate-500 text-[10px] leading-relaxed line-clamp-2 font-medium">
                   {post.excerpt}
                 </p>
-                <div className="mt-2 flex items-center text-sky-600 font-black text-[9px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                  Ver Post <ChevronRight className="w-3 h-3" strokeWidth={3} />
+                <div className="mt-1 flex items-center text-sky-600 font-black text-[8px] uppercase tracking-widest">
+                  Ler Agora <ChevronRight className="w-3 h-3" strokeWidth={3} />
                 </div>
               </div>
             </Link>

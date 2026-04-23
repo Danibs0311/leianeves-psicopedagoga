@@ -13,8 +13,8 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
-        <div style={{ backgroundColor: '#facc15', color: '#000', padding: '10px', textAlign: 'center', fontWeight: 'bold', fontSize: '12px', zIndex: 9999, position: 'relative' }}>
-          CONTROLE DE VERSÃO: V10 - ATUALIZAÇÃO FORÇADA ATIVA
+        <div style={{ backgroundColor: '#0ea5e9', color: '#fff', padding: '10px', textAlign: 'center', fontWeight: 'bold', fontSize: '12px', zIndex: 9999, position: 'relative' }}>
+          CONTROLE DE VERSÃO: V12 - REDESIGN COMPACTO ATIVO
         </div>
         <Routes>
           <Route path="/" element={<Home />} />

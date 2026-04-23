@@ -137,49 +137,44 @@ export const Blog: React.FC = () => {
             </section>
           </aside>
 
-          {/* ARTICLES GRID (MARKETPLACE STYLE) - RIGHT */}
+          {/* ARTICLES GRID (ULTRA COMPACT) - RIGHT */}
           <section className="lg:col-span-8 xl:col-span-9">
             {loading ? (
               <div className="flex justify-center py-40">
                 <div className="w-12 h-12 border-4 border-slate-50 border-t-sky-600 rounded-full animate-spin"></div>
               </div>
             ) : filteredPosts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredPosts.map((post) => (
                   <Link 
                     key={post.id} 
                     to={`/blog/${post.slug}`} 
-                    className="group flex flex-col bg-white rounded-[1.25rem] border border-slate-100 hover:border-sky-200 hover:shadow-xl hover:shadow-sky-100/30 transition-all duration-300 overflow-hidden"
+                    className="group flex flex-col bg-white rounded-xl border border-slate-100 hover:border-sky-100 hover:shadow-lg transition-all duration-300 overflow-hidden"
                   >
-                    <div className="relative aspect-square overflow-hidden bg-slate-50">
+                    <div className="relative aspect-[2/1] overflow-hidden bg-slate-50">
                       <img 
                         src={post.image_url} 
                         alt={post.title} 
                         loading="lazy" 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
                       />
-                      <div className="absolute top-3 left-3">
-                        <span className="bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[9px] font-black text-sky-600 uppercase tracking-widest shadow-sm">
-                          {post.category}
-                        </span>
-                      </div>
                     </div>
-                    <div className="p-5 flex flex-col flex-grow">
-                      <div className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-2">
-                        {new Date(post.created_at).toLocaleDateString('pt-BR')}
+                    <div className="p-3 flex flex-col flex-grow">
+                      <div className="text-[8px] font-bold text-sky-500 uppercase tracking-widest mb-1">
+                        {post.category}
                       </div>
-                      <h3 className="text-base font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-3">
+                      <h3 className="text-[13px] font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-1">
                         {post.title}
                       </h3>
-                      <p className="text-slate-500 text-[11px] leading-relaxed line-clamp-2 font-medium mb-6">
+                      <p className="text-slate-500 text-[10px] leading-relaxed line-clamp-2 font-medium">
                         {post.excerpt}
                       </p>
-                      <div className="mt-auto flex items-center justify-between">
-                        <div className="text-sky-600 font-black text-[9px] uppercase tracking-widest flex items-center gap-1">
-                          Ler Agora <ChevronRight className="w-3 h-3" strokeWidth={3} />
-                        </div>
-                        <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-sky-50 group-hover:text-sky-500 transition-colors">
-                          <ChevronRight size={14} />
+                      <div className="mt-3 pt-3 border-t border-slate-50 flex items-center justify-between">
+                        <span className="text-slate-300 text-[8px] font-bold uppercase tracking-widest">
+                          {new Date(post.created_at).toLocaleDateString('pt-BR')}
+                        </span>
+                        <div className="text-sky-600">
+                          <ChevronRight size={12} strokeWidth={3} />
                         </div>
                       </div>
                     </div>

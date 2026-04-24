@@ -29,7 +29,7 @@ export const Blog: React.FC = () => {
 
   useEffect(() => {
     fetchPosts();
-  }, [selectedCategory]);
+  }, []); // Removemos selectedCategory daqui para não recarregar do banco a cada clique
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -52,15 +52,18 @@ export const Blog: React.FC = () => {
     }
   };
 
+  const normalize = (str?: string) => 
+    str?.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
+
   const filteredPosts = posts.filter(post => {
     // Filtro por termo de pesquisa
     const matchesSearch = searchTerm === '' || 
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+      normalize(post.title).includes(normalize(searchTerm)) ||
+      normalize(post.excerpt).includes(normalize(searchTerm));
     
-    // Filtro por categoria (comparação flexível)
+    // Filtro por categoria (comparação ultra-flexível ignorando acentos)
     const matchesCategory = !selectedCategory || 
-      post.category?.trim().toLowerCase() === selectedCategory.trim().toLowerCase();
+      normalize(post.category) === normalize(selectedCategory);
 
     return matchesSearch && matchesCategory;
   });

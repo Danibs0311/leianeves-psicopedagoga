@@ -131,7 +131,7 @@ export const Blog: React.FC = () => {
       {/* Header */}
       <div className="border-b border-slate-100 py-6 bg-white">
         <div className="max-w-[1440px] mx-auto px-6 flex justify-between items-center">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">Nosso Blog</h1>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">Blog Profissional</h1>
           <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">
             <Link to="/" className="hover:text-sky-600 transition-colors">Home</Link>
             <span>/</span>

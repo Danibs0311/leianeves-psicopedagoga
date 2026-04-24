@@ -43,7 +43,7 @@ export const Footer: React.FC = () => {
               <li><a href="/#metodo" className="hover:text-sky-600 transition-colors">Como funciona</a></li>
               <li><a href="/#beneficios" className="hover:text-sky-600 transition-colors">Benefícios</a></li>
               <li><Link to="/materiais" className="hover:text-sky-600 transition-colors">Materiais</Link></li>
-              <li><Link to="/blog" className="hover:text-sky-600 transition-colors">Nosso Blog</Link></li>
+              <li><Link to="/blog" className="hover:text-sky-600 transition-colors">Blog Profissional</Link></li>
               <li><a href="https://biolink.website/leianeves_psicopedagoga" target="_blank" rel="noopener noreferrer" className="hover:text-sky-600 transition-colors">Contato</a></li>
             </ul>
           </div>

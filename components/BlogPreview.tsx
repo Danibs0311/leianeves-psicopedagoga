@@ -75,19 +75,19 @@ export const BlogPreview: React.FC = () => {
                   </span>
                 </div>
               </div>
-              <div className="p-3 flex flex-col flex-grow">
-                <div className="text-[8px] font-bold text-slate-300 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                  <Calendar size={8} className="text-sky-400" />
+              <div className="p-4 flex flex-col flex-grow">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                  <Calendar size={12} className="text-sky-400" />
                   {new Date(post.created_at).toLocaleDateString('pt-BR')}
                 </div>
-                <h3 className="text-sm font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-1.5">
+                <h3 className="text-base font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-2">
                   {post.title}
                 </h3>
-                <p className="text-slate-500 text-xs leading-relaxed line-clamp-2 font-medium mb-3">
+                <p className="text-slate-500 text-xs leading-relaxed line-clamp-2 font-medium mb-4">
                   {post.excerpt}
                 </p>
-                <div className="mt-auto flex items-center text-sky-600 font-black text-[7px] uppercase tracking-widest">
-                  Ver Conteúdo <ChevronRight className="w-2.5 h-2.5 ml-0.5" strokeWidth={3} />
+                <div className="mt-auto flex items-center text-sky-600 font-black text-[10px] uppercase tracking-widest">
+                  Ver Conteúdo <ChevronRight className="w-3.5 h-3.5 ml-1" strokeWidth={3} />
                 </div>
               </div>
             </Link>

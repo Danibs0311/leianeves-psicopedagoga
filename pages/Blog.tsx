@@ -42,9 +42,40 @@ export const Blog: React.FC = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
+      const mappedPosts = (data || []).map(post => {
+        const text = (post.title + ' ' + (post.category || '')).toLowerCase();
+        let newCat = 'Aprendizagem'; // Default
+
+        if (text.includes('tecnologia') || text.includes('digital') || text.includes('celular') || text.includes('tablet') || text.includes('conectad')) 
+          newCat = 'Tecnologia';
+        else if (text.includes('tea') || text.includes('autismo') || text.includes('inclusão') || text.includes('atípico')) 
+          newCat = 'Inclusão';
+        else if (text.includes('tdah') || text.includes('hiperatividade') || text.includes('atenção') || text.includes('foco')) 
+          newCat = 'Desenvolvimento';
+        else if (text.includes('família') || text.includes('pais') || text.includes('mãe') || text.includes('pai') || text.includes('escola') || text.includes('casa')) 
+          newCat = 'Família & Escola';
+        else if (text.includes('emoção') || text.includes('sentimento') || text.includes('emocional') || text.includes('ansiedade') || text.includes('medo')) 
+          newCat = 'Emoções';
+        else if (text.includes('pesquisa') || text.includes('estudo') || text.includes('ciência') || text.includes('científico')) 
+          newCat = 'Pesquisas';
+        else if (text.includes('método') || text.includes('ensino') || text.includes('didática') || text.includes('pedagogia')) 
+          newCat = 'Métodos de Ensino';
+        else if (text.includes('intervenção') || text.includes('terapia') || text.includes('clínica') || text.includes('sessão')) 
+          newCat = 'Intervenções';
+        else if (text.includes('motivação') || text.includes('ânimo') || text.includes('vontade') || text.includes('incentivo')) 
+          newCat = 'Motivação';
+        else if (text.includes('criatividade') || text.includes('arte') || text.includes('lúdico') || text.includes('brincar')) 
+          newCat = 'Criatividade';
+        else if (text.includes('auto') || text.includes('cuidado') || text.includes('saúde mental') || text.includes('bem-estar')) 
+          newCat = 'Autocuidado';
+        else if (text.includes('alfabetização') || text.includes('leitura') || text.includes('escrita') || text.includes('aprender')) 
+          newCat = 'Aprendizagem';
+
+        return { ...post, category: newCat };
+      });
       
-      console.log('Posts carregados:', data?.map(p => ({ title: p.title, cat: p.category })));
-      setPosts(data || []);
+      console.log('Posts mapeados:', mappedPosts.map(p => ({ title: p.title, cat: p.category })));
+      setPosts(mappedPosts);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {

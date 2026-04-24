@@ -6,6 +6,9 @@ on:
     - cron: '0 11 * * 1'
   workflow_dispatch: # Permite rodar manualmente pelo GitHub se você quiser testar
 
+permissions:
+  contents: write
+
 jobs:
   gerar-artigo:
     runs-on: ubuntu-latest

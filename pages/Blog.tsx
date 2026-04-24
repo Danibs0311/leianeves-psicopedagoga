@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { Search, ChevronRight, X, AlertCircle } from 'lucide-react';
+import { SchedulingModal } from '../components/SchedulingModal';
 
 interface BlogPost {
   id: string;
@@ -20,7 +21,7 @@ export const Blog: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
+  const [isSchedulingModalOpen, setIsSchedulingModalOpen] = useState(false);
   const categories = [
     'Aprendizagem', 'Métodos de Ensino', 'Desenvolvimento', 'Emoções', 
     'Intervenções', 'Família & Escola', 'Tecnologia', 'Inclusão', 
@@ -125,7 +126,7 @@ export const Blog: React.FC = () => {
         SISTEMA ATUALIZADO - MODO 5 COLUNAS ATIVO
       </div>
 
-      <Navbar onOpenScheduling={() => {}} />
+      <Navbar onOpenScheduling={() => setIsSchedulingModalOpen(true)} />
       
       {/* Header */}
       <div className="border-b border-slate-100 py-6 bg-white">
@@ -262,6 +263,10 @@ export const Blog: React.FC = () => {
       </main>
 
       <Footer />
+      <SchedulingModal
+        isOpen={isSchedulingModalOpen}
+        onClose={() => setIsSchedulingModalOpen(false)}
+      />
     </div>
   );
 };

@@ -21,7 +21,11 @@ export const Blog: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const categories = ['TEA (Autismo)', 'TDAH', 'Alfabetização', 'Desenvolvimento', 'Apoio Familiar'];
+  const categories = [
+    'Aprendizagem', 'Métodos de Ensino', 'Desenvolvimento', 'Emoções', 
+    'Intervenções', 'Família & Escola', 'Tecnologia', 'Inclusão', 
+    'Pesquisas', 'Autocuidado'
+  ];
 
   useEffect(() => {
     fetchPosts();
@@ -68,127 +72,100 @@ export const Blog: React.FC = () => {
         </div>
       </div>
 
-      <main className="max-w-[1440px] mx-auto px-6 py-20 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-20">
-          
-          {/* SIDEBAR - LEFT */}
-          <aside className="lg:col-span-4 xl:col-span-3 flex flex-col gap-12">
-            {/* Search */}
-            <div className="relative group">
-              <input 
-                type="text" 
-                placeholder="Buscar artigos..." 
-                className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:outline-none focus:border-sky-400 focus:bg-white focus:shadow-lg focus:shadow-sky-50 transition-all font-semibold text-slate-700"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <Search className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-sky-500 transition-colors" />
+      <main className="max-w-[1440px] mx-auto px-6 py-12 w-full">
+        {/* Search Bar - Full Width & Modern */}
+        <div className="max-w-3xl mx-auto mb-16 relative group">
+          <input 
+            type="text" 
+            placeholder="O que você está buscando hoje?" 
+            className="w-full px-8 py-6 bg-slate-50 border border-slate-100 rounded-[2rem] text-sm focus:outline-none focus:border-sky-400 focus:bg-white focus:shadow-2xl focus:shadow-sky-100/50 transition-all font-semibold text-slate-700 text-center"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Search className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-sky-500 transition-colors" />
+        </div>
+
+        {/* Categories Grid - 4 Columns */}
+        <section className="mb-20">
+          <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
+            <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em]">Explorar por Temas</h3>
+            {selectedCategory && (
+              <button onClick={() => setSelectedCategory(null)} className="text-[9px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-1 hover:text-rose-600 transition-colors">
+                Ver todos os artigos <X size={10} />
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {categories.map((cat) => (
+              <button 
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`text-[12px] font-bold py-4 px-6 rounded-2xl transition-all text-center border ${
+                  selectedCategory === cat 
+                  ? 'bg-sky-600 text-white border-sky-600 shadow-xl shadow-sky-100 scale-[1.02]' 
+                  : 'bg-white text-slate-500 border-slate-100 hover:border-sky-200 hover:text-sky-600 hover:shadow-lg hover:shadow-slate-100'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* ARTICLES GRID (ULTRA COMPACT 4 COLUMNS) */}
+        <section>
+          {loading ? (
+            <div className="flex justify-center py-40">
+              <div className="w-12 h-12 border-4 border-slate-50 border-t-sky-600 rounded-full animate-spin"></div>
             </div>
-
-            {/* Topics Filter */}
-            <section className="bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100">
-              <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
-                <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em]">Categorias</h3>
-                {selectedCategory && (
-                  <button onClick={() => setSelectedCategory(null)} className="text-[9px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-1 hover:text-rose-600 transition-colors">
-                    Limpar <X size={10} />
-                  </button>
-                )}
-              </div>
-              <ul className="flex flex-col gap-3">
-                {categories.map((cat) => (
-                  <li key={cat}>
-                    <button 
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`text-[14px] font-bold py-2 px-4 rounded-xl transition-all text-left w-full flex justify-between items-center ${
-                        selectedCategory === cat 
-                        ? 'bg-sky-600 text-white shadow-lg shadow-sky-100 translate-x-2' 
-                        : 'text-slate-500 hover:text-sky-600 hover:bg-white hover:translate-x-1'
-                      }`}
-                    >
-                      {cat}
-                      <ChevronRight size={14} className={selectedCategory === cat ? 'opacity-100' : 'opacity-0'} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            {/* Popular */}
-            <section className="px-4">
-              <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em] mb-10 border-b border-slate-100 pb-4">Destaques Semanais</h3>
-              <div className="flex flex-col gap-10">
-                {[1, 2, 3].map((idx) => (
-                  <div key={idx} className="flex gap-5 items-center group cursor-pointer">
-                    <div className="relative">
-                      <span className="text-5xl font-black text-slate-100 group-hover:text-sky-50 transition-colors leading-none italic">{idx}</span>
+          ) : filteredPosts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredPosts.map((post) => (
+                <Link 
+                  key={post.id} 
+                  to={`/blog/${post.slug}`} 
+                  className="group flex flex-col bg-white rounded-2xl border border-slate-100 hover:border-sky-200 hover:shadow-2xl hover:shadow-sky-100/30 transition-all duration-500 overflow-hidden"
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden bg-slate-50">
+                    <img 
+                      src={post.image_url} 
+                      alt={post.title} 
+                      loading="lazy" 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    />
+                    <div className="absolute top-3 left-3">
+                      <span className="px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-black text-sky-600 uppercase tracking-widest shadow-sm">
+                        {post.category}
+                      </span>
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <h4 className="text-[14px] font-bold text-slate-700 leading-tight group-hover:text-sky-600 transition-colors line-clamp-2">Estratégias avançadas para o desenvolvimento cognitivo infantil</h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[9px] text-sky-500 font-black uppercase tracking-widest">Léia Neves</span>
-                        <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
-                        <span className="text-[9px] text-slate-300 font-bold">5 min leitura</span>
+                  </div>
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h3 className="text-sm font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-slate-500 text-[10px] leading-relaxed line-clamp-2 font-medium mb-4">
+                      {post.excerpt}
+                    </p>
+                    <div className="mt-auto pt-3 border-t border-slate-50 flex items-center justify-between">
+                      <span className="text-slate-300 text-[8px] font-bold uppercase tracking-widest flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 bg-sky-400 rounded-full"></span>
+                        {new Date(post.created_at).toLocaleDateString('pt-BR')}
+                      </span>
+                      <div className="text-sky-600 group-hover:translate-x-1 transition-transform">
+                        <ChevronRight size={14} strokeWidth={3} />
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </section>
-          </aside>
-
-          {/* ARTICLES GRID (ULTRA COMPACT) - RIGHT */}
-          <section className="lg:col-span-8 xl:col-span-9">
-            {loading ? (
-              <div className="flex justify-center py-40">
-                <div className="w-12 h-12 border-4 border-slate-50 border-t-sky-600 rounded-full animate-spin"></div>
-              </div>
-            ) : filteredPosts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filteredPosts.map((post) => (
-                  <Link 
-                    key={post.id} 
-                    to={`/blog/${post.slug}`} 
-                    className="group flex flex-col bg-white rounded-xl border border-slate-100 hover:border-sky-100 hover:shadow-lg transition-all duration-300 overflow-hidden"
-                  >
-                    <div className="relative aspect-[2/1] overflow-hidden bg-slate-50">
-                      <img 
-                        src={post.image_url} 
-                        alt={post.title} 
-                        loading="lazy" 
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                      />
-                    </div>
-                    <div className="p-3 flex flex-col flex-grow">
-                      <div className="text-[8px] font-bold text-sky-500 uppercase tracking-widest mb-1">
-                        {post.category}
-                      </div>
-                      <h3 className="text-[13px] font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-1">
-                        {post.title}
-                      </h3>
-                      <p className="text-slate-500 text-[10px] leading-relaxed line-clamp-2 font-medium">
-                        {post.excerpt}
-                      </p>
-                      <div className="mt-3 pt-3 border-t border-slate-50 flex items-center justify-between">
-                        <span className="text-slate-300 text-[8px] font-bold uppercase tracking-widest">
-                          {new Date(post.created_at).toLocaleDateString('pt-BR')}
-                        </span>
-                        <div className="text-sky-600">
-                          <ChevronRight size={12} strokeWidth={3} />
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-40 bg-slate-50/50 rounded-[3rem] border border-slate-100 border-dashed">
-                <AlertCircle size={32} className="mx-auto text-slate-200 mb-4" />
-                <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Nenhum artigo encontrado.</p>
-              </div>
-            )}
-          </section>
-        </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-40 bg-slate-50/50 rounded-[3rem] border border-slate-100 border-dashed">
+              <AlertCircle size={32} className="mx-auto text-slate-200 mb-4" />
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Nenhum artigo encontrado para esta busca ou categoria.</p>
+            </div>
+          )}
+        </section>
       </main>
 
       <Footer />

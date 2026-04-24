@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Loader2, AlertCircle, CheckCircle2, FileText, ChevronRight, Check } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, FileText, ChevronRight, Check, User } from 'lucide-react';
 
 const anamnesisSchema = z.object({
     // Gestação e Nascimento

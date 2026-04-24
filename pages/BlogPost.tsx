@@ -160,7 +160,7 @@ export const BlogPost: React.FC = () => {
             </p>
             
             <a 
-              href="https://wa.me/5583999999999" 
+              href="https://biolink.website/leianeves_psicopedagoga" 
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 

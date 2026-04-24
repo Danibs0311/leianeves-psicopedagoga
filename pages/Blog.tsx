@@ -42,33 +42,44 @@ export const Blog: React.FC = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
+      const validCategories = [
+        'Aprendizagem', 'Métodos de Ensino', 'Desenvolvimento', 'Emoções', 
+        'Intervenções', 'Família & Escola', 'Tecnologia', 'Inclusão', 
+        'Pesquisas', 'Autocuidado', 'Motivação', 'Criatividade'
+      ];
+
       const mappedPosts = (data || []).map(post => {
-        const text = (post.title + ' ' + (post.category || '')).toLowerCase();
+        // Se já tem uma categoria perfeitamente válida, mantém ela
+        if (post.category && validCategories.includes(post.category)) {
+          return post;
+        }
+
+        const text = (post.title + ' ' + (post.category || '') + ' ' + (post.excerpt || '')).toLowerCase();
         let newCat = 'Aprendizagem'; // Default
 
-        if (text.includes('tecnologia') || text.includes('digital') || text.includes('celular') || text.includes('tablet') || text.includes('conectad')) 
+        if (text.includes('tecnologia') || text.includes('digital') || text.includes('celular') || text.includes('tablet') || text.includes('conectad') || text.includes('tela')) 
           newCat = 'Tecnologia';
-        else if (text.includes('tea') || text.includes('autismo') || text.includes('inclusão') || text.includes('atípico')) 
+        else if (text.includes('tea') || text.includes('autismo') || text.includes('inclusão') || text.includes('atípico') || text.includes('espectro')) 
           newCat = 'Inclusão';
-        else if (text.includes('tdah') || text.includes('hiperatividade') || text.includes('atenção') || text.includes('foco')) 
+        else if (text.includes('tdah') || text.includes('hiperatividade') || text.includes('atenção') || text.includes('foco') || text.includes('desenvolvimento')) 
           newCat = 'Desenvolvimento';
         else if (text.includes('família') || text.includes('pais') || text.includes('mãe') || text.includes('pai') || text.includes('escola') || text.includes('casa')) 
           newCat = 'Família & Escola';
-        else if (text.includes('emoção') || text.includes('sentimento') || text.includes('emocional') || text.includes('ansiedade') || text.includes('medo')) 
+        else if (text.includes('emoção') || text.includes('sentimento') || text.includes('emocional') || text.includes('ansiedade') || text.includes('medo') || text.includes('angústia')) 
           newCat = 'Emoções';
         else if (text.includes('pesquisa') || text.includes('estudo') || text.includes('ciência') || text.includes('científico')) 
           newCat = 'Pesquisas';
         else if (text.includes('método') || text.includes('ensino') || text.includes('didática') || text.includes('pedagogia')) 
           newCat = 'Métodos de Ensino';
-        else if (text.includes('intervenção') || text.includes('terapia') || text.includes('clínica') || text.includes('sessão')) 
+        else if (text.includes('intervenção') || text.includes('terapia') || text.includes('clínica') || text.includes('sessão') || text.includes('psicopedagogia')) 
           newCat = 'Intervenções';
         else if (text.includes('motivação') || text.includes('ânimo') || text.includes('vontade') || text.includes('incentivo')) 
           newCat = 'Motivação';
-        else if (text.includes('criatividade') || text.includes('arte') || text.includes('lúdico') || text.includes('brincar')) 
+        else if (text.includes('criatividade') || text.includes('arte') || text.includes('lúdico') || text.includes('brincar') || text.includes('jogo')) 
           newCat = 'Criatividade';
-        else if (text.includes('auto') || text.includes('cuidado') || text.includes('saúde mental') || text.includes('bem-estar')) 
+        else if (text.includes('auto') || text.includes('cuidado') || text.includes('saúde mental') || text.includes('bem-estar') || text.includes('rotina')) 
           newCat = 'Autocuidado';
-        else if (text.includes('alfabetização') || text.includes('leitura') || text.includes('escrita') || text.includes('aprender')) 
+        else if (text.includes('alfabetização') || text.includes('leitura') || text.includes('escrita') || text.includes('aprender') || text.includes('aprendizado')) 
           newCat = 'Aprendizagem';
 
         return { ...post, category: newCat };

@@ -1,0 +1,40 @@
+name: Gerador de Artigos Automático (Semanal)
+
+on:
+  schedule:
+    # Executa toda segunda-feira às 11:00 UTC (08:00 no Horário de Brasília UTC-3)
+    - cron: '0 11 * * 1'
+  workflow_dispatch: # Permite rodar manualmente pelo GitHub se você quiser testar
+
+jobs:
+  gerar-artigo:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Fazer checkout do código
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar o Motor de Autoridade (Gerador de Blog)
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/generate_blog_content.js
+
+      - name: Commit e Push das atualizações
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m "🤖 Auto-publish: Artigo Semanal Adicionado" || echo "Sem mudanças para commitar"
+          git push

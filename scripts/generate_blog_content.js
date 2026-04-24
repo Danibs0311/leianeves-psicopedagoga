@@ -72,27 +72,53 @@ async function generateImage(title) {
 
 async function runEngine() {
     console.log('🚀 MOTOR DE AUTORIDADE LÉIA NEVES (IMAGEM ILIMITADA)');
+    
+    // 1. Definir o ciclo de categorias
+    const categoriesCycle = [
+        'Aprendizagem', 'Métodos de Ensino', 'Desenvolvimento', 'Emoções', 
+        'Intervenções', 'Família & Escola', 'Tecnologia', 'Inclusão', 
+        'Pesquisas', 'Autocuidado', 'Motivação', 'Criatividade'
+    ];
+
+    // 2. Descobrir qual foi a última categoria gerada
+    let nextCategory = categoriesCycle[0];
+    try {
+        const { data: lastPosts } = await supabase
+            .from('blog_posts')
+            .select('category')
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+        if (lastPosts && lastPosts.length > 0) {
+            const lastCategory = lastPosts[0].category;
+            const currentIndex = categoriesCycle.indexOf(lastCategory);
+            
+            if (currentIndex !== -1) {
+                // Pega a próxima, se for a última, volta para a primeira (0)
+                const nextIndex = (currentIndex + 1) % categoriesCycle.length;
+                nextCategory = categoriesCycle[nextIndex];
+            }
+        }
+    } catch (e) {
+        console.warn('⚠️ Não foi possível verificar o último post. Começando o ciclo do zero.');
+    }
+
+    console.log(`\n📅 TEMA DA SEMANA SELECIONADO: [${nextCategory.toUpperCase()}]`);
+
     const modelsToTry = ["gemini-2.0-flash-lite", "gemma-3-27b-it", "gemini-pro-latest"];
     let responseText = null;
-
-    const topics = [
-        "Sinais de TEA: Guia definitivo para pais e cuidadores",
-        "TDAH e Alfabetização: Como superar os desafios na escola",
-        "O impacto da tecnologia no desenvolvimento emocional infantil",
-        "Legislação de Inclusão 2026: Direitos garantidos na escola",
-        "Ansiedade infantil: Como identificar e acolher seu filho"
-    ];
-    const chosenTopic = topics[Math.floor(Math.random() * topics.length)];
 
     for (const modelName of modelsToTry) {
         try {
             console.log(`📡 Gerando conteúdo e descrição visual com: ${modelName}...`);
             const currentModel = genAI.getGenerativeModel({ model: modelName });
             const result = await currentModel.generateContent(`
-                Atue como uma Psicopedagoga Clínica de renome, especialista em TEA e TDAH. 
-                Seu objetivo é escrever um artigo de autoridade para o blog da Léia Neves.
+                Atue como uma Psicopedagoga Clínica de renome, especialista em desenvolvimento infantil, TEA e TDAH. 
+                Seu objetivo é escrever um artigo inédito e de autoridade para o blog da clínica Léia Neves.
                 
-                Tópico: ${chosenTopic}
+                O TEMA OBRIGATÓRIO DESTE ARTIGO É: ${nextCategory}
+
+                Crie um tópico fascinante dentro deste tema.
 
                 REGRAS DE OURO:
                 1. TOM DE VOZ: Acolhedor, técnico porém simples, e profundamente empático.
@@ -107,7 +133,7 @@ async function runEngine() {
                 - visual_description: Uma descrição detalhada para a IA criar uma foto. Ex: "A close-up of a child's hands carefully placing a puzzle piece, warm evening sunlight, high-end photography".
                 - meta_title: Para o Google (máx 60 chars).
                 - meta_description: Para o Google (máx 160 chars).
-                - category: Escolha EXATAMENTE UMA destas: 'Aprendizagem', 'Métodos de Ensino', 'Desenvolvimento', 'Emoções', 'Intervenções', 'Família & Escola', 'Tecnologia', 'Inclusão', 'Pesquisas', 'Autocuidado', 'Motivação', 'Criatividade'.
+                - category: DEVE SER EXATAMENTE A STRING "${nextCategory}".
             `);
             responseText = result.response.text();
             if (responseText) break;

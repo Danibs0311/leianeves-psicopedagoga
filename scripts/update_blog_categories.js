@@ -26,31 +26,44 @@ async function updateCategories() {
     }
 
     for (const post of posts) {
-        // Simple mapping logic based on keywords
-        let newCategory = 'Aprendizagem'; // default
+        let newCategory = 'Aprendizagem'; // Default
 
         const text = (post.title + ' ' + (post.category || '')).toLowerCase();
 
-        if (text.includes('tea') || text.includes('autismo') || text.includes('inclusão')) newCategory = 'Inclusão';
-        else if (text.includes('tdah') || text.includes('desenvolvimento')) newCategory = 'Desenvolvimento';
-        else if (text.includes('família') || text.includes('pais') || text.includes('escola')) newCategory = 'Família & Escola';
-        else if (text.includes('emoção') || text.includes('sentimento')) newCategory = 'Emoções';
-        else if (text.includes('tecnologia') || text.includes('digital')) newCategory = 'Tecnologia';
-        else if (text.includes('pesquisa') || text.includes('estudo')) newCategory = 'Pesquisas';
-        else if (text.includes('método') || text.includes('ensino')) newCategory = 'Métodos de Ensino';
-        else if (text.includes('intervenção')) newCategory = 'Intervenções';
-        else if (text.includes('motivação') || text.includes('ânimo')) newCategory = 'Motivação';
-        else if (text.includes('criatividade') || text.includes('arte')) newCategory = 'Criatividade';
-        else if (text.includes('auto') || text.includes('cuidado')) newCategory = 'Autocuidado';
+        // Categorização mais robusta
+        if (text.includes('tea') || text.includes('autismo') || text.includes('inclusão') || text.includes('atípico')) 
+            newCategory = 'Inclusão';
+        else if (text.includes('tdah') || text.includes('hiperatividade') || text.includes('atenção') || text.includes('foco')) 
+            newCategory = 'Desenvolvimento';
+        else if (text.includes('família') || text.includes('pais') || text.includes('mãe') || text.includes('pai') || text.includes('escola') || text.includes('casa')) 
+            newCategory = 'Família & Escola';
+        else if (text.includes('emoção') || text.includes('sentimento') || text.includes('emocional') || text.includes('ansiedade') || text.includes('medo')) 
+            newCategory = 'Emoções';
+        else if (text.includes('tecnologia') || text.includes('digital') || text.includes('celular') || text.includes('tablet') || text.includes('conectad')) 
+            newCategory = 'Tecnologia';
+        else if (text.includes('pesquisa') || text.includes('estudo') || text.includes('ciência') || text.includes('científico')) 
+            newCategory = 'Pesquisas';
+        else if (text.includes('método') || text.includes('ensino') || text.includes('didática') || text.includes('pedagogia')) 
+            newCategory = 'Métodos de Ensino';
+        else if (text.includes('intervenção') || text.includes('terapia') || text.includes('clínica') || text.includes('sessão')) 
+            newCategory = 'Intervenções';
+        else if (text.includes('motivação') || text.includes('ânimo') || text.includes('vontade') || text.includes('incentivo')) 
+            newCategory = 'Motivação';
+        else if (text.includes('criatividade') || text.includes('arte') || text.includes('lúdico') || text.includes('brincar')) 
+            newCategory = 'Criatividade';
+        else if (text.includes('auto') || text.includes('cuidado') || text.includes('saúde mental') || text.includes('bem-estar')) 
+            newCategory = 'Autocuidado';
+        else if (text.includes('alfabetização') || text.includes('leitura') || text.includes('escrita') || text.includes('aprender')) 
+            newCategory = 'Aprendizagem';
 
-        console.log(`📝 Atualizando "${post.title}" para categoria: ${newCategory}`);
+        console.log(`📝 Vinculando "${post.title}" -> ${newCategory}`);
 
         const { error: updateError } = await supabase
             .from('blog_posts')
             .update({ category: newCategory })
             .eq('id', post.id);
 
-        if (updateError) console.error(`❌ Erro ao atualizar post ${post.id}:`, updateError);
+        if (updateError) console.error(`❌ Erro no post ${post.id}:`, updateError);
     }
 
     console.log('✅ Categorias atualizadas com sucesso!');

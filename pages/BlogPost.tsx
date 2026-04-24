@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { Calendar, User, ChevronLeft, Share2, MessageCircle } from 'lucide-react';
+import { SchedulingModal } from '../components/SchedulingModal';
 
 interface Post {
   id: string;
@@ -20,7 +21,7 @@ export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [isSchedulingModalOpen, setIsSchedulingModalOpen] = useState(false);
   useEffect(() => {
     fetchPost();
   }, [slug]);
@@ -80,7 +81,7 @@ export const BlogPost: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans">
-      <Navbar onOpenScheduling={() => {}} />
+      <Navbar onOpenScheduling={() => setIsSchedulingModalOpen(true)} />
 
       {/* Article Header */}
       <header className="max-w-4xl mx-auto px-6 pt-16 pb-8 w-full">
@@ -159,27 +160,29 @@ export const BlogPost: React.FC = () => {
               </span>
             </p>
             
-            <a 
-              href="https://biolink.website/leianeves_psicopedagoga" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <button 
+              onClick={() => setIsSchedulingModalOpen(true)}
               style={{ 
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 boxShadow: '0 10px 40px -10px rgba(16, 185, 129, 0.5)'
               }}
-              className="group relative inline-flex items-center gap-4 px-12 py-6 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 overflow-hidden"
+              className="group relative inline-flex items-center gap-4 px-12 py-6 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 overflow-hidden border-none cursor-pointer text-white"
             >
               {/* Shimmer Effect */}
               <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer" />
               
-              <MessageCircle className="w-8 h-8 animate-bounce-subtle" /> 
-              <span className="relative z-10">Agendar Conversa no WhatsApp</span>
-            </a>
+              <Calendar className="w-8 h-8 animate-bounce-subtle" /> 
+              <span className="relative z-10">Agendar Consulta Agora</span>
+            </button>
           </div>
         </section>
       </main>
 
       <Footer />
+      <SchedulingModal
+        isOpen={isSchedulingModalOpen}
+        onClose={() => setIsSchedulingModalOpen(false)}
+      />
     </div>
   );
 };

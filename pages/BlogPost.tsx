@@ -139,29 +139,41 @@ export const BlogPost: React.FC = () => {
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
-        {/* Premium CTA Footer - Forçado com Style para garantir contraste */}
+        {/* Premium CTA Footer - Design de Alta Conversão */}
         <section 
-          style={{ backgroundColor: '#0f172a', color: 'white' }}
-          className="relative overflow-hidden rounded-[2.5rem] p-10 md:p-16 text-center shadow-2xl border border-slate-800"
+          style={{ backgroundColor: '#050a15', color: 'white' }}
+          className="relative overflow-hidden rounded-[3rem] p-12 md:p-20 text-center shadow-[0_20px_50px_rgba(8,112,184,0.15)] border border-slate-800/50"
         >
+          {/* Background Glows */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-sky-600/10 rounded-full blur-[100px]"></div>
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-600/10 rounded-full blur-[100px]"></div>
+
           <div className="relative z-10 max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black mb-6 leading-tight" style={{ color: '#ffffff' }}>
-              Precisa de orientação especializada para o seu filho?
+            <h2 className="text-3xl md:text-5xl font-black mb-8 leading-[1.1] tracking-tight" style={{ color: '#ffffff' }}>
+              Deseja um acompanhamento exclusivo para o seu filho?
             </h2>
-            <p className="text-lg mb-10 font-medium" style={{ color: '#cbd5e1' }}>
-              Entender o desenvolvimento atípico é o primeiro passo para a autonomia. 
-              <span className="block mt-2 font-bold italic text-xl" style={{ color: '#38bdf8' }}>
-                Agende uma conversa acolhedora agora.
+            <p className="text-lg md:text-xl mb-12 font-medium leading-relaxed" style={{ color: '#94a3b8' }}>
+              Entenda cada etapa do desenvolvimento e transforme desafios em conquistas. 
+              <span className="block mt-4 font-black text-sky-400 uppercase tracking-widest text-sm">
+                Agende uma consulta agora
               </span>
             </p>
+            
             <a 
               href="https://wa.me/5583999999999" 
               target="_blank" 
               rel="noopener noreferrer"
-              style={{ backgroundColor: '#10b981', color: 'white' }}
-              className="inline-flex items-center gap-4 px-10 py-5 rounded-2xl font-black text-xl transition-all hover:scale-105 shadow-xl shadow-emerald-500/20"
+              style={{ 
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                boxShadow: '0 10px 40px -10px rgba(16, 185, 129, 0.5)'
+              }}
+              className="group relative inline-flex items-center gap-4 px-12 py-6 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 overflow-hidden"
             >
-              <MessageCircle className="w-8 h-8" /> Falar com a Léia Neves
+              {/* Shimmer Effect */}
+              <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer" />
+              
+              <MessageCircle className="w-8 h-8 animate-bounce-subtle" /> 
+              <span className="relative z-10">Agendar Conversa no WhatsApp</span>
             </a>
           </div>
         </section>

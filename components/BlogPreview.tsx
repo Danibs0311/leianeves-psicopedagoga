@@ -69,6 +69,11 @@ export const BlogPreview: React.FC = () => {
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
+                <div className="absolute top-2 left-2">
+                  <span className="px-2 py-0.5 bg-white/90 backdrop-blur-md rounded-full text-[7px] font-black text-sky-600 uppercase tracking-widest shadow-sm">
+                    {post.category || 'Educação'}
+                  </span>
+                </div>
               </div>
               <div className="p-3 flex flex-col flex-grow">
                 <div className="text-[8px] font-bold text-slate-300 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">

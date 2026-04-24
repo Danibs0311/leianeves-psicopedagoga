@@ -173,9 +173,9 @@ export const Blog: React.FC = () => {
                       loading="lazy" 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                     />
-                    <div className="absolute top-2 left-2">
-                      <span className="px-2 py-0.5 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-black text-sky-600 uppercase tracking-widest shadow-sm">
-                        {post.category}
+                    <div className="absolute top-2 left-2 z-10">
+                      <span className="px-2 py-1 bg-white/95 backdrop-blur-sm rounded-lg text-[8px] font-black text-sky-600 uppercase tracking-widest shadow-md border border-slate-100">
+                        {post.category || 'Geral'}
                       </span>
                     </div>
                   </div>

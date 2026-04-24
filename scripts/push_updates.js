@@ -33,18 +33,27 @@ async function run() {
         try {
             execSync(`${git} commit -m "Configurando automação semanal do blog"`);
         } catch (e) {
-            console.log('ℹ️ Sem mudanças pendentes para enviar.');
-            return;
+            console.log('ℹ️ Sem mudanças locais para commitar.');
+        }
+
+        console.log('🔄 Sincronizando com o GitHub (Pull)...');
+        try {
+            execSync(`${git} pull origin main --rebase`);
+        } catch (e) {
+            console.log('⚠️ Aviso: Falha ao sincronizar (pull). Continuando mesmo assim...');
         }
         
-        console.log('⬆️ Enviando para o GitHub...');
-        execSync(`${git} push`);
+        console.log('⬆️ Enviando para o GitHub (Push)...');
+        execSync(`${git} push origin main`);
         
         console.log('\n✅ TUDO PRONTO! Os arquivos foram enviados com sucesso.');
         console.log('Agora você pode ir na aba "Actions" do seu GitHub e verá o gerador lá!');
     } catch (error) {
         console.error('\n❌ Erro ao enviar:', error.message);
-        console.log('\n💡 Dica: Se o erro for de autenticação, abra o GitHub Desktop e clique em "Push origin" manualmente.');
+        console.log('\n💡 Dicas para resolver:');
+        console.log('1. Se o erro for de autenticação, abra o GitHub Desktop e clique em "Push origin".');
+        console.log('2. Verifique se o OneDrive não está travando os arquivos (ícone azul na barra de tarefas).');
+        console.log('3. Tente rodar: git push origin main --force (APENAS se tiver certeza).');
     }
 }
 

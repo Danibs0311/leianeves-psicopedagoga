@@ -113,7 +113,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
         defaultValues: {
             parentName: '',
             childName: '',
-            childAge: undefined as any,
+            childAge: '' as any,
             cpf: '',
             email: '',
             phone: '',

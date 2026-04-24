@@ -34,10 +34,16 @@ export const Blog: React.FC = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      let query = supabase.from('blog_posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
-      if (selectedCategory) query = query.eq('category', selectedCategory);
-      const { data, error } = await query;
+      // Buscamos TODOS os posts e filtramos no frontend para maior flexibilidade
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+      
       if (error) throw error;
+      
+      console.log('Posts carregados:', data?.map(p => ({ title: p.title, cat: p.category })));
       setPosts(data || []);
     } catch (error) {
       console.error('Error fetching posts:', error);
@@ -46,10 +52,18 @@ export const Blog: React.FC = () => {
     }
   };
 
-  const filteredPosts = posts.filter(post =>
-    post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPosts = posts.filter(post => {
+    // Filtro por termo de pesquisa
+    const matchesSearch = searchTerm === '' || 
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Filtro por categoria (comparação flexível)
+    const matchesCategory = !selectedCategory || 
+      post.category?.trim().toLowerCase() === selectedCategory.trim().toLowerCase();
+
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans overflow-x-hidden">

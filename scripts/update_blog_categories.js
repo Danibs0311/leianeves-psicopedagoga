@@ -30,8 +30,10 @@ async function updateCategories() {
 
         const text = (post.title + ' ' + (post.category || '')).toLowerCase();
 
-        // Categorização mais robusta
-        if (text.includes('tea') || text.includes('autismo') || text.includes('inclusão') || text.includes('atípico')) 
+        // Categorização mais robusta (Prioridade para temas específicos)
+        if (text.includes('tecnologia') || text.includes('digital') || text.includes('celular') || text.includes('tablet') || text.includes('conectad')) 
+            newCategory = 'Tecnologia';
+        else if (text.includes('tea') || text.includes('autismo') || text.includes('inclusão') || text.includes('atípico')) 
             newCategory = 'Inclusão';
         else if (text.includes('tdah') || text.includes('hiperatividade') || text.includes('atenção') || text.includes('foco')) 
             newCategory = 'Desenvolvimento';
@@ -39,8 +41,6 @@ async function updateCategories() {
             newCategory = 'Família & Escola';
         else if (text.includes('emoção') || text.includes('sentimento') || text.includes('emocional') || text.includes('ansiedade') || text.includes('medo')) 
             newCategory = 'Emoções';
-        else if (text.includes('tecnologia') || text.includes('digital') || text.includes('celular') || text.includes('tablet') || text.includes('conectad')) 
-            newCategory = 'Tecnologia';
         else if (text.includes('pesquisa') || text.includes('estudo') || text.includes('ciência') || text.includes('científico')) 
             newCategory = 'Pesquisas';
         else if (text.includes('método') || text.includes('ensino') || text.includes('didática') || text.includes('pedagogia')) 

@@ -26,7 +26,7 @@ export const BlogPreview: React.FC = () => {
       .select('*')
       .eq('is_published', true)
       .order('published_at', { ascending: false })
-      .limit(3);
+      .limit(4);
     
     if (data) setPosts(data);
   };
@@ -39,9 +39,13 @@ export const BlogPreview: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
           <div className="max-w-2xl">
             <span className="text-sky-600 font-black text-xs uppercase tracking-[0.3em] mb-4 block">Educação e Cuidado</span>
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-[1.1] tracking-tight">
-              Nosso Blog de <span className="text-sky-600 underline decoration-sky-200 underline-offset-8">Psicopedagogia</span>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-[1.1] tracking-tight mb-4">
+              Nosso <span className="text-sky-600 underline decoration-sky-200 underline-offset-8">Blog</span>
             </h2>
+            <p className="text-slate-500 text-sm md:text-base font-medium leading-relaxed max-w-xl">
+              Dicas, orientações e artigos especializados para auxiliar no desenvolvimento cognitivo e emocional. 
+              <span className="block mt-2 font-black text-sky-600 uppercase text-[10px] tracking-widest">Acompanhe nossos conteúdos semanais.</span>
+            </p>
           </div>
           <Link 
             to="/blog" 
@@ -51,14 +55,14 @@ export const BlogPreview: React.FC = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {posts.map((post) => (
             <Link 
               key={post.id} 
               to={`/blog/${post.slug}`}
-              className="group flex flex-col bg-white rounded-[1.25rem] border border-slate-100 hover:border-sky-200 hover:shadow-xl hover:shadow-sky-100/30 transition-all duration-300 overflow-hidden"
+              className="group flex flex-col bg-white rounded-xl border border-slate-100 hover:border-sky-200 hover:shadow-xl hover:shadow-sky-100/30 transition-all duration-300 overflow-hidden"
             >
-              <div className="relative aspect-square overflow-hidden bg-slate-50">
+              <div className="relative aspect-[4/3] overflow-hidden bg-slate-50">
                 <img 
                   src={post.image_url || 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=1200'} 
                   alt={post.title}
@@ -66,19 +70,19 @@ export const BlogPreview: React.FC = () => {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
               </div>
-              <div className="p-4 flex flex-col flex-grow">
-                <div className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mb-2 flex items-center gap-2">
-                  <Calendar size={10} className="text-sky-400" />
+              <div className="p-3 flex flex-col flex-grow">
+                <div className="text-[8px] font-bold text-slate-300 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                  <Calendar size={8} className="text-sky-400" />
                   {new Date(post.created_at).toLocaleDateString('pt-BR')}
                 </div>
-                <h3 className="text-sm font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-2">
+                <h3 className="text-xs font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-1.5">
                   {post.title}
                 </h3>
-                <p className="text-slate-500 text-[10px] leading-relaxed line-clamp-2 font-medium mb-4">
+                <p className="text-slate-500 text-[9px] leading-relaxed line-clamp-2 font-medium mb-3">
                   {post.excerpt}
                 </p>
-                <div className="mt-auto flex items-center text-sky-600 font-black text-[8px] uppercase tracking-widest">
-                  Ver Conteúdo <ChevronRight className="w-3 h-3" strokeWidth={3} />
+                <div className="mt-auto flex items-center text-sky-600 font-black text-[7px] uppercase tracking-widest">
+                  Ver Conteúdo <ChevronRight className="w-2.5 h-2.5 ml-0.5" strokeWidth={3} />
                 </div>
               </div>
             </Link>

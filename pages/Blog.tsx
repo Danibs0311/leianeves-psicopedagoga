@@ -52,18 +52,26 @@ export const Blog: React.FC = () => {
     }
   };
 
-  const normalize = (str?: string) => 
-    str?.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || "";
+  const normalize = (val: any) => {
+    if (!val) return "";
+    return String(val).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  };
 
   const filteredPosts = posts.filter(post => {
     // Filtro por termo de pesquisa
-    const matchesSearch = searchTerm === '' || 
-      normalize(post.title).includes(normalize(searchTerm)) ||
-      normalize(post.excerpt).includes(normalize(searchTerm));
+    const searchNorm = normalize(searchTerm);
+    const matchesSearch = searchNorm === '' || 
+      normalize(post.title).includes(searchNorm) ||
+      normalize(post.excerpt).includes(searchNorm);
     
-    // Filtro por categoria (comparação ultra-flexível ignorando acentos)
+    // Filtro por categoria (comparação segura e flexível)
+    const categoryNorm = normalize(selectedCategory);
+    const postCategoryNorm = normalize(post.category);
+    
     const matchesCategory = !selectedCategory || 
-      normalize(post.category) === normalize(selectedCategory);
+      postCategoryNorm === categoryNorm || 
+      postCategoryNorm.includes(categoryNorm) || 
+      categoryNorm.includes(postCategoryNorm);
 
     return matchesSearch && matchesCategory;
   });

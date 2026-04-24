@@ -3,25 +3,6 @@ import { join } from 'path';
 import { existsSync, readdirSync } from 'fs';
 
 function getGitCmd() {
-    const localAppData = process.env.LOCALAPPDATA;
-    const githubDesktopPath = join(localAppData, 'GitHubDesktop');
-    const possiblePaths = ['git', join(githubDesktopPath, 'bin', 'github-git.exe'), 'C:\\Program Files\\Git\\bin\\git.exe'];
-    
-    if (existsSync(githubDesktopPath)) {
-        try {
-            const apps = readdirSync(githubDesktopPath).filter(f => f.startsWith('app-'));
-            if (apps.length > 0) {
-                possiblePaths.push(join(githubDesktopPath, apps[apps.length - 1], 'resources', 'app', 'git', 'cmd', 'git.exe'));
-            }
-        } catch (e) {}
-    }
-
-    for (const p of possiblePaths) {
-        try {
-            execSync(`"${p}" --version`, { stdio: 'ignore' });
-            return `"${p}"`;
-        } catch (e) {}
-    }
     return 'git';
 }
 

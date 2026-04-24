@@ -80,30 +80,32 @@ async function runEngine() {
         'Pesquisas', 'Autocuidado', 'Motivação', 'Criatividade'
     ];
 
-    // 2. Descobrir qual foi a última categoria gerada
+    // 2. Descobrir qual foi a última categoria gerada e quais os títulos recentes
     let nextCategory = categoriesCycle[0];
+    let recentTitles = [];
     try {
         const { data: lastPosts } = await supabase
             .from('blog_posts')
-            .select('category')
+            .select('title, category')
             .order('created_at', { ascending: false })
-            .limit(1);
+            .limit(10);
 
         if (lastPosts && lastPosts.length > 0) {
+            recentTitles = lastPosts.map(p => p.title);
             const lastCategory = lastPosts[0].category;
             const currentIndex = categoriesCycle.indexOf(lastCategory);
             
             if (currentIndex !== -1) {
-                // Pega a próxima, se for a última, volta para a primeira (0)
                 const nextIndex = (currentIndex + 1) % categoriesCycle.length;
                 nextCategory = categoriesCycle[nextIndex];
             }
         }
     } catch (e) {
-        console.warn('⚠️ Não foi possível verificar o último post. Começando o ciclo do zero.');
+        console.warn('⚠️ Não foi possível verificar o histórico. Seguindo sem lista de exclusão.');
     }
 
-    console.log(`\n📅 TEMA DA SEMANA SELECIONADO: [${nextCategory.toUpperCase()}]`);
+    console.log(`\n📅 TEMA DA SEMANA: [${nextCategory.toUpperCase()}]`);
+    console.log(`📖 Analisando ${recentTitles.length} títulos recentes para evitar repetição...`);
 
     const modelsToTry = ["gemini-2.0-flash-lite", "gemma-3-27b-it", "gemini-pro-latest"];
     let responseText = null;
@@ -118,7 +120,12 @@ async function runEngine() {
                 
                 O TEMA OBRIGATÓRIO DESTE ARTIGO É: ${nextCategory}
 
-                Crie um tópico fascinante dentro deste tema.
+                IMPORTANTE (EVITAR REPETIÇÃO):
+                Os últimos artigos publicados foram:
+                ${recentTitles.map(t => `- ${t}`).join('\n')}
+
+                Crie um tópico FASCINANTE e TOTALMENTE DIFERENTE dos listados acima, mas que ainda pertença ao tema "${nextCategory}".
+                Inove na abordagem, traga novas pesquisas ou dicas práticas inéditas.
 
                 REGRAS DE OURO:
                 1. TOM DE VOZ: Acolhedor, técnico porém simples, e profundamente empático.

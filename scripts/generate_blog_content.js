@@ -107,7 +107,7 @@ async function runEngine() {
                 - visual_description: Uma descrição detalhada para a IA criar uma foto. Ex: "A close-up of a child's hands carefully placing a puzzle piece, warm evening sunlight, high-end photography".
                 - meta_title: Para o Google (máx 60 chars).
                 - meta_description: Para o Google (máx 160 chars).
-                - category: Escolha a mais adequada.
+                - category: Escolha EXATAMENTE UMA destas: 'Aprendizagem', 'Métodos de Ensino', 'Desenvolvimento', 'Emoções', 'Intervenções', 'Família & Escola', 'Tecnologia', 'Inclusão', 'Pesquisas', 'Autocuidado', 'Motivação', 'Criatividade'.
             `);
             responseText = result.response.text();
             if (responseText) break;

@@ -139,21 +139,27 @@ export const BlogPost: React.FC = () => {
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
-        {/* Premium CTA Footer */}
-        <section className="relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-10 md:p-16 text-center shadow-2xl border border-slate-800">
+        {/* Premium CTA Footer - Forçado com Style para garantir contraste */}
+        <section 
+          style={{ backgroundColor: '#0f172a', color: 'white' }}
+          className="relative overflow-hidden rounded-[2.5rem] p-10 md:p-16 text-center shadow-2xl border border-slate-800"
+        >
           <div className="relative z-10 max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black mb-6 leading-tight text-white">
+            <h2 className="text-3xl md:text-4xl font-black mb-6 leading-tight" style={{ color: '#ffffff' }}>
               Precisa de orientação especializada para o seu filho?
             </h2>
-            <p className="text-slate-300 text-lg mb-10 font-medium">
+            <p className="text-lg mb-10 font-medium" style={{ color: '#cbd5e1' }}>
               Entender o desenvolvimento atípico é o primeiro passo para a autonomia. 
-              <span className="text-sky-400 block mt-2 font-bold italic text-xl">Agende uma conversa acolhedora agora.</span>
+              <span className="block mt-2 font-bold italic text-xl" style={{ color: '#38bdf8' }}>
+                Agende uma conversa acolhedora agora.
+              </span>
             </p>
             <a 
               href="https://wa.me/5583999999999" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-4 bg-[#10b981] hover:bg-[#059669] text-white px-10 py-5 rounded-2xl font-black text-xl transition-all hover:scale-105 shadow-xl shadow-emerald-500/20"
+              style={{ backgroundColor: '#10b981', color: 'white' }}
+              className="inline-flex items-center gap-4 px-10 py-5 rounded-2xl font-black text-xl transition-all hover:scale-105 shadow-xl shadow-emerald-500/20"
             >
               <MessageCircle className="w-8 h-8" /> Falar com a Léia Neves
             </a>

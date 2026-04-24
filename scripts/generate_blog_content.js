@@ -130,7 +130,12 @@ async function runEngine() {
                 - title: Título magnético e focado em SEO.
                 - content: O HTML completo do artigo (mínimo 600 palavras).
                 - excerpt: Um gancho inicial de 2 frases que instigue a leitura.
-                - visual_description: Uma descrição detalhada para a IA criar uma foto. Ex: "A close-up of a child's hands carefully placing a puzzle piece, warm evening sunlight, high-end photography".
+                - visual_description: Crie uma descrição visual artística e VARIADA para este tema. Alternar entre: 
+                    1. Interação humana (ex: psicopedagoga sorridente auxiliando criança com blocos de madeira);
+                    2. Detalhes de intervenção (ex: mãos de uma criança usando massinha ou pincel);
+                    3. Materiais inclusivos (ex: brinquedos sensoriais, ábacos, pranchas coloridas);
+                    4. Ambiente (ex: consultório lúdico com luz quente e acolhedora).
+                    SEJA ESPECÍFICO: Descreva iluminação, texturas e emoções. Estilo: Fotografia clínica premium, realista, 8k.
                 - meta_title: Para o Google (máx 60 chars).
                 - meta_description: Para o Google (máx 160 chars).
                 - category: DEVE SER EXATAMENTE A STRING "${nextCategory}".

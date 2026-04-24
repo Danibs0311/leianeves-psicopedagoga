@@ -130,12 +130,13 @@ async function runEngine() {
                 - title: Título magnético e focado em SEO.
                 - content: O HTML completo do artigo (mínimo 600 palavras).
                 - excerpt: Um gancho inicial de 2 frases que instigue a leitura.
-                - visual_description: Crie uma descrição visual artística e VARIADA para este tema. Alternar entre: 
-                    1. Interação humana (ex: psicopedagoga sorridente auxiliando criança com blocos de madeira);
-                    2. Detalhes de intervenção (ex: mãos de uma criança usando massinha ou pincel);
-                    3. Materiais inclusivos (ex: brinquedos sensoriais, ábacos, pranchas coloridas);
-                    4. Ambiente (ex: consultório lúdico com luz quente e acolhedora).
-                    SEJA ESPECÍFICO: Descreva iluminação, texturas e emoções. Estilo: Fotografia clínica premium, realista, 8k.
+                - visual_description: Atue como um Diretor de Arte. Crie uma descrição visual ÚNICA e CINEMATOGRÁFICA. 
+                    - VARIE O ÂNGULO: Alterne entre close-up (macro), plano médio (interação), ou vista de cima (flat lay da mesa).
+                    - VARIE O CENÁRIO: Consultório moderno, sala de aula inclusiva, parquinho gramado, ou cantinho de estudo.
+                    - VARIE O FOCO: Crianças de diferentes idades e etnias, psicopedagoga em ação, ou apenas brinquedos e materiais pedagógicos (ábacos, tangram, massinha).
+                    - ILUMINAÇÃO: Use termos como "luz natural suave", "iluminação clínica acolhedora", "raios de sol de fim de tarde".
+                    - REGRA: Nunca repita a mesma composição. Cada foto deve parecer de um ensaio fotográfico profissional diferente.
+                    - ESTILO: Realistic photography, high-end, 8k, cinematic lighting, no text.
                 - meta_title: Para o Google (máx 60 chars).
                 - meta_description: Para o Google (máx 160 chars).
                 - category: DEVE SER EXATAMENTE A STRING "${nextCategory}".

@@ -139,21 +139,33 @@ export const BlogPost: React.FC = () => {
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
-        {/* Dynamic CTA Footer */}
-        <section className="bg-slate-900 rounded-[2rem] p-10 md:p-16 text-center text-white relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-400 to-indigo-500"></div>
-          <h2 className="text-3xl font-black mb-6 leading-tight">Precisa de orientação especializada para o seu filho?</h2>
-          <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto font-medium">
-            Entender o desenvolvimento atípico é o primeiro passo para a autonomia. Agende uma conversa agora.
-          </p>
-          <a 
-            href="https://wa.me/5583999999999" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-sky-500 hover:bg-sky-600 text-white px-10 py-5 rounded-2xl font-black transition-all hover:scale-105 shadow-xl shadow-sky-500/20"
-          >
-            <MessageCircle className="w-6 h-6" /> Falar com a Léia Neves
-          </a>
+        {/* Premium CTA Footer */}
+        <section className="relative overflow-hidden rounded-[3rem] bg-slate-950 p-12 md:p-20 text-center shadow-2xl shadow-sky-900/20">
+          {/* Decorative background elements */}
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10 max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-black mb-6 leading-[1.1] text-white tracking-tight">
+              Precisa de orientação especializada para o seu filho?
+            </h2>
+            <p className="text-slate-400 text-lg md:text-xl mb-12 font-medium leading-relaxed">
+              Entender o desenvolvimento atípico é o primeiro passo para a autonomia. 
+              <span className="text-sky-400 block mt-2 font-bold italic">Agende uma conversa acolhedora agora.</span>
+            </p>
+            <a 
+              href="https://wa.me/5583999999999" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-4 bg-gradient-to-br from-sky-400 to-sky-600 hover:from-sky-500 hover:to-sky-700 text-white px-12 py-6 rounded-2xl font-black transition-all hover:scale-105 shadow-2xl shadow-sky-500/40"
+            >
+              <MessageCircle className="w-7 h-7 group-hover:rotate-12 transition-transform" /> 
+              <span className="text-lg">Falar com a Léia Neves</span>
+            </a>
+          </div>
+
+          {/* Bottom highlight bar */}
+          <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-sky-500/50 to-transparent"></div>
         </section>
       </main>
 

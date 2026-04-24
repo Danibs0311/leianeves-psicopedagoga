@@ -131,7 +131,7 @@ async function runEngine() {
                 1. TOM DE VOZ: Acolhedor, técnico porém simples, e profundamente empático.
                 2. ESTRUTURA: Use títulos (h2, h3), listas e uma citação forte (blockquote).
                 3. CONTEÚDO: Comece com a dor do pai/mãe, apresente a solução clínica e termine com esperança.
-                4. CTA: No final do texto, convide suavemente para uma conversa no WhatsApp para avaliação.
+                4. CTA: No final do texto, convide suavemente para uma consulta de avaliação e crie um botão ou link forte direcionando para a Biolink: https://biolink.website/leianeves_psicopedagoga (use o texto "Agendar Conversa no WhatsApp").
 
                 Retorne APENAS um JSON:
                 - title: Título magnético e focado em SEO.

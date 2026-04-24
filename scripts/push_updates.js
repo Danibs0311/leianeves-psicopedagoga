@@ -3,6 +3,21 @@ import { join } from 'path';
 import { existsSync, readdirSync } from 'fs';
 
 function getGitCmd() {
+    const possiblePaths = [
+        'git',
+        'C:\\Program Files\\Git\\bin\\git.exe',
+        'C:\\Program Files\\Git\\cmd\\git.exe',
+        'C:\\Program Files (x86)\\Git\\bin\\git.exe',
+        'C:\\Program Files (x86)\\Git\\cmd\\git.exe',
+        join(process.env.LOCALAPPDATA || '', 'Programs', 'Git', 'bin', 'git.exe')
+    ];
+    
+    for (const p of possiblePaths) {
+        try {
+            execSync(`"${p}" --version`, { stdio: 'ignore' });
+            return `"${p}"`;
+        } catch (e) {}
+    }
     return 'git';
 }
 

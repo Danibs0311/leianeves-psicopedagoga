@@ -61,7 +61,7 @@ export const Blog: React.FC = () => {
       <Navbar onOpenScheduling={() => {}} />
       
       {/* Header */}
-      <div className="border-b border-slate-100 py-10 bg-white">
+      <div className="border-b border-slate-100 py-6 bg-white">
         <div className="max-w-[1440px] mx-auto px-6 flex justify-between items-center">
           <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">Blog Profissional</h1>
           <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">
@@ -72,22 +72,48 @@ export const Blog: React.FC = () => {
         </div>
       </div>
 
-      <main className="max-w-[1440px] mx-auto px-6 py-12 w-full">
-        {/* Search Bar - Full Width & Modern */}
-        <div className="max-w-3xl mx-auto mb-16 relative group">
-          <input 
-            type="text" 
-            placeholder="O que você está buscando hoje?" 
-            className="w-full px-8 py-6 bg-slate-50 border border-slate-100 rounded-[2rem] text-sm focus:outline-none focus:border-sky-400 focus:bg-white focus:shadow-2xl focus:shadow-sky-100/50 transition-all font-semibold text-slate-700 text-center"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Search className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-sky-500 transition-colors" />
+      <main className="max-w-[1440px] mx-auto px-6 py-8 w-full">
+        {/* Search Bar - Full Width & Modern with Suggestions */}
+        <div className="max-w-3xl mx-auto mb-8 relative group">
+          <div className="relative">
+            <input 
+              type="text" 
+              placeholder="O que você está buscando hoje?" 
+              className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-[2rem] text-sm focus:outline-none focus:border-sky-400 focus:bg-white focus:shadow-2xl focus:shadow-sky-100/50 transition-all font-semibold text-slate-700 text-center"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Search className="absolute right-8 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-sky-500 transition-colors" />
+          </div>
+
+          {/* Search Suggestions Dropdown */}
+          {searchTerm && filteredPosts.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 overflow-hidden max-h-60 overflow-y-auto backdrop-blur-sm">
+              <div className="p-2">
+                <span className="px-4 py-2 text-[9px] font-black text-slate-400 uppercase tracking-widest block border-b border-slate-50 mb-2">Sugestões de Leitura</span>
+                {filteredPosts.slice(0, 5).map(post => (
+                  <Link 
+                    key={post.id}
+                    to={`/blog/${post.slug}`}
+                    className="flex items-center gap-4 px-4 py-3 hover:bg-sky-50 transition-colors rounded-xl group"
+                  >
+                    <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100">
+                      <img src={post.image_url} alt="" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-slate-900 group-hover:text-sky-600 transition-colors line-clamp-1">{post.title}</span>
+                      <span className="text-[9px] text-sky-500 font-black uppercase tracking-widest">{post.category}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Categories Grid - 4 Columns Always */}
-        <section className="mb-16">
-          <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+        <section className="mb-10">
+          <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-4">
             <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em]">Explorar por Temas</h3>
             {selectedCategory && (
               <button onClick={() => setSelectedCategory(null)} className="text-[8px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-1 hover:text-rose-600 transition-colors">
@@ -100,9 +126,9 @@ export const Blog: React.FC = () => {
               <button 
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-[13px] font-bold py-4 px-4 rounded-xl transition-all text-center border ${
+                className={`text-[15px] font-bold py-4 px-4 rounded-xl transition-all text-center border ${
                   selectedCategory === cat 
-                  ? 'bg-sky-600 text-white border-sky-600 shadow-lg shadow-sky-100' 
+                  ? 'bg-sky-600 text-white border-sky-600 shadow-lg shadow-sky-100 scale-[1.02]' 
                   : 'bg-white text-slate-500 border-slate-100 hover:border-sky-200 hover:text-sky-600 hover:shadow-md'
                 }`}
               >

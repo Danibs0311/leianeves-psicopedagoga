@@ -1,6 +1,6 @@
-const { execSync } = require('child_process');
-const { join } = require('path');
-const { existsSync, readdirSync } = require('fs');
+import { execSync } from 'child_process';
+import { join } from 'path';
+import { existsSync, readdirSync } from 'fs';
 
 function getGitCmd() {
     const localAppData = process.env.LOCALAPPDATA;

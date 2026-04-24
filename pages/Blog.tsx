@@ -24,7 +24,7 @@ export const Blog: React.FC = () => {
   const categories = [
     'Aprendizagem', 'Métodos de Ensino', 'Desenvolvimento', 'Emoções', 
     'Intervenções', 'Família & Escola', 'Tecnologia', 'Inclusão', 
-    'Pesquisas', 'Autocuidado'
+    'Pesquisas', 'Autocuidado', 'Motivação', 'Criatividade'
   ];
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export const Blog: React.FC = () => {
     <div className="min-h-screen bg-white flex flex-col font-sans overflow-x-hidden">
       {/* VERIFICATION TAG - To ensure you are seeing the latest version */}
       <div className="bg-amber-400 py-2 text-center text-[10px] font-black uppercase tracking-[0.3em] text-amber-950">
-        SISTEMA ATUALIZADO - MODO 3 COLUNAS ATIVO
+        SISTEMA ATUALIZADO - MODO 5 COLUNAS ATIVO
       </div>
 
       <Navbar onOpenScheduling={() => {}} />
@@ -100,7 +100,7 @@ export const Blog: React.FC = () => {
               <button 
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-[11px] font-bold py-3 px-4 rounded-xl transition-all text-center border ${
+                className={`text-[13px] font-bold py-4 px-4 rounded-xl transition-all text-center border ${
                   selectedCategory === cat 
                   ? 'bg-sky-600 text-white border-sky-600 shadow-lg shadow-sky-100' 
                   : 'bg-white text-slate-500 border-slate-100 hover:border-sky-200 hover:text-sky-600 hover:shadow-md'
@@ -134,20 +134,20 @@ export const Blog: React.FC = () => {
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                     />
                     <div className="absolute top-2 left-2">
-                      <span className="px-2 py-0.5 bg-white/90 backdrop-blur-md rounded-full text-[7px] font-black text-sky-600 uppercase tracking-widest shadow-sm">
+                      <span className="px-2 py-0.5 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-black text-sky-600 uppercase tracking-widest shadow-sm">
                         {post.category}
                       </span>
                     </div>
                   </div>
                   <div className="p-3 flex flex-col flex-grow">
-                    <h3 className="text-[11px] font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-1.5">
+                    <h3 className="text-sm font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-1.5">
                       {post.title}
                     </h3>
-                    <p className="text-slate-500 text-[9px] leading-relaxed line-clamp-2 font-medium mb-3">
+                    <p className="text-slate-500 text-[11px] leading-relaxed line-clamp-2 font-medium mb-3">
                       {post.excerpt}
                     </p>
                     <div className="mt-auto pt-2 border-t border-slate-50 flex items-center justify-between">
-                      <span className="text-slate-300 text-[7px] font-bold uppercase tracking-widest flex items-center gap-1.5">
+                      <span className="text-slate-300 text-[8px] font-bold uppercase tracking-widest flex items-center gap-1.5">
                         <span className="w-1 h-1 bg-sky-400 rounded-full"></span>
                         {new Date(post.created_at).toLocaleDateString('pt-BR')}
                       </span>

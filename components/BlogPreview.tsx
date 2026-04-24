@@ -80,10 +80,10 @@ export const BlogPreview: React.FC = () => {
                   <Calendar size={8} className="text-sky-400" />
                   {new Date(post.created_at).toLocaleDateString('pt-BR')}
                 </div>
-                <h3 className="text-xs font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-1.5">
+                <h3 className="text-sm font-black text-slate-900 group-hover:text-sky-600 transition-colors leading-tight line-clamp-2 mb-1.5">
                   {post.title}
                 </h3>
-                <p className="text-slate-500 text-[9px] leading-relaxed line-clamp-2 font-medium mb-3">
+                <p className="text-slate-500 text-xs leading-relaxed line-clamp-2 font-medium mb-3">
                   {post.excerpt}
                 </p>
                 <div className="mt-auto flex items-center text-sky-600 font-black text-[7px] uppercase tracking-widest">

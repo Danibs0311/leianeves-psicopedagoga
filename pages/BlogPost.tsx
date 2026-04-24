@@ -105,8 +105,8 @@ export const BlogPost: React.FC = () => {
               <User className="w-5 h-5" />
             </div>
             <div>
-              <span className="block text-[11px] font-black text-slate-900 uppercase tracking-widest">Léia Neves</span>
-              <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-widest">Psicopedagoga Clínica</span>
+              <span className="block text-sm font-black text-slate-900 uppercase tracking-widest">Léia Neves</span>
+              <span className="block text-[10px] text-slate-400 font-bold uppercase tracking-widest">Psicopedagoga Especialista em TEA e TDAH</span>
             </div>
           </div>
           <button 

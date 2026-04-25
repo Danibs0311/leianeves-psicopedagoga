@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { Eye, EyeOff, KeyRound, Mail, Loader2, ArrowLeft, Send, CheckCircle2 } from 'lucide-react';
 
 export const AdminLogin: React.FC = () => {
+    const { isRecovering: authIsRecovering } = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -19,12 +21,12 @@ export const AdminLogin: React.FC = () => {
 
     // Detect if we are coming from a password reset link
     useEffect(() => {
-        const isRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
-        if (isRecovery) {
+        const urlIsRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
+        if (urlIsRecovery || authIsRecovering) {
             setIsResettingPassword(true);
             setSuccessMessage('Link de recuperação validado! Por favor, defina sua nova senha abaixo.');
         }
-    }, []);
+    }, [authIsRecovering]);
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();

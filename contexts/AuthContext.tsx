@@ -7,6 +7,7 @@ interface AuthContextType {
     session: Session | null;
     user: User | null;
     loading: boolean;
+    isRecovering: boolean;
     signOut: () => Promise<void>;
 }
 
@@ -14,6 +15,7 @@ const AuthContext = createContext<AuthContextType>({
     session: null,
     user: null,
     loading: true,
+    isRecovering: false,
     signOut: async () => { },
 });
 
@@ -21,6 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [session, setSession] = useState<Session | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isRecovering, setIsRecovering] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
@@ -52,12 +55,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             });
 
         // Ouvir mudanças na autenticação (login, logout, refresh)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (isMounted) {
+                console.log("Auth Event:", event);
                 setSession(session);
                 setUser(session?.user ?? null);
                 setLoading(false);
                 clearTimeout(timeout);
+
+                if (event === 'PASSWORD_RECOVERY') {
+                    setIsRecovering(true);
+                }
             }
         });
 
@@ -76,6 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         session,
         user,
         loading,
+        isRecovering,
         signOut,
     };
 

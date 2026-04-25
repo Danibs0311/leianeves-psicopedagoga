@@ -10,7 +10,7 @@ import { AdminPatientDetail } from '../components/admin/AdminPatientDetail';
 import { AdminBlog } from '../components/admin/AdminBlog';
 
 export const Admin: React.FC = () => {
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, isRecovering: authIsRecovering } = useAuth();
     const { tab, id } = useParams<{ tab?: string; id?: string }>();
     const navigate = useNavigate();
 
@@ -34,12 +34,12 @@ export const Admin: React.FC = () => {
 
     useEffect(() => {
         // Se estivermos em processo de recuperação de senha, NÃO redireciona para a agenda
-        const isRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
+        const urlIsRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
         
-        if (!tab && user && !isRecovery) {
+        if (!tab && user && !urlIsRecovery && !authIsRecovering) {
             navigate('/admin/agenda', { replace: true });
         }
-    }, [tab, user, navigate]);
+    }, [tab, user, navigate, authIsRecovering]);
 
     const navigateTo = (view: 'dashboard' | 'patients' | 'settings' | 'blog', patientId: number | null = null) => {
         const urlChunk = viewToUrl[view];
@@ -50,7 +50,7 @@ export const Admin: React.FC = () => {
         }
     };
 
-    const isRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
+    const urlIsRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
 
     if (authLoading) {
         return (
@@ -63,7 +63,7 @@ export const Admin: React.FC = () => {
         );
     }
 
-    if (!user || isRecovery) {
+    if (!user || urlIsRecovery || authIsRecovering) {
         return <AdminLogin />;
     }
 

@@ -66,6 +66,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 if (event === 'PASSWORD_RECOVERY') {
                     setIsRecovering(true);
                 }
+
+                if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+                    setIsRecovering(false);
+                }
             }
         });
 

@@ -95,6 +95,10 @@ export const AdminLogin: React.FC = () => {
             if (error) throw error;
             
             setSuccessMessage('Senha atualizada com sucesso! Você já pode entrar com as novas credenciais.');
+            
+            // Limpa a URL para não re-disparar o modo de reset
+            window.history.replaceState(null, '', window.location.pathname);
+            
             setIsResettingPassword(false);
             setPassword('');
         } catch (error: any) {

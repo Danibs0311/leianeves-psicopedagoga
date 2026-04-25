@@ -19,8 +19,8 @@ export const AdminLogin: React.FC = () => {
 
     // Detect if we are coming from a password reset link
     useEffect(() => {
-        const hash = window.location.hash;
-        if (hash && hash.includes('type=recovery')) {
+        const isRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
+        if (isRecovery) {
             setIsResettingPassword(true);
             setSuccessMessage('Link de recuperação validado! Por favor, defina sua nova senha abaixo.');
         }

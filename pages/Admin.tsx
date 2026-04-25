@@ -33,7 +33,10 @@ export const Admin: React.FC = () => {
     const selectedPatientId = id ? Number(id) : null;
 
     useEffect(() => {
-        if (!tab && user) {
+        // Se estivermos em processo de recuperação de senha, NÃO redireciona para a agenda
+        const isRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
+        
+        if (!tab && user && !isRecovery) {
             navigate('/admin/agenda', { replace: true });
         }
     }, [tab, user, navigate]);
@@ -47,6 +50,8 @@ export const Admin: React.FC = () => {
         }
     };
 
+    const isRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
+
     if (authLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50 font-sans">
@@ -58,7 +63,7 @@ export const Admin: React.FC = () => {
         );
     }
 
-    if (!user) {
+    if (!user || isRecovery) {
         return <AdminLogin />;
     }
 

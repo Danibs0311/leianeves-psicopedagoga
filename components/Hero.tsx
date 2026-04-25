@@ -46,18 +46,18 @@ export const Hero: React.FC<HeroProps> = ({ onOpenScheduling }) => {
                 Como funciona o atendimento
               </a>
             </div>
-            <div className="mt-10 flex items-center justify-center lg:justify-start gap-4">
-              <div className="flex -space-x-2">
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6">
+              <div className="flex -space-x-2 flex-shrink-0">
                 {[1, 2, 3, 4].map((i) => (
                   <img
                     key={i}
-                    className="w-10 h-10 rounded-full border-2 border-white"
+                    className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm"
                     src={`https://picsum.photos/100/100?random=${i}`}
                     alt="Família atendida"
                   />
                 ))}
               </div>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-slate-500 text-center sm:text-left leading-relaxed max-w-sm lg:max-w-md">
                 <span className="font-bold text-slate-900">Mais de 100 famílias</span> já entenderam e superaram dificuldades de aprendizagem com acompanhamento especializado.
               </p>
             </div>

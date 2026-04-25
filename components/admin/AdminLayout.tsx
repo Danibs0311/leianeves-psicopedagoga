@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AdminSidebar } from './AdminSidebar';
+import { SchedulingModal } from '../SchedulingModal';
 import { useAuth } from '../../contexts/AuthContext';
 import { Menu, X } from 'lucide-react';
 
@@ -12,6 +13,7 @@ interface AdminLayoutProps {
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeView, onNavigate }) => {
     const { user, signOut } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isSchedulingModalOpen, setIsSchedulingModalOpen] = useState(false);
 
     const handleNavigate = (view: 'dashboard' | 'patients' | 'settings' | 'blog') => {
         onNavigate(view);
@@ -26,6 +28,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeView, 
                     activeView={activeView}
                     onNavigate={handleNavigate}
                     onLogout={signOut}
+                    onOpenScheduling={() => setIsSchedulingModalOpen(true)}
                     userEmail={user?.email}
                 />
             </div>
@@ -50,6 +53,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeView, 
                             activeView={activeView}
                             onNavigate={handleNavigate}
                             onLogout={signOut}
+                            onOpenScheduling={() => setIsSchedulingModalOpen(true)}
                             userEmail={user?.email}
                         />
                     </div>
@@ -60,6 +64,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeView, 
             <main className="flex-1 p-6 md:p-12 pt-24 md:pt-12 w-full max-w-[1600px] mx-auto overflow-x-hidden">
                 {children}
             </main>
+
+            {/* Global Scheduling Modal for Admin */}
+            <SchedulingModal
+                isOpen={isSchedulingModalOpen}
+                onClose={() => setIsSchedulingModalOpen(false)}
+            />
         </div>
     );
 };

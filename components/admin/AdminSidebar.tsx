@@ -1,11 +1,11 @@
-import React from 'react';
-import { LayoutDashboard, Users, Settings, LogOut, FileText, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, LogOut, FileText, ExternalLink, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface AdminSidebarProps {
     activeView: 'dashboard' | 'patients' | 'settings' | 'blog';
     onNavigate: (view: 'dashboard' | 'patients' | 'settings' | 'blog') => void;
     onLogout: () => void;
+    onOpenScheduling: () => void;
     userEmail?: string;
 }
 
@@ -13,6 +13,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     activeView,
     onNavigate,
     onLogout,
+    onOpenScheduling,
     userEmail
 }) => {
     const menuItems = [
@@ -31,7 +32,17 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 </h1>
             </div>
 
-            <nav className="flex-1 p-4 mt-4">
+            <div className="px-4 mt-6">
+                <button
+                    onClick={onOpenScheduling}
+                    className="w-full flex items-center justify-center gap-3 bg-sky-600 hover:bg-sky-700 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all shadow-lg shadow-sky-900/40 group"
+                >
+                    <Plus size={18} strokeWidth={3} className="group-hover:scale-110 transition-transform" />
+                    Novo Agendamento
+                </button>
+            </div>
+
+            <nav className="flex-1 p-4 mt-2">
                 <ul className="space-y-2">
                     {menuItems.map((item) => (
                         <li key={item.id}>

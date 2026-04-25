@@ -21,9 +21,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeView, 
     };
 
     return (
-        <div className="flex min-h-screen bg-slate-50">
+        <div className="flex h-screen bg-slate-50 overflow-hidden">
             {/* Desktop Sidebar */}
-            <div className="hidden md:block sticky top-0 h-screen flex-none print:hidden">
+            <div className="hidden md:block flex-none print:hidden border-r border-slate-200">
                 <AdminSidebar
                     activeView={activeView}
                     onNavigate={handleNavigate}
@@ -60,8 +60,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeView, 
                 </div>
             )}
 
-            {/* Main Content */}
-            <main className="flex-1 p-6 md:p-12 pt-24 md:pt-12 w-full max-w-[1600px] mx-auto overflow-x-hidden">
+            {/* Main Content - ROLAGEM APENAS AQUI */}
+            <main className="flex-1 h-full overflow-y-auto p-6 md:p-12 pt-24 md:pt-12 w-full max-w-[1600px] mx-auto print:p-0 print:overflow-visible">
                 {children}
             </main>
 

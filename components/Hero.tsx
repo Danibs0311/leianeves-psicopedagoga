@@ -23,7 +23,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenScheduling }) => {
               Seu filho tem dificuldade para <span className="text-sky-600">aprender</span> — e você sente que ninguém explica o motivo?
             </h1>
             <p className="text-lg sm:text-xl text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0">
-              Especialista em TEA, TDAH e alfabetização e letramento, ajudando famílias a superarem desafios escolares e emocionais através de estratégias baseadas em evidências.
+              Dificuldade na leitura, falta de atenção, desinteresse pela escola…<br />
+              <span className="mt-2 block">Esses sinais podem indicar algo que precisa ser compreendido com cuidado e estratégia.</span>
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <button

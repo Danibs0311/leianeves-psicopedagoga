@@ -34,7 +34,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenScheduling }) => {
                 onClick={onOpenScheduling}
                 className="bg-sky-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-sky-700 transition-all shadow-xl hover:shadow-sky-200/50 flex items-center justify-center gap-2 group"
               >
-                Quero Ajuda Especializada
+                Quero entender o que está acontecendo
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -43,7 +43,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenScheduling }) => {
                 href="#metodo"
                 className="bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all flex items-center justify-center"
               >
-                Conhecer o Método
+                Como funciona o atendimento
               </a>
             </div>
             <div className="mt-10 flex items-center justify-center lg:justify-start gap-4">

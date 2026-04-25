@@ -289,74 +289,79 @@ export const AdminAppointments: React.FC = () => {
     }
 
     return (
-        <div className="space-y-6">
-            <header className="mb-8">
-                <h2 className="text-2xl font-bold text-slate-800">Gerenciar Agendamentos</h2>
-                <p className="text-slate-500">Acompanhe as solicitações e o status de cada paciente.</p>
-            </header>
+        <div className="space-y-4">
+            {/* Sticky Compact Header */}
+            <div className="sticky -top-6 md:-top-12 z-20 bg-slate-50 pb-4 pt-2 -mx-4 px-4 md:-mx-12 md:px-12 border-b border-slate-200/60 shadow-sm shadow-slate-200/20">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-800">Gerenciar Agendamentos</h2>
+                        <p className="text-[11px] text-slate-500">Acompanhe as solicitações e o status de cada paciente.</p>
+                    </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Total</p>
-                    <p className="text-3xl font-bold text-slate-800 mt-1">{stats.total}</p>
-                </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                    <p className="text-xs text-yellow-500 font-bold uppercase tracking-wider">Pendentes</p>
-                    <p className="text-3xl font-bold text-slate-800 mt-1">{stats.pending}</p>
-                </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                    <p className="text-xs text-green-500 font-bold uppercase tracking-wider">Confirmados</p>
-                    <p className="text-3xl font-bold text-slate-800 mt-1">{stats.confirmed}</p>
-                </div>
-                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                    <p className="text-xs text-blue-500 font-bold uppercase tracking-wider">Concluídos</p>
-                    <p className="text-3xl font-bold text-slate-800 mt-1">{stats.completed}</p>
-                </div>
-            </div>
-
-            {/* Filters Bar */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-4 justify-between items-center sticky top-20 z-10">
-                <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
-                    <button
-                        onClick={() => setFilter('all')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap
-                        ${filter === 'all' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
-                    >
-                        Todos
-                    </button>
-                    <button
-                        onClick={() => setFilter('pending')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap
-                        ${filter === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'text-slate-600 hover:bg-slate-100'}`}
-                    >
-                        Pendentes
-                    </button>
-                    <button
-                        onClick={() => setFilter('confirmed')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap
-                        ${filter === 'confirmed' ? 'bg-green-100 text-green-700' : 'text-slate-600 hover:bg-slate-100'}`}
-                    >
-                        Confirmados
-                    </button>
-                    <button
-                        onClick={() => setFilter('completed')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap
-                        ${filter === 'completed' ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}
-                    >
-                        Concluídos
-                    </button>
+                    {/* Compact Stats Cards */}
+                    <div className="flex gap-2">
+                        <div className="bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm flex flex-col items-center min-w-[70px]">
+                            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total</p>
+                            <p className="text-sm font-bold text-slate-800">{stats.total}</p>
+                        </div>
+                        <div className="bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm flex flex-col items-center min-w-[70px]">
+                            <p className="text-[9px] text-yellow-500 font-bold uppercase tracking-wider">Pendentes</p>
+                            <p className="text-sm font-bold text-slate-800">{stats.pending}</p>
+                        </div>
+                        <div className="bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm flex flex-col items-center min-w-[70px]">
+                            <p className="text-[9px] text-green-500 font-bold uppercase tracking-wider">Confirmados</p>
+                            <p className="text-sm font-bold text-slate-800">{stats.confirmed}</p>
+                        </div>
+                        <div className="bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm flex flex-col items-center min-w-[70px]">
+                            <p className="text-[9px] text-blue-500 font-bold uppercase tracking-wider">Concluídos</p>
+                            <p className="text-sm font-bold text-slate-800">{stats.completed}</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="relative w-full md:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input
-                        type="text"
-                        placeholder="Buscar por nome ou e-mail..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-sky-500 text-sm"
-                    />
+                {/* Filters Bar - Compact */}
+                <div className="bg-white p-1.5 rounded-xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-2 justify-between items-center">
+                    <div className="flex items-center gap-1 overflow-x-auto w-full md:w-auto">
+                        <button
+                            onClick={() => setFilter('all')}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-colors whitespace-nowrap
+                            ${filter === 'all' ? 'bg-slate-800 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                        >
+                            Todos
+                        </button>
+                        <button
+                            onClick={() => setFilter('pending')}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-colors whitespace-nowrap
+                            ${filter === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'text-slate-600 hover:bg-slate-100'}`}
+                        >
+                            Pendentes
+                        </button>
+                        <button
+                            onClick={() => setFilter('confirmed')}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-colors whitespace-nowrap
+                            ${filter === 'confirmed' ? 'bg-green-100 text-green-700' : 'text-slate-600 hover:bg-slate-100'}`}
+                        >
+                            Confirmados
+                        </button>
+                        <button
+                            onClick={() => setFilter('completed')}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-colors whitespace-nowrap
+                            ${filter === 'completed' ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-slate-100'}`}
+                        >
+                            Concluídos
+                        </button>
+                    </div>
+
+                    <div className="relative w-full md:w-56">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                        <input
+                            type="text"
+                            placeholder="Buscar por nome..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-9 pr-4 py-1.5 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-sky-500 text-xs"
+                        />
+                    </div>
                 </div>
             </div>
 

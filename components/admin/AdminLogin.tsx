@@ -88,22 +88,27 @@ export const AdminLogin: React.FC = () => {
         setLoginError(null);
 
         try {
-            const { error } = await supabase.auth.updateUser({
+            const { data, error } = await supabase.auth.updateUser({
                 password: password
             });
             
             if (error) throw error;
+
+            console.log("Password updated successfully for user:", data.user?.email);
             
-            setSuccessMessage('Senha atualizada com sucesso! Você já pode entrar com as novas credenciais.');
+            // Forçar o encerramento da sessão atual para garantir que o login seguinte use a senha nova
+            await supabase.auth.signOut();
             
-            // Limpa a URL para não re-disparar o modo de reset
+            setSuccessMessage('Senha alterada com sucesso! Por segurança, faça login novamente com sua NOVA senha.');
+            
+            // Limpa a URL e estados
             window.history.replaceState(null, '', window.location.pathname);
-            
             setIsResettingPassword(false);
             setPassword('');
+            setEmail(data.user?.email || ''); // Preenche o e-mail para facilitar o login
         } catch (error: any) {
             console.error('Update password error:', error);
-            setLoginError(error.message || 'Erro ao atualizar a senha. O link pode ter expirado.');
+            setLoginError(error.message || 'Erro ao atualizar a senha. Tente novamente ou peça um novo link.');
         } finally {
             setLoginLoading(false);
         }

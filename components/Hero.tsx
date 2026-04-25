@@ -32,11 +32,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenScheduling }) => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <button
                 onClick={onOpenScheduling}
-                className="bg-sky-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-sky-700 transition-all shadow-xl hover:shadow-sky-200/50 flex items-center justify-center gap-2 group"
+                className="bg-sky-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-2xl font-black text-lg hover:bg-sky-700 transition-all duration-300 shadow-xl shadow-sky-600/20 hover:shadow-2xl hover:shadow-sky-600/40 hover:-translate-y-1 flex items-center justify-center gap-3 group"
               >
                 Quero entender o que está acontecendo
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </button>
               <a

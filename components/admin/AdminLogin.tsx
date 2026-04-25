@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
+import { Eye, EyeOff, KeyRound, Mail, Loader2, ArrowLeft, Send } from 'lucide-react';
 
 export const AdminLogin: React.FC = () => {
-    // START IN LOGIN MODE BY DEFAULT
-    const [isLoginMode, setIsLoginMode] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loginLoading, setLoginLoading] = useState(false);
     const [loginError, setLoginError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    
+    // Recovery State
+    const [isRecoveryMode, setIsRecoveryMode] = useState(false);
+    const [recoveryLoading, setRecoveryLoading] = useState(false);
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -18,23 +22,11 @@ export const AdminLogin: React.FC = () => {
         setSuccessMessage(null);
 
         try {
-            if (isLoginMode) {
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
-                if (error) throw error;
-            } else {
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                });
-                if (error) throw error;
-                if (data.user) {
-                    setSuccessMessage('Conta criada com sucesso! Você já pode entrar.');
-                    setIsLoginMode(true);
-                }
-            }
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+            if (error) throw error;
         } catch (error: any) {
             console.error('Auth error:', error);
             setLoginError(error.message || 'Falha na autenticação. Verifique os dados.');
@@ -43,76 +35,173 @@ export const AdminLogin: React.FC = () => {
         }
     };
 
+    const handlePasswordRecovery = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!email) {
+            setLoginError('Por favor, digite seu e-mail para recuperar a senha.');
+            return;
+        }
+
+        setRecoveryLoading(true);
+        setLoginError(null);
+        setSuccessMessage(null);
+
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/admin`,
+            });
+            
+            if (error) throw error;
+            
+            setSuccessMessage('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
+            setIsRecoveryMode(false);
+        } catch (error: any) {
+            console.error('Recovery error:', error);
+            setLoginError(error.message || 'Erro ao enviar e-mail de recuperação.');
+        } finally {
+            setRecoveryLoading(false);
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-            <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-                <h1 className="text-2xl font-bold text-slate-800 mb-2 text-center">
-                    {isLoginMode ? 'Área Administrativa' : 'Criar Conta Mestre'}
-                </h1>
-                {!isLoginMode && (
-                    <p className="text-center text-sm text-amber-600 font-medium mb-6">
-                        Atenção: Cadastre seu e-mail e senha de acesso seguro agora.
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans">
+            <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
+                {/* Header */}
+                <div className="text-center mb-8">
+                    <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center text-sky-600 mx-auto mb-4">
+                        {isRecoveryMode ? <Send size={32} /> : <KeyRound size={32} />}
+                    </div>
+                    <h1 className="text-2xl font-black text-slate-800 tracking-tight">
+                        {isRecoveryMode ? 'Recuperar Senha' : 'Acesso Restrito'}
+                    </h1>
+                    <p className="text-slate-500 text-sm mt-1">
+                        {isRecoveryMode 
+                            ? 'Enviaremos um link para o seu e-mail cadastrado.' 
+                            : 'Painel Administrativo Léia Neves'}
                     </p>
-                )}
+                </div>
 
                 {loginError && (
-                    <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center">
+                    <div className="mb-6 p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-sm flex items-start gap-3">
+                        <div className="w-1.5 h-1.5 bg-rose-500 rounded-full mt-1.5 shrink-0" />
                         {loginError}
                     </div>
                 )}
 
                 {successMessage && (
-                    <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm text-center font-medium">
+                    <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl text-sm font-medium flex items-start gap-3">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 shrink-0" />
                         {successMessage}
                     </div>
                 )}
 
-                <form onSubmit={handleAuth} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">E-mail</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
-                            placeholder="seu@email.com"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Senha</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
-                            placeholder="Sua senha"
-                            required
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        disabled={loginLoading}
-                        className={`w-full text-white py-3 rounded-lg font-bold transition-colors disabled:opacity-70 flex justify-center ${isLoginMode ? 'bg-sky-600 hover:bg-sky-700' : 'bg-green-600 hover:bg-green-700'}`}
-                    >
-                        {loginLoading ? 'Carregando...' : isLoginMode ? 'Entrar' : 'Criar Conta Agora'}
-                    </button>
+                {!isRecoveryMode ? (
+                    /* LOGIN FORM */
+                    <form onSubmit={handleAuth} className="space-y-5">
+                        <div>
+                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">E-mail de Acesso</label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none transition-all text-slate-700"
+                                    placeholder="seu@email.com"
+                                    required
+                                />
+                            </div>
+                        </div>
 
-                    <div className="text-center pt-4 border-t border-slate-100 mt-4 space-y-2 flex flex-col">
+                        <div>
+                            <div className="flex justify-between items-center mb-1.5 ml-1">
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Senha Mestre</label>
+                                <button 
+                                    type="button"
+                                    onClick={() => setIsRecoveryMode(true)}
+                                    className="text-[10px] font-bold text-sky-600 hover:text-sky-700 uppercase tracking-widest"
+                                >
+                                    Esqueci a senha
+                                </button>
+                            </div>
+                            <div className="relative">
+                                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none transition-all text-slate-700 font-mono"
+                                    placeholder="••••••••"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                                    title={showPassword ? "Esconder senha" : "Mostrar senha"}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loginLoading}
+                            className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 disabled:opacity-70 flex items-center justify-center gap-2 mt-2"
+                        >
+                            {loginLoading ? (
+                                <Loader2 className="animate-spin w-5 h-5" />
+                            ) : (
+                                'Entrar no Painel'
+                            )}
+                        </button>
+                    </form>
+                ) : (
+                    /* RECOVERY FORM */
+                    <form onSubmit={handlePasswordRecovery} className="space-y-5">
+                        <div>
+                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">E-mail Cadastrado</label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none transition-all text-slate-700"
+                                    placeholder="seu@email.com"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={recoveryLoading}
+                            className="w-full bg-sky-600 text-white py-4 rounded-xl font-bold hover:bg-sky-700 transition-all shadow-lg shadow-sky-100 disabled:opacity-70 flex items-center justify-center gap-2 mt-2"
+                        >
+                            {recoveryLoading ? (
+                                <Loader2 className="animate-spin w-5 h-5" />
+                            ) : (
+                                'Enviar Link de Recuperação'
+                            )}
+                        </button>
+
                         <button
                             type="button"
-                            onClick={() => {
-                                setIsLoginMode(!isLoginMode);
-                                setLoginError(null);
-                                setSuccessMessage(null);
-                            }}
-                            className="text-sm text-sky-600 font-medium hover:underline"
+                            onClick={() => setIsRecoveryMode(false)}
+                            className="w-full flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800 font-bold text-sm transition-colors py-2"
                         >
-                            {isLoginMode ? 'Primeiro acesso? Crie sua conta master aqui' : 'Já tem conta? Fazer Login'}
+                            <ArrowLeft size={16} /> Voltar para Login
                         </button>
-                        <Link to="/" className="text-sm text-slate-500 hover:text-slate-800 pt-2 inline-block">Voltar para o site</Link>
-                    </div>
-                </form>
+                    </form>
+                )}
+
+                <div className="text-center mt-8 pt-6 border-t border-slate-100">
+                    <Link to="/" className="text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest flex items-center justify-center gap-2">
+                        <ArrowLeft size={12} /> Voltar para o Site
+                    </Link>
+                </div>
             </div>
         </div>
     );

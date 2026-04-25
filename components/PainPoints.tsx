@@ -5,22 +5,22 @@ export const PainPoints: React.FC = () => {
   const pains = [
     {
       title: "Medo e Insegurança",
-      description: "A sensação de que seu filho está ficando para trás na escola e você não sabe como ajudar.",
+      description: "Seu filho está ficando para trás — e você não sabe como ajudar.",
       icon: "😟"
     },
     {
-      title: "Diagnóstico Sem Direção",
-      description: "Você recebeu o laudo de TEA ou TDAH, mas sente-se perdido sobre os próximos passos práticos.",
+      title: "Diagnóstico sem direção",
+      description: "Você recebeu um diagnóstico, mas ninguém explicou o que fazer agora.",
       icon: "🧭"
     },
     {
-      title: "Barreiras na Alfabetização",
-      description: "Dificuldades reais em aprender a ler e escrever, gerando frustração tanto na criança quanto na família.",
+      title: "Barreiras na alfabetização",
+      description: "Seu filho tenta aprender, mas enfrenta dificuldades que ninguém parece entender.",
       icon: "📚"
     },
     {
-      title: "Sobrecarga Emocional",
-      description: "Culpa e cansaço por não conseguir lidar com as crises ou com as demandas escolares diárias.",
+      title: "Sobrecarga emocional",
+      description: "Você se sente cansado, culpado e sobrecarregado com tudo isso.",
       icon: "⚖️"
     }
   ];
@@ -33,7 +33,7 @@ export const PainPoints: React.FC = () => {
             Você se sente assim em relação ao seu filho?
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Criar e educar uma criança com necessidades específicas exige mais do que apenas amor; exige estratégia e orientação especializada.
+            Criar e educar uma criança com dificuldades de aprendizagem pode gerar dúvidas, culpa e exaustão — especialmente quando você não sabe por onde começar.
           </p>
         </div>
         
@@ -53,7 +53,7 @@ export const PainPoints: React.FC = () => {
 
         <div className="mt-16 text-center">
           <p className="text-xl font-medium text-sky-700 italic">
-            "Não precisa ser uma jornada solitária. Existe um caminho claro e acolhedor para o desenvolvimento do seu filho."
+            "Você não precisa passar por isso sozinho — existe um caminho claro para entender e ajudar seu filho com segurança."
           </p>
         </div>
       </div>

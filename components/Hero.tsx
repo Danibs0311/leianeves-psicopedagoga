@@ -20,7 +20,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenScheduling }) => {
               Psicopedagoga & Neuropsicopedagoga
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-6">
-              Transforme o caminho da <span className="text-sky-600">aprendizagem</span> do seu filho com acolhimento e ciência.
+              Seu filho tem dificuldade para <span className="text-sky-600">aprender</span> — e você sente que ninguém explica o motivo?
             </h1>
             <p className="text-lg sm:text-xl text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0">
               Especialista em TEA, TDAH e alfabetização e letramento, ajudando famílias a superarem desafios escolares e emocionais através de estratégias baseadas em evidências.

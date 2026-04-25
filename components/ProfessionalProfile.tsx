@@ -21,24 +21,24 @@ export const ProfessionalProfile: React.FC = () => {
 
           <div className="order-1 lg:order-2">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
-              Quem é Léia Neves?
+              Quem vai ajudar seu filho a superar essas dificuldades
             </h2>
             <div className="space-y-4 text-lg text-slate-700 leading-relaxed">
               <p>
-                Olá! Sou <strong>Léia Neves</strong>, Psicopedagoga e Neuropsicopedagoga com anos de experiência dedicada ao desenvolvimento infantil.
+                Eu ajudo crianças que enfrentam dificuldades na aprendizagem a desenvolverem <strong>confiança, autonomia e evolução real</strong> na escola — sem pressão e respeitando seu ritmo.
               </p>
               <p>
-                Minha missão é ser a ponte entre o potencial da criança e suas conquistas reais. Especializei-me em <strong>TEA (Autismo) e TDAH</strong> porque acredito que cada cérebro aprende de uma forma única, e ignorar essa singularidade é o que gera frustração escolar.
+                Ao longo da minha experiência, percebi que muitas crianças não têm dificuldade de aprender — elas só não estão sendo ensinadas da forma certa.
               </p>
               <p>
-                Com foco em <strong>alfabetização e letramento baseados em evidências</strong>, utilizo métodos que a ciência já comprovou serem eficazes, poupando tempo precioso da criança e reduzindo a ansiedade da família.
+                Atuo com foco em crianças com <strong>TDAH, TEA e dificuldades na alfabetização</strong>, utilizando estratégias baseadas em evidências científicas.
               </p>
               <ul className="space-y-3 mt-6">
                 {[
-                  "Especialista em Neuropsicopedagogia Institucional",
-                  "Expert em Intervenção no Autismo e TDAH",
-                  "Foco em Alfabetização Baseada na Ciência da Leitura",
-                  "Orientação Parental e Consultoria Educacional"
+                  "Intervenção personalizada para dificuldades reais de aprendizagem",
+                  "Acompanhamento individual com foco no progresso da criança",
+                  "Estratégias práticas que podem ser aplicadas em casa e na escola",
+                  "Orientação clara para pais que não sabem por onde começar"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <svg className="w-6 h-6 text-sky-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,14 +49,18 @@ export const ProfessionalProfile: React.FC = () => {
                 ))}
               </ul>
             </div>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <a
-                href="https://biolink.info/leianeves_psicopedagoga"
-                className="bg-sky-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-sky-700 transition-all shadow-lg active:scale-95"
-              >
-                Falar com a Léia
-              </a>
-
+            <div className="mt-10">
+              <p className="text-lg font-medium text-slate-800 mb-5">
+                Se você chegou até aqui, provavelmente já percebeu que seu filho precisa de um olhar mais atento.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <a
+                  href="https://biolink.info/leianeves_psicopedagoga"
+                  className="bg-sky-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-sky-700 transition-all shadow-lg active:scale-95"
+                >
+                  Quero ajuda para meu filho
+                </a>
+              </div>
             </div>
           </div>
         </div>

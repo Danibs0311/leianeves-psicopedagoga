@@ -30,7 +30,7 @@ export const PainPoints: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-            Você se sente assim em relação ao seu filho?
+            Se você vive isso com seu filho, não ignore esses sinais
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
             Criar e educar uma criança com dificuldades de aprendizagem pode gerar dúvidas, culpa e exaustão — especialmente quando você não sabe por onde começar.

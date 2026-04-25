@@ -137,7 +137,11 @@ export const BlogPost: React.FC = () => {
           prose-blockquote:border-sky-500 prose-blockquote:bg-sky-50/50 prose-blockquote:py-2 prose-blockquote:rounded-r-xl
           prose-li:text-slate-600
           mb-20"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ 
+            __html: post.content
+              .replace(/<a[^>]*>.*?Agendar\s+Conversa.*?<\/a>/gi, '')
+              .replace(/<button[^>]*>.*?Agendar\s+Conversa.*?<\/button>/gi, '') 
+          }}
         />
 
         {/* Premium CTA Footer - Design de Alta Conversão */}

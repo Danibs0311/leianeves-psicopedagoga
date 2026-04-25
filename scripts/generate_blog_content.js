@@ -11,7 +11,7 @@ import { join } from 'path';
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY; 
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 const geminiApiKey = process.env.GEMINI_API_KEY;
 
 if (!supabaseUrl || !supabaseKey || !geminiApiKey) {
@@ -30,13 +30,13 @@ function getGitCmd() {
         try {
             const apps = readdirSync(githubDesktopPath).filter(f => f.startsWith('app-'));
             if (apps.length > 0) possiblePaths.push(join(githubDesktopPath, apps[apps.length - 1], 'resources', 'app', 'git', 'cmd', 'git.exe'));
-        } catch (e) {}
+        } catch (e) { }
     }
     for (const p of possiblePaths) {
         try {
             execSync(`"${p}" --version`, { stdio: 'ignore' });
             return `"${p}"`;
-        } catch (e) {}
+        } catch (e) { }
     }
     return 'git';
 }
@@ -44,7 +44,7 @@ function getGitCmd() {
 async function generateImage(title) {
     const seed = Math.floor(Math.random() * 1000000);
     console.log(`🎨 Gerando imagem ÚNICA (Seed: ${seed}) para: "${title}"`);
-    
+
     // Prompt ultra-específico para evitar generalização
     const visualPrompt = `High-end clinical photography, realistic, child psychology, theme: ${title}, cinematic lighting, professional gear, 8k, highly detailed. No text.`;
     const encodedPrompt = encodeURIComponent(visualPrompt);
@@ -72,11 +72,11 @@ async function generateImage(title) {
 
 async function runEngine() {
     console.log('🚀 MOTOR DE AUTORIDADE LÉIA NEVES (IMAGEM ILIMITADA)');
-    
+
     // 1. Definir o ciclo de categorias
     const categoriesCycle = [
-        'Aprendizagem', 'Métodos de Ensino', 'Desenvolvimento', 'Emoções', 
-        'Intervenções', 'Família & Escola', 'Tecnologia', 'Inclusão', 
+        'Aprendizagem', 'Métodos de Ensino', 'Desenvolvimento', 'Emoções',
+        'Intervenções', 'Família & Escola', 'Tecnologia', 'Inclusão',
         'Pesquisas', 'Autocuidado', 'Motivação', 'Criatividade'
     ];
 
@@ -94,7 +94,7 @@ async function runEngine() {
             recentTitles = lastPosts.map(p => p.title);
             const lastCategory = lastPosts[0].category;
             const currentIndex = categoriesCycle.indexOf(lastCategory);
-            
+
             if (currentIndex !== -1) {
                 const nextIndex = (currentIndex + 1) % categoriesCycle.length;
                 nextCategory = categoriesCycle[nextIndex];
@@ -134,16 +134,10 @@ async function runEngine() {
                 4. CTA: No final do texto, convide suavemente para uma consulta de avaliação e crie um botão ou link forte direcionando para a Biolink: https://biolink.website/leianeves_psicopedagoga (use o texto "Agendar Conversa no WhatsApp").
 
                 Retorne APENAS um JSON:
-                - title: Título magnético e focado em SEO.
-                - content: O HTML completo do artigo (mínimo 600 palavras).
-                - excerpt: Um gancho inicial de 2 frases que instigue a leitura.
-                - visual_description: Atue como um Diretor de Arte. Crie uma descrição visual ÚNICA e CINEMATOGRÁFICA. 
-                    - VARIE O ÂNGULO: Alterne entre close-up (macro), plano médio (interação), ou vista de cima (flat lay da mesa).
-                    - VARIE O CENÁRIO: Consultório moderno, sala de aula inclusiva, parquinho gramado, ou cantinho de estudo.
-                    - VARIE O FOCO: Crianças de diferentes idades e etnias, psicopedagoga em ação, ou apenas brinquedos e materiais pedagógicos (ábacos, tangram, massinha).
-                    - ILUMINAÇÃO: Use termos como "luz natural suave", "iluminação clínica acolhedora", "raios de sol de fim de tarde".
-                    - REGRA: Nunca repita a mesma composição. Cada foto deve parecer de um ensaio fotográfico profissional diferente.
-                    - ESTILO: Realistic photography, high-end, 8k, cinematic lighting, no text.
+                - title: Gere um título altamente magnético, emocional e otimizado para SEO dentro do tema atual da rotação semanal. Utilize gatilhos como curiosidade, dor, transformação ou descoberta. Evite títulos genéricos e priorize especificidade, benefício claro e conexão com o público (pais, educadores ou profissionais da área).
+                - content: Crie um artigo em HTML completo com no mínimo 600 palavras, estruturado com <h1>, <h2>, <h3>, <p> e listas quando necessário.\n\nCONTEXTO DE GERAÇÃO:\n- O artigo deve respeitar o tema atual da rotação semanal.\n- Os temas seguem ordem fixa e cíclica (1 por semana, toda segunda às 08h):\n  1. Aprendizagem\n  2. Métodos de Ensino\n  3. Desenvolvimento\n  4. Emoções\n  5. Intervenções\n  6. Família & Escola\n  7. Tecnologia\n  8. Inclusão\n  9. Pesquisas\n  10. Autocuidado\n  11. Motivação\n  12. Criatividade\n\n- A cada nova execução, considerar o próximo tema da lista (loop contínuo).\n\nDIRETRIZES DO CONTEÚDO:\n- Profundo, prático e aplicável.\n- Linguagem acessível com autoridade técnica.\n- Incluir exemplos reais e situações do cotidiano.\n- Trazer micro-ações práticas para pais e educadores.\n- Abordar, quando relevante: TDAH, TEA, dislexia, dificuldades de aprendizagem, inclusão e estratégias pedagógicas.\n- Evitar conteúdo genérico e superficial.\n\nOBJETIVO:\nGerar valor real e posicionamento como referência em psicopedagogia.
+                - excerpt: Crie um gancho inicial com 2 frases curtas, impactantes e instigantes, despertando identificação emocional e curiosidade. Deve provocar reflexão imediata ou sensação de urgência. Evite clichês.
+                - visual_description: Atue como um Diretor de Arte Sênior especializado em fotografia educacional, documental e humanizada.\n\nA imagem deve ser baseada diretamente no tema da semana e no conteúdo do artigo.\n\nREGRAS DE VARIAÇÃO (OBRIGATÓRIAS):\n- ÂNGULO: Alterne entre macro extremo (detalhes de mãos, olhos, materiais), plano médio (interação humana), plano aberto (ambiente completo), ou vista superior (flat lay).\n- CENÁRIO: Sala de aula inclusiva, consultório psicopedagógico moderno, ambiente doméstico acolhedor, espaço externo (parquinho, jardim), ou mesa de estudo organizada.\n- FOCO PRINCIPAL: Alternar entre crianças, profissional, interação familiar, ou objetos pedagógicos.\n\nDIREÇÃO CRIATIVA POR TEMA:\n- Aprendizagem: foco em descoberta e concentração\n- Métodos de Ensino: interação ativa e prática pedagógica\n- Desenvolvimento: progressão e evolução da criança\n- Emoções: expressão facial e vínculo afetivo\n- Intervenções: ação prática e orientação profissional\n- Família & Escola: conexão entre responsáveis e educadores\n- Tecnologia: uso equilibrado de dispositivos na aprendizagem\n- Inclusão: diversidade real e acessibilidade\n- Pesquisas: ambiente analítico, livros, estudo\n- Autocuidado: pausas, acolhimento, bem-estar\n- Motivação: superação, conquista\n- Criatividade: expressão livre, cores, materiais lúdicos\n\nDIREÇÃO VISUAL AVANÇADA:\n- Definir emoção clara (descoberta, dúvida, conquista, acolhimento).\n- Capturar um momento específico (não poses genéricas).\n- Usar profundidade de campo (bokeh), foco seletivo e composição profissional.\n\nILUMINAÇÃO:\n- Variar entre luz natural suave, luz lateral de janela, iluminação clínica acolhedora, luz dourada de fim de tarde.\n\nTEXTURAS E REALISMO:\n- Incluir materiais reais: papel, madeira, lápis usados, tecidos.\n- Evitar aparência artificial ou estéril.\n\nESTILO FINAL (OBRIGATÓRIO):\nRealistic photography, ultra-detailed, high-end editorial, 8k, cinematic lighting, shallow depth of field, professional color grading, no text, no watermark.\n\nREGRA CRÍTICA:\nNunca repetir composição, cenário ou estilo. Cada imagem deve parecer de um ensaio fotográfico completamente diferente."
                 - meta_title: Para o Google (máx 60 chars).
                 - meta_description: Para o Google (máx 160 chars).
                 - category: DEVE SER EXATAMENTE A STRING "${nextCategory}".
@@ -157,7 +151,7 @@ async function runEngine() {
 
     try {
         const data = JSON.parse(responseText.replace(/```json|```/g, '').trim());
-        
+
         // Usando a descrição visual ÚNICA gerada pela IA
         const seed = Math.floor(Math.random() * 999999);
         const visualPrompt = encodeURIComponent(data.visual_description + ", professional clinical style, no text, 8k");
@@ -189,7 +183,7 @@ async function runEngine() {
             execSync(`${gitCmd} commit -m "Auto-publish: ${data.title}"`);
             execSync(`${gitCmd} push`);
             console.log('✅ Tudo sincronizado no GitHub.');
-        } catch (sErr) {}
+        } catch (sErr) { }
     } catch (e) { console.error('❌ Erro final:', e.message); }
 }
 

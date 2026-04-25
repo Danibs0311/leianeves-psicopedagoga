@@ -42,7 +42,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 </button>
             </div>
 
-            <nav className="flex-1 p-4 mt-2">
+            <nav className="flex-1 p-4 mt-2 overflow-y-auto scrollbar-hide hover:scrollbar-default transition-all">
                 <ul className="space-y-2">
                     {menuItems.map((item) => (
                         <li key={item.id}>

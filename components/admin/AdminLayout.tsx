@@ -23,7 +23,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeView, 
     return (
         <div className="flex min-h-screen bg-slate-50">
             {/* Desktop Sidebar */}
-            <div className="hidden md:block print:hidden">
+            <div className="hidden md:block sticky top-0 h-screen flex-none print:hidden">
                 <AdminSidebar
                     activeView={activeView}
                     onNavigate={handleNavigate}

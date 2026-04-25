@@ -1,5 +1,6 @@
 import React from 'react';
-import { LayoutDashboard, Users, Settings, LogOut, FileText } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, LogOut, FileText, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface AdminSidebarProps {
     activeView: 'dashboard' | 'patients' | 'settings' | 'blog';
@@ -55,6 +56,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Logado como</span>
                     <span className="block text-xs font-bold text-slate-300 truncate">{userEmail}</span>
                 </div>
+                <Link
+                    to="/"
+                    className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-[13px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-slate-800 transition-all mb-2"
+                >
+                    <ExternalLink size={18} strokeWidth={2.5} />
+                    Ver Site
+                </Link>
                 <button
                     onClick={onLogout}
                     className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-[13px] font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500/10 transition-all"

@@ -19,14 +19,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenScheduling }) => {
             <span className="inline-block px-4 py-1.5 mb-6 text-sm font-bold tracking-wider text-sky-700 uppercase bg-sky-100 rounded-full">
               Psicopedagoga & Neuropsicopedagoga
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.15] mb-8 max-w-2xl mx-auto lg:mx-0">
               Seu filho tem dificuldade para <span className="text-sky-600">aprender</span> — e você sente que ninguém explica o motivo?
             </h1>
-            <p className="text-xl sm:text-2xl text-slate-700 font-medium mb-4 max-w-2xl mx-auto lg:mx-0">
+            <p className="text-lg sm:text-xl text-slate-700 font-medium mb-6 max-w-xl mx-auto lg:mx-0 leading-relaxed">
               Dificuldade na leitura, falta de atenção, desinteresse pela escola…<br />
-              <span className="mt-1 block">Esses sinais podem indicar algo que precisa ser compreendido com cuidado e estratégia.</span>
+              <span className="mt-2 block">Esses sinais podem indicar algo que precisa ser compreendido com cuidado e estratégia.</span>
             </p>
-            <p className="text-base sm:text-lg text-slate-500 mb-8 max-w-2xl mx-auto lg:mx-0">
+            <p className="text-sm sm:text-base text-slate-500 mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
               Atendimento psicopedagógico especializado em TDAH, TEA e dificuldades de aprendizagem, com acompanhamento individual e baseado em evidências.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">

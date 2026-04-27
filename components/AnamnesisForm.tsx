@@ -35,6 +35,7 @@ type AnamnesisData = z.infer<typeof anamnesisSchema>;
 
 interface AnamnesisFormProps {
     patientId: number | null;
+    anamnesisId?: number;
     initialData?: Record<string, any>;
     isEditMode?: boolean;
     onSuccess: () => void;
@@ -43,6 +44,7 @@ interface AnamnesisFormProps {
 
 export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ 
     patientId, 
+    anamnesisId,
     initialData, 
     isEditMode = false, 
     onSuccess, 
@@ -90,9 +92,10 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({
                 const { error } = await supabase
                     .from('patient_anamnesis')
                     .upsert({
+                        ...(anamnesisId ? { id: anamnesisId } : {}),
                         patient_id: patientId,
                         answers: data
-                    }, { onConflict: 'patient_id' });
+                    });
 
                 if (error) throw error;
             } else {

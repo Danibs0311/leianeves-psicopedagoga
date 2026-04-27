@@ -1106,6 +1106,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                             </div>
                             <AnamnesisForm
                                 patientId={patientId}
+                                anamnesisId={anamnesis?.id}
                                 isEditMode={true}
                                 initialData={anamnesis?.answers}
                                 onSuccess={() => {

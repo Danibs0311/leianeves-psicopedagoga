@@ -91,8 +91,7 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({
                     .from('patient_anamnesis')
                     .upsert({
                         patient_id: patientId,
-                        answers: data,
-                        updated_at: new Date().toISOString()
+                        answers: data
                     }, { onConflict: 'patient_id' });
 
                 if (error) throw error;

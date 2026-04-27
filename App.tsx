@@ -13,9 +13,6 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
-        <div style={{ backgroundColor: '#ef4444', color: '#fff', padding: '10px', textAlign: 'center', fontWeight: 'bold', fontSize: '12px', zIndex: 9999, position: 'relative' }}>
-          CONTROLE DE VERSÃO: V15 - REDESIGN ULTRA COMPACTO ATIVO (BANNER VERMELHO)
-        </div>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/blog" element={<Blog />} />

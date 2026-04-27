@@ -50,8 +50,16 @@ export const AdminAppointments: React.FC = () => {
             )
             .subscribe();
 
+        // Manual refresh trigger for when Realtime is disabled/slow
+        const handleManualRefresh = () => {
+            console.log('Manual refresh event received!');
+            fetchAppointments();
+        };
+        window.addEventListener('refresh-appointments', handleManualRefresh);
+
         return () => {
             supabase.removeChannel(channel);
+            window.removeEventListener('refresh-appointments', handleManualRefresh);
         };
     }, []);
 

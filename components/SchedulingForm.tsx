@@ -293,6 +293,9 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
 
             if (appointmentError) throw appointmentError;
 
+            // Trigger UI refresh for admin panel (Realtime fallback)
+            window.dispatchEvent(new Event('refresh-appointments'));
+
             // Pass the clinical patientId back so the Modal knows to open the Anamnesis step
             onSuccess(patientId);
         } catch (error) {

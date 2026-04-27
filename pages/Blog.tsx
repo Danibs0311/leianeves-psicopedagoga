@@ -122,9 +122,7 @@ export const Blog: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans overflow-x-hidden">
       {/* VERIFICATION TAG - To ensure you are seeing the latest version */}
-      <div className="bg-amber-400 py-2 text-center text-[10px] font-black uppercase tracking-[0.3em] text-amber-950">
-        SISTEMA ATUALIZADO - MODO 5 COLUNAS ATIVO
-      </div>
+
 
       <Navbar onOpenScheduling={() => setIsSchedulingModalOpen(true)} />
       

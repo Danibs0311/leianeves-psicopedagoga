@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, User, Phone, Mail, FileText, Upload, Trash2, Clock, FilePlus, Save, Eye, X, Plus, ChevronDown, Bold, Italic, Underline, List, ListOrdered, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { ArrowLeft, User, Phone, Mail, FileText, Upload, Trash2, Clock, FilePlus, Save, Eye, X, Plus, ChevronDown, Bold, Italic, Underline, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, Edit3 } from 'lucide-react';
+import { AnamnesisForm } from '../AnamnesisForm';
 import Editor, {
     BtnBold,
     BtnItalic,
@@ -305,6 +306,7 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
     const [isEditingNotes, setIsEditingNotes] = useState(false);
     const [notesValue, setNotesValue] = useState('');
     const [viewingExternalUrl, setViewingExternalUrl] = useState<string | null>(null);
+    const [isEditingAnamnesis, setIsEditingAnamnesis] = useState(false);
 
     // Load html2pdf.js
     useEffect(() => {
@@ -1088,11 +1090,42 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
             {/* Content Anamnesis */}
             {activeTab === 'anamnesis' && (
                 <div className="space-y-6">
-                    {!anamnesis ? (
-                        <div className="bg-slate-50 border border-slate-200 border-dashed rounded-2xl p-10 text-center text-slate-500">
+                    {isEditingAnamnesis ? (
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="font-bold text-slate-800 text-xl flex items-center gap-2">
+                                    <FilePlus size={24} className="text-sky-600" />
+                                    {anamnesis ? 'Editando Ficha de Anamnese' : 'Preenchendo Nova Ficha'}
+                                </h3>
+                                <button
+                                    onClick={() => setIsEditingAnamnesis(false)}
+                                    className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+                            <AnamnesisForm
+                                patientId={patientId}
+                                isEditMode={true}
+                                initialData={anamnesis?.answers}
+                                onSuccess={() => {
+                                    setIsEditingAnamnesis(false);
+                                    fetchPatientData();
+                                }}
+                            />
+                        </div>
+                    ) : !anamnesis ? (
+                        <div className="bg-slate-50 border border-slate-200 border-dashed rounded-2xl p-10 text-center">
                             <List className="mx-auto mb-3 text-slate-400 opacity-50" size={48} />
                             <h3 className="font-bold text-slate-700 mb-1">Nenhuma ficha de triagem preenchida</h3>
-                            <p className="text-sm">Os responsáveis ainda não enviaram as informações prévias pelo formulário do site.</p>
+                            <p className="text-sm text-slate-500 mb-6">Os responsáveis ainda não enviaram as informações prévias pelo formulário do site.</p>
+                            <button
+                                onClick={() => setIsEditingAnamnesis(true)}
+                                className="inline-flex items-center gap-2 bg-sky-600 text-white px-6 py-2.5 rounded-xl hover:bg-sky-700 transition-all font-medium shadow-md active:scale-95"
+                            >
+                                <Plus size={18} />
+                                Preencher Ficha Manualmente
+                            </button>
                         </div>
                     ) : (
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -1102,8 +1135,18 @@ export const AdminPatientDetail: React.FC<AdminPatientDetailProps> = ({ patientI
                                         <List size={20} className="text-sky-600" />
                                         Respostas da Triagem Digital
                                     </h3>
-                                    <p className="text-sm text-sky-700">Preenchido em: {new Date(anamnesis.created_at).toLocaleString('pt-BR')}</p>
+                                    <p className="text-sm text-sky-700">
+                                        Preenchido em: {new Date(anamnesis.created_at).toLocaleString('pt-BR')}
+                                        {anamnesis.updated_at && ` (Editado em: ${new Date(anamnesis.updated_at).toLocaleString('pt-BR')})`}
+                                    </p>
                                 </div>
+                                <button
+                                    onClick={() => setIsEditingAnamnesis(true)}
+                                    className="flex items-center gap-2 bg-white text-sky-700 px-4 py-2 rounded-xl border border-sky-200 hover:bg-sky-100 transition-all text-sm font-bold shadow-sm"
+                                >
+                                    <Edit3 size={16} />
+                                    Editar Respostas
+                                </button>
                             </div>
 
                             <div className="p-6 grid gap-6 md:grid-cols-2">

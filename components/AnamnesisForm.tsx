@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Loader2, AlertCircle, CheckCircle2, FileText, ChevronRight, Check, User } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, FileText, ChevronRight, Check, User, Save } from 'lucide-react';
 
 const anamnesisSchema = z.object({
     // Gestação e Nascimento
@@ -35,11 +35,19 @@ type AnamnesisData = z.infer<typeof anamnesisSchema>;
 
 interface AnamnesisFormProps {
     patientId: number | null;
+    initialData?: Record<string, any>;
+    isEditMode?: boolean;
     onSuccess: () => void;
-    onSkip: () => void;
+    onSkip?: () => void;
 }
 
-export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSuccess, onSkip }) => {
+export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ 
+    patientId, 
+    initialData, 
+    isEditMode = false, 
+    onSuccess, 
+    onSkip 
+}) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -50,26 +58,26 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
     } = useForm<AnamnesisData>({
         resolver: zodResolver(anamnesisSchema),
         defaultValues: {
-            pregnancyType: '',
-            birthType: '',
-            birthComplications: '',
-            motorDevelopment: '',
-            speechDevelopment: '',
-            sphincterControl: '',
-            sleepQuality: '',
-            eatingHabits: '',
-            allergiesOrMedications: '',
-            schoolName: '',
-            currentGrade: '',
-            schoolPerformance: '',
-            homeworkBehavior: '',
-            additionalNotes: ''
+            pregnancyType: initialData?.pregnancyType || '',
+            birthType: initialData?.birthType || '',
+            birthComplications: initialData?.birthComplications || '',
+            motorDevelopment: initialData?.motorDevelopment || '',
+            speechDevelopment: initialData?.speechDevelopment || '',
+            sphincterControl: initialData?.sphincterControl || '',
+            sleepQuality: initialData?.sleepQuality || '',
+            eatingHabits: initialData?.eatingHabits || '',
+            allergiesOrMedications: initialData?.allergiesOrMedications || '',
+            schoolName: initialData?.schoolName || '',
+            currentGrade: initialData?.currentGrade || '',
+            schoolPerformance: initialData?.schoolPerformance || '',
+            homeworkBehavior: initialData?.homeworkBehavior || '',
+            additionalNotes: initialData?.additionalNotes || ''
         }
     });
 
     const onSubmit = async (data: AnamnesisData) => {
         if (!patientId) {
-            setSubmitError('ID do paciente não encontrado. O agendamento parece estar incompleto.');
+            setSubmitError('ID do paciente não encontrado.');
             return;
         }
 
@@ -77,17 +85,30 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
         setSubmitError(null);
 
         try {
-            // Inserir JSONB no Supabase
-            const { error } = await supabase
-                .from('patient_anamnesis')
-                .insert([
-                    {
+            if (isEditMode) {
+                // UPDATE if editing
+                const { error } = await supabase
+                    .from('patient_anamnesis')
+                    .upsert({
                         patient_id: patientId,
-                        answers: data
-                    }
-                ]);
+                        answers: data,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'patient_id' });
 
-            if (error) throw error;
+                if (error) throw error;
+            } else {
+                // INSERT if new
+                const { error } = await supabase
+                    .from('patient_anamnesis')
+                    .insert([
+                        {
+                            patient_id: patientId,
+                            answers: data
+                        }
+                    ]);
+
+                if (error) throw error;
+            }
             onSuccess();
         } catch (error: any) {
             console.error('Erro ao salvar anamnese:', error);
@@ -100,16 +121,18 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
     return (
         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
 
-            <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 mb-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 transform translate-x-10 -translate-y-10"></div>
-                <h4 className="font-bold text-sky-900 flex items-center gap-2 mb-2 text-lg">
-                    <CheckCircle2 className="text-sky-600" size={24} />
-                    Agendamento Confirmado!
-                </h4>
-                <p className="text-sm text-sky-800 relative z-10">
-                    Você já garantiu seu horário na clínica. Para adiantarmos a análise e oferecermos o melhor acolhimento, pedimos que preencha a ficha de anamnese abaixo.
-                </p>
-            </div>
+            {!isEditMode && (
+                <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 mb-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 transform translate-x-10 -translate-y-10"></div>
+                    <h4 className="font-bold text-sky-900 flex items-center gap-2 mb-2 text-lg">
+                        <CheckCircle2 className="text-sky-600" size={24} />
+                        Agendamento Confirmado!
+                    </h4>
+                    <p className="text-sm text-sky-800 relative z-10">
+                        Você já garantiu seu horário na clínica. Para adiantarmos a análise e oferecermos o melhor acolhimento, pedimos que preencha a ficha de anamnese abaixo.
+                    </p>
+                </div>
+            )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 {submitError && (
@@ -262,24 +285,27 @@ export const AnamnesisForm: React.FC<AnamnesisFormProps> = ({ patientId, onSucce
 
                 {/* Botões */}
                 <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-slate-200">
-                    <button
-                        type="button"
-                        onClick={onSkip}
-                        className="px-6 py-2.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-all font-medium"
-                    >
-                        Pular e concluir depois
-                    </button>
+                    {!isEditMode && onSkip && (
+                        <button
+                            type="button"
+                            onClick={onSkip}
+                            className="px-6 py-2.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-all font-medium"
+                        >
+                            Pular e concluir depois
+                        </button>
+                    )}
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-6 py-2.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all font-medium shadow-md active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
+                        className={`px-6 py-2.5 rounded-lg text-white transition-all font-medium shadow-md active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto
+                        ${isEditMode ? 'bg-sky-600 hover:bg-sky-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}
                     >
                         {isSubmitting ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
-                            <Check size={18} />
+                            isEditMode ? <Save size={18} /> : <Check size={18} />
                         )}
-                        {isSubmitting ? 'Enviando Ficha...' : 'Concluir Agendamento e Enviar'}
+                        {isSubmitting ? 'Salvando...' : isEditMode ? 'Salvar Alterações na Ficha' : 'Concluir Agendamento e Enviar'}
                     </button>
                 </div>
             </form>

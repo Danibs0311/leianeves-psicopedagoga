@@ -22,19 +22,69 @@ export const BlogPost: React.FC = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSchedulingModalOpen, setIsSchedulingModalOpen] = useState(false);
+  const [roadmap, setRoadmap] = useState<{ id: string, title: string, items: any[] } | null>(null);
+
   useEffect(() => {
     fetchPost();
   }, [slug]);
 
   useEffect(() => {
     if (post) {
+      fetchRoadmap();
       document.title = `${post.meta_title || post.title} | Léia Neves`;
       const metaDesc = document.querySelector('meta[name="description"]');
       if (metaDesc) metaDesc.setAttribute('content', post.meta_description || post.title);
     }
   }, [post]);
 
+  const fetchRoadmap = async () => {
+    if (!post) return;
+    try {
+      const { data: item } = await supabase
+        .from('blog_roadmap_items')
+        .select('roadmap_id')
+        .eq('post_id', post.id)
+        .single();
+      
+      if (item) {
+        const { data: roadmapData } = await supabase
+          .from('blog_roadmaps')
+          .select('id, title')
+          .eq('id', item.roadmap_id)
+          .single();
+        
+        const { data: items } = await supabase
+          .from('blog_roadmap_items')
+          .select('post_id, order_index, blog_posts(title, slug)')
+          .eq('roadmap_id', item.roadmap_id)
+          .order('order_index', { ascending: true });
+        
+        if (roadmapData && items) {
+          setRoadmap({
+            id: roadmapData.id,
+            title: roadmapData.title,
+            items: items.map(i => ({
+              id: i.post_id,
+              order: i.order_index,
+              title: (i.blog_posts as any).title,
+              slug: (i.blog_posts as any).slug
+            }))
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('Post is not part of a roadmap');
+    }
+  };
+
+  const currentItemIndex = roadmap?.items.findIndex(i => i.id === post?.id) ?? -1;
+  const prevPost = currentItemIndex > 0 ? roadmap?.items[currentItemIndex - 1] : null;
+  const nextPost = currentItemIndex !== -1 && currentItemIndex < (roadmap?.items.length ?? 0) - 1 
+    ? roadmap?.items[currentItemIndex + 1] 
+    : null;
+
   const fetchPost = async () => {
+    // ... rest of the code (keeping the existing fetchPost)
     try {
       const { data, error } = await supabase
         .from('blog_posts')
@@ -120,6 +170,46 @@ export const BlogPost: React.FC = () => {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 pb-24 w-full">
+        {/* ROADMAP NAVIGATION WIDGET - NEW */}
+        {roadmap && (
+          <div className="mb-12 bg-sky-50/50 rounded-2xl p-6 border border-sky-100/50">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+              <div>
+                <span className="text-[10px] font-black text-sky-600 uppercase tracking-widest block mb-1">Você está lendo a trilha:</span>
+                <h4 className="text-lg font-black text-slate-900">{roadmap.title}</h4>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Progresso</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-sky-600 transition-all duration-1000" 
+                      style={{ width: `${((currentItemIndex + 1) / roadmap.items.length) * 100}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-xs font-black text-slate-900">{currentItemIndex + 1} de {roadmap.items.length}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {roadmap.items.map((item, idx) => (
+                <Link 
+                  key={item.id}
+                  to={`/blog/${item.slug}`}
+                  className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all ${
+                    idx === currentItemIndex 
+                      ? 'bg-sky-600 text-white shadow-lg shadow-sky-200' 
+                      : 'bg-white text-slate-400 border border-slate-100 hover:border-sky-300 hover:text-sky-600'
+                  }`}
+                >
+                  {idx + 1}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="relative aspect-[16/9] mb-16 rounded-2xl overflow-hidden shadow-2xl shadow-slate-100 bg-slate-50">
           <img 
             src={post.image_url} 
@@ -143,6 +233,54 @@ export const BlogPost: React.FC = () => {
               .replace(/<button[^>]*>.*?Agendar\s+Conversa.*?<\/button>/gi, '') 
           }}
         />
+
+        {/* ROADMAP NEXT/PREV BUTTONS - NEW */}
+        {roadmap && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-20">
+            {prevPost ? (
+              <Link 
+                to={`/blog/${prevPost.slug}`}
+                className="flex items-center gap-4 p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:border-sky-300 hover:bg-white transition-all group"
+              >
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 group-hover:text-sky-600 transition-colors">
+                  <ChevronLeft size={20} />
+                </div>
+                <div>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Anterior</span>
+                  <span className="text-sm font-bold text-slate-700 line-clamp-1">{prevPost.title}</span>
+                </div>
+              </Link>
+            ) : <div />}
+
+            {nextPost ? (
+              <Link 
+                to={`/blog/${nextPost.slug}`}
+                className="flex items-center justify-between gap-4 p-6 bg-sky-600 rounded-2xl shadow-lg shadow-sky-100 hover:bg-sky-700 transition-all group"
+              >
+                <div className="text-left">
+                  <span className="text-[10px] font-black text-sky-200 uppercase tracking-widest block">Próximo</span>
+                  <span className="text-sm font-bold text-white line-clamp-1">{nextPost.title}</span>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:translate-x-1 transition-transform">
+                  <ChevronRight size={20} />
+                </div>
+              </Link>
+            ) : (
+              <button 
+                onClick={() => setIsSchedulingModalOpen(true)}
+                className="flex items-center justify-between gap-4 p-6 bg-emerald-600 rounded-2xl shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition-all group cursor-pointer border-none"
+              >
+                <div className="text-left">
+                  <span className="text-[10px] font-black text-emerald-200 uppercase tracking-widest block">Fim do Roteiro</span>
+                  <span className="text-sm font-bold text-white">Agendar Avaliação</span>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
+                  <Calendar size={20} />
+                </div>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Premium CTA Footer - Design de Alta Conversão */}
         <section 

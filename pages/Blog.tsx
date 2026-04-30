@@ -16,8 +16,17 @@ interface BlogPost {
   created_at: string;
 }
 
+interface Roadmap {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  category: string;
+}
+
 export const Blog: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -30,6 +39,22 @@ export const Blog: React.FC = () => {
 
   const [roadmapPosts, setRoadmapPosts] = useState<string[]>([]);
   const [activeRoadmap, setActiveRoadmap] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchRoadmaps();
+  }, []);
+
+  const fetchRoadmaps = async () => {
+    try {
+      const { data } = await supabase
+        .from('blog_roadmaps')
+        .select('*')
+        .order('created_at', { ascending: true });
+      setRoadmaps(data || []);
+    } catch (e) {
+      console.error('Error fetching roadmaps:', e);
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -195,25 +220,30 @@ export const Blog: React.FC = () => {
             <span className="text-[9px] font-bold text-sky-500 uppercase tracking-widest bg-sky-50 px-3 py-1 rounded-full">Trilhas Guiadas</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { title: 'Suspeita de TDAH?', slug: 'roteiro-aprendizagem', description: 'Entenda os sinais e o que fazer se você suspeita que seu filho tem TDAH.', icon: '🧠' },
-              { title: 'Jornada da Alfabetização', slug: 'roteiro-metodos-de-ensino', description: 'Um guia passo a passo para apoiar seu filho no processo de leitura e escrita.', icon: '📚' },
-              { title: 'Desenvolvimento Atípico', slug: 'roteiro-inclusao', description: 'Como lidar com diagnósticos e garantir uma inclusão real e efetiva.', icon: '🌈' }
-            ].map((roadmap) => (
+            {roadmaps.length > 0 ? roadmaps.map((roadmap) => (
               <Link 
                 key={roadmap.slug}
                 to={`/blog?roadmap=${roadmap.slug}`}
                 className="group relative bg-white rounded-2xl p-6 border border-slate-100 hover:border-sky-300 hover:shadow-2xl hover:shadow-sky-100/30 transition-all duration-500 overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full -mr-16 -mt-16 group-hover:bg-sky-100 transition-colors duration-500 opacity-50"></div>
-                <div className="text-3xl mb-4 relative z-10">{roadmap.icon}</div>
+                <div className="text-3xl mb-4 relative z-10">
+                  {roadmap.category === 'Aprendizagem' ? '🧠' : 
+                   roadmap.category === 'Emoções' ? '❤️' :
+                   roadmap.category === 'Desenvolvimento' ? '🌱' :
+                   roadmap.category === 'Inclusão' ? '🌈' : '📚'}
+                </div>
                 <h4 className="text-lg font-black text-slate-900 mb-2 relative z-10 group-hover:text-sky-600 transition-colors">{roadmap.title}</h4>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed mb-4 relative z-10 line-clamp-2">{roadmap.description}</p>
                 <div className="flex items-center text-[10px] font-black text-sky-600 uppercase tracking-widest gap-2 relative z-10">
                   Começar Trilha <ChevronRight size={12} strokeWidth={3} />
                 </div>
               </Link>
-            ))}
+            )) : (
+              <div className="lg:col-span-3 py-10 text-center border border-dashed border-slate-200 rounded-2xl">
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Nenhuma trilha ativa ainda. O sistema irá gerar automaticamente na próxima segunda-feira!</p>
+              </div>
+            )}
           </div>
         </section>
 

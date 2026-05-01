@@ -150,29 +150,36 @@ export const Blog: React.FC = () => {
       <Navbar onOpenScheduling={() => setIsSchedulingModalOpen(true)} />
       
       {/* Header */}
-      <div className="border-b border-slate-100 py-6 bg-white">
-        <div className="max-w-[1440px] mx-auto px-6 flex justify-between items-center">
-          <div className="flex flex-col">
-            <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">
-              {activeRoadmap ? activeRoadmap : 'Nosso Blog'}
-            </h1>
-            {activeRoadmap && (
-              <span className="text-[10px] font-black text-sky-600 uppercase tracking-widest mt-1">Trilha de Conhecimento</span>
-            )}
+      <section className="mb-20 text-center py-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-100 mb-6">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+            </span>
+            <span className="text-[10px] font-black text-sky-700 uppercase tracking-widest">Blog de Autoridade Clínica</span>
           </div>
-          <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">
-            <Link to="/" className="hover:text-sky-600 transition-colors">Home</Link>
-            <span>/</span>
-            <Link to="/blog" className="hover:text-sky-600 transition-colors">Blog</Link>
-            {activeRoadmap && (
-              <>
-                <span>/</span>
-                <span className="text-slate-900">Roteiro</span>
-              </>
-            )}
+          <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight">
+            Léia Neves <span className="text-sky-600">Blog</span>
+          </h1>
+          <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed mb-8">
+            Psicopedagoga Especializada em <span className="text-sky-600 font-bold">TEA e TDAH</span>. 
+            Apoio especializado e estratégias práticas para o desenvolvimento integral de crianças e adolescentes.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <button 
+              onClick={() => setIsSchedulingModalOpen(true)}
+              className="px-8 py-4 bg-sky-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-sky-700 hover:scale-105 transition-all shadow-xl shadow-sky-100"
+            >
+              Agendar Avaliação
+            </button>
+            <a 
+              href="#roadmaps"
+              className="px-8 py-4 bg-white text-slate-900 border-2 border-slate-100 rounded-2xl font-black text-sm uppercase tracking-widest hover:border-sky-200 transition-all"
+            >
+              Ver Trilhas de Aprendizado
+            </a>
           </div>
-        </div>
-      </div>
+        </section>
 
       <main className="max-w-[1440px] mx-auto px-6 py-8 w-full">
         {/* Search Bar - Full Width & Modern with Suggestions */}

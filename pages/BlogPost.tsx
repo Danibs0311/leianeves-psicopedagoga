@@ -282,6 +282,28 @@ export const BlogPost: React.FC = () => {
           </div>
         )}
 
+        {/* Newsletter Section - NOVO */}
+        <section className="bg-slate-900 rounded-3xl p-8 md:p-12 mb-20 text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+          <div className="relative z-10">
+            <span className="text-[10px] font-black text-sky-400 uppercase tracking-widest block mb-4">Mantenha-se Informado</span>
+            <h3 className="text-2xl md:text-3xl font-black text-white mb-4">Receba orientações exclusivas sobre TEA e TDAH</h3>
+            <p className="text-slate-400 text-sm md:text-base max-w-xl mx-auto mb-8 font-medium">
+              Junte-se a centenas de famílias que recebem nossos artigos técnicos e dicas práticas diretamente no e-mail.
+            </p>
+            <form className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto" onSubmit={(e) => e.preventDefault()}>
+              <input 
+                type="email" 
+                placeholder="Seu melhor e-mail" 
+                className="flex-1 px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-sky-500 transition-all font-medium"
+              />
+              <button className="px-8 py-4 bg-sky-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-sky-700 transition-all shadow-xl shadow-sky-900/20 whitespace-nowrap">
+                Quero me Inscrever
+              </button>
+            </form>
+          </div>
+        </section>
+
         {/* Premium CTA Footer - Design de Alta Conversão */}
         <section 
           style={{ backgroundColor: '#050a15', color: 'white' }}

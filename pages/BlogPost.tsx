@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
-import { Calendar, User, ChevronLeft, Share2, MessageCircle } from 'lucide-react';
+import { Calendar, User, ChevronLeft, Share2, MessageCircle, Search, ChevronRight } from 'lucide-react';
+import profileImage from '../images/leia_psicoped.webp';
 import { SchedulingModal } from '../components/SchedulingModal';
 
 interface Post {
@@ -282,22 +283,54 @@ export const BlogPost: React.FC = () => {
           </div>
         )}
 
-        {/* Newsletter Section - NOVO */}
-        <section className="bg-slate-900 rounded-3xl p-8 md:p-12 mb-20 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        {/* Bio Section - Otimizada com Foto */}
+        <section className="border-t border-slate-100 pt-12 mb-16">
+          <div className="flex flex-col md:flex-row items-center gap-8 bg-slate-50/50 p-8 rounded-3xl">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl flex-shrink-0">
+              <img src={profileImage} alt="Léia Neves" className="w-full h-full object-cover" />
+            </div>
+            <div className="text-center md:text-left">
+              <h4 className="text-[10px] font-black text-sky-600 uppercase tracking-widest mb-2">Quem é a Profissional</h4>
+              <h3 className="text-xl font-black text-slate-900 mb-3">Léia Neves</h3>
+              <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                Psicopedagoga Clínica especialista em TEA e TDAH. Minha missão é transformar a jornada de aprendizagem de crianças e adolescentes, oferecendo suporte técnico e acolhimento para as famílias.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Bio Section - Otimizada com Foto Circular */}
+        <section className="border-t border-slate-100 pt-12 mb-16">
+          <div className="flex flex-col md:flex-row items-center gap-8 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-sky-50 shadow-xl flex-shrink-0">
+              <img src={profileImage} alt="Léia Neves" className="w-full h-full object-cover" />
+            </div>
+            <div className="text-center md:text-left">
+              <h4 className="text-[10px] font-black text-sky-600 uppercase tracking-widest mb-2">Quem é a Profissional</h4>
+              <h3 className="text-xl font-black text-slate-900 mb-3">Léia Neves</h3>
+              <p className="text-sm text-slate-600 leading-[1.7] font-medium">
+                Psicopedagoga Clínica especialista em TEA e TDAH. Minha missão é transformar a jornada de aprendizagem de crianças e adolescentes, oferecendo suporte técnico e acolhimento para as famílias através de intervenções baseadas em evidências.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Newsletter Section - Cores Diferenciadas (Relatório UX) */}
+        <section className="bg-sky-50 rounded-3xl p-8 md:p-12 mb-20 text-center relative overflow-hidden border border-sky-100">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-sky-200/20 rounded-full -mr-32 -mt-32 blur-3xl"></div>
           <div className="relative z-10">
-            <span className="text-[10px] font-black text-sky-400 uppercase tracking-widest block mb-4">Mantenha-se Informado</span>
-            <h3 className="text-2xl md:text-3xl font-black text-white mb-4">Receba orientações exclusivas sobre TEA e TDAH</h3>
-            <p className="text-slate-400 text-sm md:text-base max-w-xl mx-auto mb-8 font-medium">
+            <span className="text-[10px] font-black text-sky-600 uppercase tracking-widest block mb-4">Mantenha-se Informado</span>
+            <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-4">Receba orientações exclusivas sobre TEA e TDAH</h3>
+            <p className="text-slate-600 text-sm md:text-base max-w-xl mx-auto mb-8 font-medium">
               Junte-se a centenas de famílias que recebem nossos artigos técnicos e dicas práticas diretamente no e-mail.
             </p>
             <form className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto" onSubmit={(e) => e.preventDefault()}>
               <input 
                 type="email" 
                 placeholder="Seu melhor e-mail" 
-                className="flex-1 px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-sky-500 transition-all font-medium"
+                className="flex-1 px-6 py-4 bg-white border border-sky-100 rounded-2xl text-slate-900 focus:outline-none focus:border-sky-500 transition-all font-medium"
               />
-              <button className="px-8 py-4 bg-sky-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-sky-700 transition-all shadow-xl shadow-sky-900/20 whitespace-nowrap">
+              <button className="px-8 py-4 bg-sky-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-sky-700 transition-all shadow-xl shadow-sky-900/10 whitespace-nowrap">
                 Quero me Inscrever
               </button>
             </form>

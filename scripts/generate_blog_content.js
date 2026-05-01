@@ -138,24 +138,24 @@ async function runEngine() {
                 TÍTULO: "${selectedTitle}"
                 CATEGORIA: "${nextCategory}"
 
-                DIRETRIZES DE AUTORIDADE E SEO (RELATÓRIO DE MELHORIAS):
-                1. CONTEÚDO PILAR: Não escreva apenas um texto. Crie um guia profundo, rico em detalhes técnicos explicados de forma simples para pais exaustos.
-                2. ESCANEABILIDADE: Use parágrafos de no máximo 3 linhas. Use negrito (bold) em termos-chave para permitir a leitura dinâmica.
-                3. ESTRUTURA SEMÂNTICA: Use H2 para os tópicos principais e H3 para detalhamentos.
-                4. TONE OF VOICE: Empático, clínico, esperançoso e direto.
+                DIRETRIZES DE AUTORIDADE E UX (RELATÓRIO DE OTIMIZAÇÃO):
+                1. CONTEÚDO PILAR: Crie um guia profundo. Use listas (bullet points) extensivamente para quebrar blocos de texto.
+                2. CTA CONTEXTUAL: Insira um parágrafo curto no meio do texto convidando o leitor a tirar dúvidas via WhatsApp (https://biolink.website/leianeves_psicopedagoga) se identificar esses sinais no filho.
+                3. ESCANEABILIDADE: Parágrafos curtos (máx 3 linhas). Negrito em conceitos vitais.
+                4. IMAGENS E LEGENDAS: Para cada seção importante, sugira uma imagem e OBRIGATORIAMENTE forneça uma <figcaption> explicativa e acolhedora.
+                5. TOM: Empático e focado em SOLUÇÕES e ESPERANÇA.
 
                 ELEMENTOS OBRIGATÓRIOS NO HTML:
-                - INSIGHT CLÍNICO: Um box <div style="background:#f0f7ff; border-left:5px solid #0284c7; padding:20px; margin:30px 0; border-radius:0 12px 12px 0;"> com uma explicação neurocientífica do tema.
-                - GUIA PRÁTICO: Uma seção com <ul> de "O que fazer hoje em casa" com 3 a 5 passos claros.
-                - CITAÇÃO DE IMPACTO: Um <blockquote> elegante.
+                - INSIGHT CLÍNICO: Um box <div style="background:#f8fafc; border-left:5px solid #0284c7; padding:20px; margin:30px 0; border-radius:0 12px 12px 0;"> com a neurociência do tema.
+                - GUIA PRÁTICO (LISTA): Use <ul> com 5+ itens de ações práticas.
 
                 RETORNE APENAS JSON:
                 - title: "${selectedTitle}"
-                - content: Artigo em HTML (mínimo 800 palavras). Inclua os elementos de design acima.
+                - content: Artigo em HTML (mínimo 1000 palavras). Use muitas listas, o CTA de meio e legendas de imagem.
                 - excerpt: Gancho emocional de 2 frases.
-                - visual_description: Direção de arte para imagem 8k, estilo editorial clínico.
-                - meta_title: Título para SEO (máx 60 caracteres).
-                - meta_description: Descrição magnética para o Google (máx 155 caracteres) focada em dor e solução.
+                - visual_description: Direção de arte 8k (Estilo: Sucesso, Alegria, Conquista no aprendizado).
+                - meta_title: Título SEO.
+                - meta_description: Descrição magnética.
                 - category: "${nextCategory}"
             ` : `
                 (Mesma lógica de autoridade para geração de títulos inéditos se necessário...)

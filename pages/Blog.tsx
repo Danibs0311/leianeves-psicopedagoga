@@ -161,10 +161,6 @@ export const Blog: React.FC = () => {
           <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight">
             Léia Neves <span className="text-sky-600">Blog</span>
           </h1>
-          <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed mb-8">
-            Psicopedagoga Especializada em <span className="text-sky-600 font-bold">TEA e TDAH</span>. 
-            Apoio especializado e estratégias práticas para o desenvolvimento integral de crianças e adolescentes.
-          </p>
           <div className="flex flex-wrap justify-center gap-4">
             <button 
               onClick={() => setIsSchedulingModalOpen(true)}

@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShoppingBag, Star, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { products } from '../data/products';
 import { setDynamicSEO } from '../utils/seo';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
+import { SchedulingModal } from '../components/SchedulingModal';
 
 export const MaterialsStore: React.FC = () => {
+    const [isSchedulingModalOpen, setIsSchedulingModalOpen] = useState(false);
+
     React.useEffect(() => {
         window.scrollTo(0, 0);
         setDynamicSEO(
@@ -17,7 +20,7 @@ export const MaterialsStore: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-white flex flex-col font-sans">
-            <Navbar onOpenScheduling={() => {}} />
+            <Navbar onOpenScheduling={() => setIsSchedulingModalOpen(true)} />
 
             {/* Store Header - Minimalist Style */}
             <div className="border-b border-slate-100 py-8 bg-white">
@@ -113,6 +116,10 @@ export const MaterialsStore: React.FC = () => {
             </main>
 
             <Footer />
+            <SchedulingModal
+                isOpen={isSchedulingModalOpen}
+                onClose={() => setIsSchedulingModalOpen(false)}
+            />
         </div>
     );
 };

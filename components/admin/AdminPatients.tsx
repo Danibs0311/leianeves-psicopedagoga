@@ -21,6 +21,7 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
     const [patients, setPatients] = useState<Patient[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState<'active' | 'prospect' | 'all'>('active');
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
@@ -46,7 +47,6 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
 
     const fetchPatients = async () => {
         setLoading(true);
-        console.log('[Diagnostic] Fetching patients...');
         try {
             const { data, error } = await supabase
                 .from('patients')
@@ -54,11 +54,7 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
                 .order('child_name', { ascending: true });
 
             if (error) throw error;
-            
-            // Filter prospects out locally to avoid complex RLS/query issues with NULLs
-            const visiblePatients = (data || []).filter(p => !p.status || p.status !== 'prospect');
-            console.log(`[Diagnostic] Patients fetched: ${data?.length}, Visible: ${visiblePatients.length}`);
-            setPatients(visiblePatients);
+            setPatients(data || []);
         } catch (error) {
             console.error('Error fetching patients:', error);
             alert('Erro ao carregar lista de pacientes');
@@ -67,10 +63,16 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
         }
     };
 
-    const filteredPatients = patients.filter(p =>
-        p.child_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.parent_name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredPatients = patients.filter(p => {
+        const matchesSearch = p.child_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.parent_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (p.cpf && p.cpf.includes(searchTerm));
+        if (!matchesSearch) return false;
+        if (statusFilter === 'all') return true;
+        if (statusFilter === 'active') return !p.status || p.status === 'active';
+        if (statusFilter === 'prospect') return p.status === 'prospect';
+        return true;
+    });
 
     const handleDeletePatient = async (id: number, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -176,15 +178,38 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
                     <p className="text-slate-500">Gerencie os prontuários e documentos de seus pacientes.</p>
                 </div>
 
-                <div className="relative w-full md:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input
-                        type="text"
-                        placeholder="Buscar paciente..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-sky-500 text-sm"
-                    />
+                <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                    <div className="flex bg-slate-100 p-1 rounded-xl text-xs font-bold w-full sm:w-auto">
+                        <button
+                            onClick={() => setStatusFilter('active')}
+                            className={`px-3 py-1.5 rounded-lg transition-all flex-1 sm:flex-none ${statusFilter === 'active' ? 'bg-white text-sky-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            Ativos
+                        </button>
+                        <button
+                            onClick={() => setStatusFilter('prospect')}
+                            className={`px-3 py-1.5 rounded-lg transition-all flex-1 sm:flex-none ${statusFilter === 'prospect' ? 'bg-white text-amber-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            Prospectos / Leads
+                        </button>
+                        <button
+                            onClick={() => setStatusFilter('all')}
+                            className={`px-3 py-1.5 rounded-lg transition-all flex-1 sm:flex-none ${statusFilter === 'all' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            Todos
+                        </button>
+                    </div>
+
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <input
+                            type="text"
+                            placeholder="Buscar paciente..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-sky-500 text-sm bg-white"
+                        />
+                    </div>
                 </div>
             </header>
 
@@ -218,7 +243,14 @@ export const AdminPatients: React.FC<AdminPatientsProps> = ({ onSelectPatient })
                                                 <div className="w-10 h-10 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center font-bold text-sm">
                                                     {patient.child_name.charAt(0).toUpperCase()}
                                                 </div>
-                                                <span className="font-bold text-slate-800">{patient.child_name}</span>
+                                                <div>
+                                                    <span className="font-bold text-slate-800 block">{patient.child_name}</span>
+                                                    {patient.status === 'prospect' ? (
+                                                        <span className="inline-block text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Prospecto / Lead</span>
+                                                    ) : (
+                                                        <span className="inline-block text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Ativo</span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">

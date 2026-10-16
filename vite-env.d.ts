@@ -1,8 +1,18 @@
 /// <reference types="vite/client" />
 /// <reference types="react" />
 
+declare namespace React {
+    namespace JSX {
+        interface IntrinsicElements {
+            'behold-widget': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { 'feed-id': string }, HTMLElement>;
+            [elemName: string]: any;
+        }
+    }
+}
+
 declare namespace JSX {
     interface IntrinsicElements {
+        'behold-widget': any;
         [elemName: string]: any;
     }
 }

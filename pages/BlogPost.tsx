@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabase';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { Calendar, User, ChevronLeft, Share2, MessageCircle, Search, ChevronRight } from 'lucide-react';
-import profileImage from '../images/leia_psicoped.webp';
 import { SchedulingModal } from '../components/SchedulingModal';
 
 interface Post {
@@ -230,6 +229,13 @@ export const BlogPost: React.FC = () => {
           mb-20"
           dangerouslySetInnerHTML={{ 
             __html: post.content
+              .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+              .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+              .replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '')
+              .replace(/\son\w+\s*=\s*[^\s>]+/gi, '')
+              .replace(/href\s*=\s*["']\s*javascript:[^"']*["']/gi, 'href="#"')
+              .replace(/<figure[^>]*>\s*<img[^>]*example\.com[^>]*>.*?<\/figure>/gi, '')
+              .replace(/<img[^>]*example\.com[^>]*>/gi, '')
               .replace(/<a[^>]*>.*?Agendar\s+Conversa.*?<\/a>/gi, '')
               .replace(/<button[^>]*>.*?Agendar\s+Conversa.*?<\/button>/gi, '') 
           }}
@@ -282,38 +288,6 @@ export const BlogPost: React.FC = () => {
             )}
           </div>
         )}
-
-        {/* Bio Section - Otimizada com Foto */}
-        <section className="border-t border-slate-100 pt-12 mb-16">
-          <div className="flex flex-col md:flex-row items-center gap-8 bg-slate-50/50 p-8 rounded-3xl">
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl flex-shrink-0">
-              <img src={profileImage} alt="Léia Neves" className="w-full h-full object-cover" />
-            </div>
-            <div className="text-center md:text-left">
-              <h4 className="text-[10px] font-black text-sky-600 uppercase tracking-widest mb-2">Quem é a Profissional</h4>
-              <h3 className="text-xl font-black text-slate-900 mb-3">Léia Neves</h3>
-              <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                Psicopedagoga Clínica especialista em TEA e TDAH. Minha missão é transformar a jornada de aprendizagem de crianças e adolescentes, oferecendo suporte técnico e acolhimento para as famílias.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Bio Section - Otimizada com Foto Circular */}
-        <section className="border-t border-slate-100 pt-12 mb-16">
-          <div className="flex flex-col md:flex-row items-center gap-8 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-sky-50 shadow-xl flex-shrink-0">
-              <img src={profileImage} alt="Léia Neves" className="w-full h-full object-cover" />
-            </div>
-            <div className="text-center md:text-left">
-              <h4 className="text-[10px] font-black text-sky-600 uppercase tracking-widest mb-2">Quem é a Profissional</h4>
-              <h3 className="text-xl font-black text-slate-900 mb-3">Léia Neves</h3>
-              <p className="text-sm text-slate-600 leading-[1.7] font-medium">
-                Psicopedagoga Clínica especialista em TEA e TDAH. Minha missão é transformar a jornada de aprendizagem de crianças e adolescentes, oferecendo suporte técnico e acolhimento para as famílias através de intervenções baseadas em evidências.
-              </p>
-            </div>
-          </div>
-        </section>
 
         {/* Newsletter Section - Cores Diferenciadas (Relatório UX) */}
         <section className="bg-sky-50 rounded-3xl p-8 md:p-12 mb-20 text-center relative overflow-hidden border border-sky-100">

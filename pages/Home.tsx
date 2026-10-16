@@ -30,18 +30,24 @@ export const Home: React.FC = () => {
             "Trilhas terapêuticas focadas na autonomia de crianças com desenvolvimento atípico. Especialista em TEA e TDAH."
         );
         
-        // Add smooth scrolling to all anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const href = this.getAttribute('href');
-                if (href) {
-                    document.querySelector(href)?.scrollIntoView({
-                        behavior: 'smooth'
-                    });
+        // Add safe smooth scrolling to valid anchor links
+        const handleAnchorClick = function (this: HTMLAnchorElement, e: Event) {
+            const href = this.getAttribute('href');
+            if (href && href.startsWith('#') && href.length > 1) {
+                const targetElement = document.querySelector(href);
+                if (targetElement) {
+                    e.preventDefault();
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
                 }
-            });
-        });
+            }
+        };
+
+        const anchors = document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
+        anchors.forEach(anchor => anchor.addEventListener('click', handleAnchorClick));
+
+        return () => {
+            anchors.forEach(anchor => anchor.removeEventListener('click', handleAnchorClick));
+        };
     }, []);
 
     return (

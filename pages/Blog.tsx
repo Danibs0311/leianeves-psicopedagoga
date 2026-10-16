@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -56,9 +56,10 @@ export const Blog: React.FC = () => {
     }
   };
 
+  const [searchParams] = useSearchParams();
+
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const roadmapSlug = params.get('roadmap');
+    const roadmapSlug = searchParams.get('roadmap');
     if (roadmapSlug) {
       fetchRoadmapPosts(roadmapSlug);
     } else {
@@ -66,7 +67,7 @@ export const Blog: React.FC = () => {
       setActiveRoadmap(null);
       fetchPosts();
     }
-  }, [window.location.search]);
+  }, [searchParams]);
 
   const fetchRoadmapPosts = async (slug: string) => {
     setLoading(true);

@@ -25,7 +25,8 @@ export const ProductSalesPage: React.FC = () => {
         if (product?.checkoutUrl) {
             window.location.href = product.checkoutUrl;
         } else {
-            alert("Integração de pagamento pendente.");
+            const message = encodeURIComponent(`Olá Léia! Tenho interesse no material "${product?.title}". Como posso efetuar o pagamento e receber o acesso?`);
+            window.open(`https://wa.me/5575983507283?text=${message}`, '_blank');
         }
     };
 

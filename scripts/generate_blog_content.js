@@ -22,52 +22,58 @@ if (!supabaseUrl || !supabaseKey || !geminiApiKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 const genAI = new GoogleGenerativeAI(geminiApiKey);
 
-function getGitCmd() {
-    const localAppData = process.env.LOCALAPPDATA;
-    const githubDesktopPath = join(localAppData, 'GitHubDesktop');
-    const possiblePaths = ['git', join(githubDesktopPath, 'bin', 'github-git.exe'), 'C:\\Program Files\\Git\\bin\\git.exe'];
-    if (existsSync(githubDesktopPath)) {
-        try {
-            const apps = readdirSync(githubDesktopPath).filter(f => f.startsWith('app-'));
-            if (apps.length > 0) possiblePaths.push(join(githubDesktopPath, apps[apps.length - 1], 'resources', 'app', 'git', 'cmd', 'git.exe'));
-        } catch (e) { }
-    }
-    for (const p of possiblePaths) {
-        try {
-            execSync(`"${p}" --version`, { stdio: 'ignore' });
-            return `"${p}"`;
-        } catch (e) { }
-    }
-    return 'git';
-}
+// Catálogo curado de fotografias clínicas profissionais em alta resolução (sem marcas d'água)
+const categoryCoverImages = {
+    'Aprendizagem': [
+        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Métodos de Ensino': [
+        'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Desenvolvimento': [
+        'https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Emoções': [
+        'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Intervenções': [
+        'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1584697964190-7052993ab882?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Família & Escola': [
+        'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Tecnologia': [
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Inclusão': [
+        'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Pesquisas': [
+        'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Autocuidado': [
+        'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Motivação': [
+        'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?auto=format&fit=crop&w=1200&h=750&q=85'
+    ],
+    'Criatividade': [
+        'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&h=750&q=85'
+    ]
+};
 
-async function generateImage(title) {
-    const seed = Math.floor(Math.random() * 1000000);
-    console.log(`🎨 Gerando imagem ÚNICA (Seed: ${seed}) para: "${title}"`);
-
-    // Prompt ultra-específico para evitar generalização
-    const visualPrompt = `High-end clinical photography, realistic, child psychology, theme: ${title}, cinematic lighting, professional gear, 8k, highly detailed. No text.`;
-    const encodedPrompt = encodeURIComponent(visualPrompt);
-    const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1200&height=800&nologo=true&seed=${seed}&model=flux`;
-
-    try {
-        console.log('📡 Capturando imagem exclusiva da IA...');
-        const response = await fetch(pollinationsUrl);
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-
-        const fileName = `unique-post-${Date.now()}-${seed}.png`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('blog-images')
-            .upload(fileName, buffer, { contentType: 'image/png' });
-
-        if (uploadError) return pollinationsUrl;
-
-        const { data: urlData } = supabase.storage.from('blog-images').getPublicUrl(fileName);
-        return urlData.publicUrl;
-    } catch (e) {
-        return `https://images.unsplash.com/featured/?psychology,child,${title.split(' ')[0]}`;
-    }
+function getCuratedCoverImage(category, title) {
+    const list = categoryCoverImages[category] || categoryCoverImages['Aprendizagem'];
+    const charSum = (title || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    return list[charSum % list.length];
 }
 
 async function runEngine() {
@@ -123,13 +129,18 @@ async function runEngine() {
 
     console.log(`\n📅 TEMA DA SEMANA: [${nextCategory.toUpperCase()}]`);
 
-    const modelsToTry = ["gemini-2.0-flash-lite", "gemma-3-27b-it", "gemini-pro-latest"];
+    const modelsToTry = ["gemini-2.5-flash", "gemini-3.5-flash-lite", "gemini-3.8-flash"];
     let responseText = null;
 
     for (const modelName of modelsToTry) {
         try {
             console.log(`📡 Gerando conteúdo e descrição visual com: ${modelName}...`);
-            const currentModel = genAI.getGenerativeModel({ model: modelName });
+            const currentModel = genAI.getGenerativeModel({ 
+                model: modelName,
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            });
             
             const prompt = selectedTitle ? `
                 Atue como uma Psicopedagoga Clínica de renome internacional, autoridade em Neuropsicologia do Desenvolvimento, TEA e TDAH. 
@@ -142,7 +153,7 @@ async function runEngine() {
                 1. CONTEÚDO PILAR: Crie um guia profundo. Use listas (bullet points) extensivamente para quebrar blocos de texto.
                 2. CTA CONTEXTUAL: Insira um parágrafo curto no meio do texto convidando o leitor a tirar dúvidas via WhatsApp (https://biolink.website/leianeves_psicopedagoga) se identificar esses sinais no filho.
                 3. ESCANEABILIDADE: Parágrafos curtos (máx 3 linhas). Negrito em conceitos vitais.
-                4. IMAGENS E LEGENDAS: Para cada seção importante, sugira uma imagem e OBRIGATORIAMENTE forneça uma <figcaption> explicativa e acolhedora.
+                4. FOCO TEXTUAL: Não inclua tags <img> no HTML do artigo (a imagem oficial de capa já é criada e inserida automaticamente).
                 5. TOM: Empático e focado em SOLUÇÕES e ESPERANÇA.
 
                 ELEMENTOS OBRIGATÓRIOS NO HTML:
@@ -151,20 +162,39 @@ async function runEngine() {
 
                 RETORNE APENAS JSON:
                 - title: "${selectedTitle}"
-                - content: Artigo em HTML (mínimo 1000 palavras). Use muitas listas, o CTA de meio e legendas de imagem.
+                - content: Artigo em HTML (mínimo 1000 palavras). Use muitas listas e o CTA contextual de meio.
                 - excerpt: Gancho emocional de 2 frases.
                 - visual_description: Direção de arte 8k (Estilo: Sucesso, Alegria, Conquista no aprendizado).
                 - meta_title: Título SEO.
                 - meta_description: Descrição magnética.
                 - category: "${nextCategory}"
             ` : `
-                (Mesma lógica de autoridade para geração de títulos inéditos se necessário...)
+                Atue como uma Psicopedagoga Clínica de renome internacional, autoridade em Neuropsicologia do Desenvolvimento, TEA e TDAH. 
+                Seu objetivo é criar um tema inédito e escrever o ARTIGO DEFINITIVO para o blog da clínica Léia Neves.
+                
+                CATEGORIA: "${nextCategory}"
+
+                DIRETRIZES DE AUTORIDADE E UX:
+                1. Crie um Título Inédito, altamente magnético, empático e focado em pais de crianças com dificuldades escolares, TEA ou TDAH.
+                2. CONTEÚDO PILAR: Crie um guia profundo (mínimo 1000 palavras em HTML formatado com <h2>, <h3>, <p>, <ul>).
+                3. CTA CONTEXTUAL: Insira um parágrafo no meio convidando a entrar em contato via WhatsApp (https://biolink.website/leianeves_psicopedagoga).
+                4. INSIGHT CLÍNICO: Um box <div style="background:#f8fafc; border-left:5px solid #0284c7; padding:20px; margin:30px 0; border-radius:0 12px 12px 0;"> com a explicação neurocientífica.
+                5. ESCANEABILIDADE: Parágrafos curtos e objetivos.
+
+                RETORNE APENAS JSON:
+                - title: "Título Inédito Criado"
+                - content: Artigo em HTML.
+                - excerpt: Gancho emocional de 2 frases.
+                - visual_description: Direção de arte 8k sem texto.
+                - meta_title: Título SEO otimizado.
+                - meta_description: Descrição magnética.
+                - category: "${nextCategory}"
             `;
 
             const result = await currentModel.generateContent(prompt);
             responseText = result.response.text();
             if (responseText) break;
-        } catch (err) { console.warn(`⚠️ Modelo ${modelName} ocupado.`); }
+        } catch (err) { console.warn(`⚠️ Modelo ${modelName} falhou: ${err.message}`); }
     }
 
     if (!responseText) return console.error('❌ Falha na geração.');
@@ -172,9 +202,7 @@ async function runEngine() {
     try {
         const data = JSON.parse(responseText.replace(/```json|```/g, '').trim());
 
-        const seed = Math.floor(Math.random() * 999999);
-        const visualPrompt = encodeURIComponent(data.visual_description + ", professional clinical style, no text, 8k");
-        const imageUrl = `https://image.pollinations.ai/prompt/${visualPrompt}?width=1200&height=800&nologo=true&seed=${seed}&model=flux`;
+        const imageUrl = getCuratedCoverImage(data.category || nextCategory, data.title);
         const slug = data.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') + '-' + Date.now();
 
         const post = {
@@ -245,13 +273,6 @@ async function runEngine() {
             console.warn('⚠️ Erro ao associar ao roteiro:', rErr.message);
         }
 
-        try {
-            const gitCmd = getGitCmd();
-            execSync(`${gitCmd} add .`);
-            execSync(`${gitCmd} commit -m "Auto-publish: ${newPost.title}"`);
-            execSync(`${gitCmd} push`);
-            console.log('✅ Tudo sincronizado no GitHub.');
-        } catch (sErr) { }
     } catch (e) { console.error('❌ Erro final:', e.message); }
 }
 

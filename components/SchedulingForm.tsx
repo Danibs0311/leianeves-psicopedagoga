@@ -109,7 +109,7 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
         clearErrors,
         formState: { errors },
     } = useForm<SchedulingData>({
-        resolver: zodResolver(schedulingSchema),
+        resolver: zodResolver(schedulingSchema) as any,
         defaultValues: {
             parentName: '',
             childName: '',
@@ -162,20 +162,40 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
 
         setIsFetchingTimes(true);
         try {
+            // 1. Tentar via RPC seguro (get_booked_times) para anônimos sem vazar PII
+            const { data: rpcData, error: rpcError } = await supabase.rpc('get_booked_times', {
+                p_date: watchedDate
+            });
+
+            if (!rpcError && Array.isArray(rpcData)) {
+                const booked = rpcData.map((row: any) => {
+                    const timeStr = typeof row === 'string' ? row : (row.preferred_time || '');
+                    return timeStr.substring(0, 5);
+                }).filter(Boolean);
+
+                setBookedTimes(booked);
+                if (selectedTime && booked.includes(selectedTime)) {
+                    setValue('time', '', { shouldValidate: true });
+                }
+                return;
+            }
+
+            // Fallback para consulta direta caso o RPC ainda não tenha sido aplicado no Supabase
             const { data, error } = await supabase
                 .from('appointments')
                 .select('preferred_time, status')
                 .eq('preferred_date', watchedDate);
 
             if (error) {
-                console.error('Erro ao buscar horários:', error);
+                console.warn('Consulta direta de horários restrita por RLS:', error.message);
                 return;
             }
 
             // Filtrar cancelados/recusados
-            const booked = data
+            const booked = (data || [])
                 .filter(app => app.status !== 'cancelled' && app.status !== 'rejected')
-                .map(app => app.preferred_time.substring(0, 5));
+                .map(app => app.preferred_time?.substring(0, 5))
+                .filter(Boolean);
 
             setBookedTimes(booked);
 
@@ -238,38 +258,52 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({ onSuccess, onCan
             }
 
             // 2. Create Clinical Patient (Required to link Anamnesis & Appointments)
-            let patientId = null;
+            let patientId: number | null = null;
 
-            // Check if clinical patient exists by CPF
-            const { data: existingPatient, error: searchError } = await supabase
-                .from('patients')
-                .select('id')
-                .eq('cpf', cleanCpf)
-                .maybeSingle();
-
-            if (searchError && searchError.code !== 'PGRST116') {
-                throw searchError;
+            // Tentativa via RPC seguro get_or_create_prospect_patient
+            try {
+                const { data: rpcId, error: rpcErr } = await supabase.rpc('get_or_create_prospect_patient', {
+                    p_child_name: data.childName,
+                    p_parent_name: data.parentName,
+                    p_phone: data.phone,
+                    p_email: data.email,
+                    p_cpf: cleanCpf
+                });
+                if (!rpcErr && rpcId) {
+                    patientId = Number(rpcId);
+                }
+            } catch (rpcErr) {
+                console.warn('RPC get_or_create_prospect_patient fallback necessário:', rpcErr);
             }
 
-            if (existingPatient) {
-                patientId = existingPatient.id;
-            } else {
-                // Insert new patient as prospect (Will be updated when anamnesis finishes)
-                const { data: newPatient, error: insertPatientError } = await supabase
+            // Fallback direto caso a RPC ainda não esteja rodada
+            if (!patientId) {
+                const { data: existingPatient } = await supabase
                     .from('patients')
-                    .insert([{
-                        child_name: data.childName,
-                        parent_name: data.parentName,
-                        phone: data.phone,
-                        email: data.email,
-                        cpf: cleanCpf,
-                        status: 'prospect'
-                    }])
                     .select('id')
-                    .single();
+                    .eq('cpf', cleanCpf)
+                    .maybeSingle();
 
-                if (insertPatientError) throw insertPatientError;
-                if (newPatient) patientId = newPatient.id;
+                if (existingPatient) {
+                    patientId = existingPatient.id;
+                } else {
+                    const { data: newPatient, error: insertPatientError } = await supabase
+                        .from('patients')
+                        .insert([{
+                            child_name: data.childName,
+                            parent_name: data.parentName,
+                            phone: data.phone,
+                            email: data.email,
+                            cpf: cleanCpf,
+                            status: 'prospect'
+                        }])
+                        .select('id')
+                        .single();
+
+                    if (!insertPatientError && newPatient) {
+                        patientId = newPatient.id;
+                    }
+                }
             }
 
             // 3. Create Appointment Request

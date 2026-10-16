@@ -2,11 +2,17 @@
 import React, { useEffect } from 'react';
 import profileImage from '../images/rf7qvvtb.png';
 
-// Declare custom element to avoid TS errors
 declare global {
+  namespace React {
+    namespace JSX {
+      interface IntrinsicElements {
+        'behold-widget': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { 'feed-id': string }, HTMLElement>;
+      }
+    }
+  }
   namespace JSX {
     interface IntrinsicElements {
-      'behold-widget': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { 'feed-id': string }, HTMLElement>;
+      'behold-widget': any;
     }
   }
 }

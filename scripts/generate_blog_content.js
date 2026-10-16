@@ -166,7 +166,7 @@ async function runEngine() {
                 DIRETRIZES DE AUTORIDADE E UX (RELATÓRIO DE OTIMIZAÇÃO):
                 1. CONTEÚDO PILAR: Crie um guia profundo. Use listas (bullet points) extensivamente para quebrar blocos de texto.
                 2. CTA CONTEXTUAL: Insira um parágrafo curto no meio do texto convidando o leitor a tirar dúvidas via WhatsApp (https://biolink.website/leianeves_psicopedagoga) se identificar esses sinais no filho.
-                3. ESCANEABILIDADE: Parágrafos curtos (máx 3 linhas). Negrito em conceitos vitais.
+                3. ESCANEABILIDADE: Parágrafos curtos (máx 3 linhas). Para destacar conceitos importantes, use OBRIGATORIAMENTE a tag HTML <strong>palavra</strong>. NUNCA use asteriscos duplos (**) de sintaxe markdown.
                 4. FOCO TEXTUAL: Não inclua tags <img> no HTML do artigo (a imagem oficial de capa já é criada e inserida automaticamente).
                 5. TOM: Empático e focado em SOLUÇÕES e ESPERANÇA.
 
@@ -193,7 +193,7 @@ async function runEngine() {
                 2. CONTEÚDO PILAR: Crie um guia profundo (mínimo 1000 palavras em HTML formatado com <h2>, <h3>, <p>, <ul>).
                 3. CTA CONTEXTUAL: Insira um parágrafo no meio convidando a entrar em contato via WhatsApp (https://biolink.website/leianeves_psicopedagoga).
                 4. INSIGHT CLÍNICO: Um box <div style="background:#f8fafc; border-left:5px solid #0284c7; padding:20px; margin:30px 0; border-radius:0 12px 12px 0;"> com a explicação neurocientífica.
-                5. ESCANEABILIDADE: Parágrafos curtos e objetivos.
+                5. ESCANEABILIDADE: Parágrafos curtos e objetivos. Use OBRIGATORIAMENTE tags HTML <strong>texto</strong> para negrito, NUNCA asteriscos duplos (**).
 
                 RETORNE APENAS JSON:
                 - title: "Título Inédito Criado"
@@ -222,10 +222,15 @@ async function runEngine() {
         const imageUrl = getCuratedCoverImage(data.category || nextCategory, data.title);
         const slug = data.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') + '-' + Date.now();
 
+        // Higienizar e converter qualquer resíduo de markdown (**texto**) para HTML (<strong>texto</strong>)
+        const cleanContent = (data.content || '')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/__(.*?)__/g, '<strong>$1</strong>');
+
         const post = {
             title: data.title,
             slug,
-            content: data.content,
+            content: cleanContent,
             excerpt: data.excerpt,
             image_url: imageUrl,
             meta_title: data.meta_title,

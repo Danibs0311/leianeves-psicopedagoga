@@ -236,6 +236,8 @@ export const BlogPost: React.FC = () => {
               .replace(/href\s*=\s*["']\s*javascript:[^"']*["']/gi, 'href="#"')
               .replace(/<figure[^>]*>\s*<img[^>]*example\.com[^>]*>.*?<\/figure>/gi, '')
               .replace(/<img[^>]*example\.com[^>]*>/gi, '')
+              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+              .replace(/__(.*?)__/g, '<strong>$1</strong>')
               .replace(/<a[^>]*>.*?Agendar\s+Conversa.*?<\/a>/gi, '')
               .replace(/<button[^>]*>.*?Agendar\s+Conversa.*?<\/button>/gi, '') 
           }}

@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
 import { execSync } from 'child_process';
@@ -21,6 +21,19 @@ if (!supabaseUrl || !supabaseKey || !geminiApiKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 const genAI = new GoogleGenerativeAI(geminiApiKey);
+
+const blogPostSchema = {
+    type: SchemaType.OBJECT,
+    properties: {
+        title: { type: SchemaType.STRING, description: "Título do artigo" },
+        content: { type: SchemaType.STRING, description: "Artigo completo em HTML sem tags de imagem" },
+        excerpt: { type: SchemaType.STRING, description: "Resumo emocional curto de 2 frases" },
+        meta_title: { type: SchemaType.STRING, description: "Título SEO otimizado" },
+        meta_description: { type: SchemaType.STRING, description: "Meta description para buscadores" },
+        category: { type: SchemaType.STRING, description: "Categoria do artigo" }
+    },
+    required: ["title", "content", "excerpt", "meta_title", "meta_description", "category"]
+};
 
 // Catálogo curado de fotografias clínicas profissionais em alta resolução (sem marcas d'água)
 const categoryCoverImages = {
@@ -138,7 +151,8 @@ async function runEngine() {
             const currentModel = genAI.getGenerativeModel({ 
                 model: modelName,
                 generationConfig: {
-                    responseMimeType: "application/json"
+                    responseMimeType: "application/json",
+                    responseSchema: blogPostSchema
                 }
             });
             
@@ -194,7 +208,10 @@ async function runEngine() {
             const result = await currentModel.generateContent(prompt);
             responseText = result.response.text();
             if (responseText) break;
-        } catch (err) { console.warn(`⚠️ Modelo ${modelName} falhou: ${err.message}`); }
+        } catch (err) { 
+            console.warn(`⚠️ Modelo ${modelName} falhou: ${err.message}`); 
+            await new Promise(r => setTimeout(r, 2000));
+        }
     }
 
     if (!responseText) return console.error('❌ Falha na geração.');

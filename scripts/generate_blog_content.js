@@ -35,58 +35,141 @@ const blogPostSchema = {
     required: ["title", "content", "excerpt", "meta_title", "meta_description", "category"]
 };
 
-// Catálogo curado de fotografias clínicas profissionais em alta resolução (sem marcas d'água)
+// Catálogo curado e verificado de fotografias clínicas profissionais em alta resolução (sem marcas d'água)
 const categoryCoverImages = {
     'Aprendizagem': [
         'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&h=750&q=85',
         'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&h=750&q=85',
-        'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1471970471555-19d4b113e9ed?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Métodos de Ensino': [
         'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&h=750&q=85',
-        'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Desenvolvimento': [
         'https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1200&h=750&q=85',
-        'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1566004100631-35d015d6a491?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1500995617113-cf789362a3e1?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Emoções': [
         'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1200&h=750&q=85',
-        'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1476703993599-0035a21b17a9?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Intervenções': [
         'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=1200&h=750&q=85',
-        'https://images.unsplash.com/photo-1584697964190-7052993ab882?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1581056771107-24ca5f033842?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Família & Escola': [
         'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&w=1200&h=750&q=85',
-        'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1476234251651-f353703a034d?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Tecnologia': [
-        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Inclusão': [
         'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&h=750&q=85',
-        'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Pesquisas': [
-        'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Autocuidado': [
-        'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Motivação': [
-        'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?auto=format&fit=crop&w=1200&h=750&q=85'
     ],
     'Criatividade': [
-        'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&h=750&q=85'
+        'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=1200&h=750&q=85',
+        'https://images.unsplash.com/photo-1525909002-1b05e0c869d8?auto=format&fit=crop&w=1200&h=750&q=85'
     ]
 };
 
-function getCuratedCoverImage(category, title) {
-    const list = categoryCoverImages[category] || categoryCoverImages['Aprendizagem'];
-    const charSum = (title || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    return list[charSum % list.length];
+async function getUniqueCuratedCoverImage(supabaseClient, category, title) {
+    try {
+        // 1. Carregar todas as URLs de imagens atualmente cadastradas no banco
+        const { data: existingPosts, error } = await supabaseClient
+            .from('blog_posts')
+            .select('image_url');
+        
+        if (error) console.warn('⚠️ Aviso ao checar imagens existentes:', error.message);
+
+        // Extrai a base da URL (sem query params) para comparação estrita
+        const getBase = (url) => (url || '').split('?')[0].trim();
+        const usedUrls = new Set(
+            (existingPosts || [])
+                .map(p => getBase(p.image_url))
+                .filter(Boolean)
+        );
+
+        // 2. Tentar imagem não usada da categoria específica
+        const categoryList = categoryCoverImages[category] || categoryCoverImages['Aprendizagem'] || [];
+        const availableInCategory = categoryList.filter(url => !usedUrls.has(getBase(url)));
+
+        if (availableInCategory.length > 0) {
+            const charSum = (title || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            return availableInCategory[charSum % availableInCategory.length];
+        }
+
+        // 3. Se todas as imagens da categoria já foram usadas, busca imagem inédita em qualquer categoria
+        const allCatalogImages = Object.values(categoryCoverImages).flat();
+        const availableGlobal = allCatalogImages.filter(url => !usedUrls.has(getBase(url)));
+
+        if (availableGlobal.length > 0) {
+            const charSum = (title || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            return availableGlobal[charSum % availableGlobal.length];
+        }
+
+        // 4. Caso mais de 60 posts sejam gerados e todo o catálogo consumido:
+        // Seleciona do catálogo com timestamp exclusivo de diferenciação
+        const all = Object.values(categoryCoverImages).flat();
+        const charSum = (title || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+        return `${all[charSum % all.length]}&post_seed=${Date.now()}`;
+    } catch (err) {
+        console.error('Erro ao selecionar imagem única:', err);
+        const list = categoryCoverImages[category] || categoryCoverImages['Aprendizagem'];
+        return list[0];
+    }
 }
 
 async function runEngine() {
@@ -219,7 +302,7 @@ async function runEngine() {
     try {
         const data = JSON.parse(responseText.replace(/```json|```/g, '').trim());
 
-        const imageUrl = getCuratedCoverImage(data.category || nextCategory, data.title);
+        const imageUrl = await getUniqueCuratedCoverImage(supabase, data.category || nextCategory, data.title);
         const slug = data.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') + '-' + Date.now();
 
         // Higienizar e converter qualquer resíduo de markdown (**texto**) para HTML (<strong>texto</strong>)

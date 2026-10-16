@@ -16,17 +16,8 @@ interface BlogPost {
   created_at: string;
 }
 
-interface Roadmap {
-  id: string;
-  title: string;
-  slug: string;
-  description: string;
-  category: string;
-}
-
 export const Blog: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -39,22 +30,6 @@ export const Blog: React.FC = () => {
 
   const [roadmapPosts, setRoadmapPosts] = useState<string[]>([]);
   const [activeRoadmap, setActiveRoadmap] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchRoadmaps();
-  }, []);
-
-  const fetchRoadmaps = async () => {
-    try {
-      const { data } = await supabase
-        .from('blog_roadmaps')
-        .select('*')
-        .order('created_at', { ascending: true });
-      setRoadmaps(data || []);
-    } catch (e) {
-      console.error('Error fetching roadmaps:', e);
-    }
-  };
 
   const [searchParams] = useSearchParams();
 
@@ -152,13 +127,6 @@ export const Blog: React.FC = () => {
       
       {/* Header */}
       <section className="mb-20 text-center py-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-100 mb-6">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-            </span>
-            <span className="text-[10px] font-black text-sky-700 uppercase tracking-widest">Blog de Autoridade Clínica</span>
-          </div>
           <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight">
             Léia Neves <span className="text-sky-600">Blog</span>
           </h1>
@@ -169,12 +137,6 @@ export const Blog: React.FC = () => {
             >
               Agendar Avaliação
             </button>
-            <a 
-              href="#roadmaps"
-              className="px-8 py-4 bg-white text-slate-900 border-2 border-slate-100 rounded-2xl font-black text-sm uppercase tracking-widest hover:border-sky-200 transition-all"
-            >
-              Ver Trilhas de Aprendizado
-            </a>
           </div>
         </section>
 
@@ -217,39 +179,6 @@ export const Blog: React.FC = () => {
           )}
         </div>
 
-        {/* ROADMAPS SECTION - NEW */}
-        <section className="mb-12">
-          <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
-            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em]">Roteiros de Aprendizado</h3>
-            <span className="text-[9px] font-bold text-sky-500 uppercase tracking-widest bg-sky-50 px-3 py-1 rounded-full">Trilhas Guiadas</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {roadmaps.length > 0 ? roadmaps.map((roadmap) => (
-              <Link 
-                key={roadmap.slug}
-                to={`/blog?roadmap=${roadmap.slug}`}
-                className="group relative bg-white rounded-2xl p-6 border border-slate-100 hover:border-sky-300 hover:shadow-2xl hover:shadow-sky-100/30 transition-all duration-500 overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full -mr-16 -mt-16 group-hover:bg-sky-100 transition-colors duration-500 opacity-50"></div>
-                <div className="text-3xl mb-4 relative z-10">
-                  {roadmap.category === 'Aprendizagem' ? '🧠' : 
-                   roadmap.category === 'Emoções' ? '❤️' :
-                   roadmap.category === 'Desenvolvimento' ? '🌱' :
-                   roadmap.category === 'Inclusão' ? '🌈' : '📚'}
-                </div>
-                <h4 className="text-lg font-black text-slate-900 mb-2 relative z-10 group-hover:text-sky-600 transition-colors">{roadmap.title}</h4>
-                <p className="text-xs text-slate-500 font-medium leading-relaxed mb-4 relative z-10 line-clamp-2">{roadmap.description}</p>
-                <div className="flex items-center text-[10px] font-black text-sky-600 uppercase tracking-widest gap-2 relative z-10">
-                  Começar Trilha <ChevronRight size={12} strokeWidth={3} />
-                </div>
-              </Link>
-            )) : (
-              <div className="lg:col-span-3 py-10 text-center border border-dashed border-slate-200 rounded-2xl">
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Nenhuma trilha ativa ainda. O sistema irá gerar automaticamente na próxima segunda-feira!</p>
-              </div>
-            )}
-          </div>
-        </section>
 
         {/* Categories Grid - 4 Columns Always */}
         <section className="mb-10">

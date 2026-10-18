@@ -41,6 +41,15 @@ export const Admin: React.FC = () => {
         }
     }, [tab, user, navigate, authIsRecovering]);
 
+    // Registra o Service Worker do PWA estritamente dentro da área administrativa
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('/sw-admin.js', { scope: '/admin' })
+                .catch((err) => console.warn('[PWA-Admin] Erro ao registrar SW:', err));
+        }
+    }, []);
+
     const navigateTo = (view: 'dashboard' | 'patients' | 'settings' | 'blog', patientId: number | null = null) => {
         const urlChunk = viewToUrl[view];
         if (patientId) {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AdminSidebar } from './AdminSidebar';
+import { AdminInstallButton } from './AdminInstallButton';
 import { SchedulingModal } from '../SchedulingModal';
 import { useAuth } from '../../contexts/AuthContext';
 import { Menu, X } from 'lucide-react';
@@ -34,15 +35,18 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeView, 
             </div>
 
             {/* Mobile Header */}
-            <div className="md:hidden fixed top-0 w-full bg-slate-900 border-b border-slate-800 z-50 px-6 py-4 flex justify-between items-center shadow-lg print:hidden">
-                <span className="font-black text-white text-sm tracking-widest uppercase">Admin Panel</span>
-                <button
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="p-2 text-white hover:bg-slate-800 rounded-lg"
-                    aria-label="Abrir menu lateral"
-                >
-                    {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
+            <div className="md:hidden fixed top-0 w-full bg-slate-900 border-b border-slate-800 z-50 px-4 py-3 flex justify-between items-center shadow-lg print:hidden">
+                <span className="font-black text-white text-xs tracking-widest uppercase">Admin Panel</span>
+                <div className="flex items-center gap-2">
+                    <AdminInstallButton variant="header" />
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="p-2 text-white hover:bg-slate-800 rounded-lg"
+                        aria-label="Abrir menu lateral"
+                    >
+                        {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+                    </button>
+                </div>
             </div>
 
             {/* Mobile Sidebar Overlay */}

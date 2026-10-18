@@ -1,5 +1,6 @@
 import { LayoutDashboard, Users, Settings, LogOut, FileText, ExternalLink, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { AdminInstallButton } from './AdminInstallButton';
 
 interface AdminSidebarProps {
     activeView: 'dashboard' | 'patients' | 'settings' | 'blog';
@@ -67,6 +68,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-0.5">Admin</span>
                     <span className="block text-[11px] font-bold text-slate-300 truncate">{userEmail}</span>
                 </div>
+                <AdminInstallButton variant="sidebar" />
                 <Link
                     to="/"
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-slate-800 transition-all mb-1"

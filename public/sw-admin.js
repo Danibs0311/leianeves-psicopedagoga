@@ -1,11 +1,13 @@
 // Service Worker para o Painel Administrativo Léia Neves
-const CACHE_NAME = 'leia-admin-v1';
+const CACHE_NAME = 'leia-admin-v2';
 
 const STATIC_ASSETS = [
   '/admin',
   '/manifest-admin.json',
   '/icon-192.png',
   '/icon-512.png',
+  '/apple-touch-icon.png',
+  '/logo.png',
   '/favicon.png'
 ];
 
